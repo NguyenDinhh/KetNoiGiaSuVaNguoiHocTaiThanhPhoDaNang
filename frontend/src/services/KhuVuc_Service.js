@@ -1,0 +1,71 @@
+const DIA_CHI_API = 'http://localhost:8000';
+
+const KhuVuc_Service = {
+  layDanhSachKhuVuc: async () => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachkhuvuc`);
+      if (!phanHoi.ok) throw new Error("Lỗi kết nối API khu vực!");
+      const ketQua = await phanHoi.json();
+      return ketQua.data;
+    } catch (loi) {
+      console.error("Lỗi tại KhuVuc_Service.layDanhSachKhuVuc:", loi);
+      throw loi;
+    }
+  },
+
+  layThongKeKhuVuc: async () => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachkhuvuc`);
+      if (!phanHoi.ok) throw new Error("Lỗi kết nối API!");
+      const ketQua = await phanHoi.json();
+      return { tongSo: ketQua.data.length }; // Chỉ đếm tổng số
+    } catch (loi) {
+      throw loi;
+    }
+  },
+
+  themKhuVucMoi: async (duLieuForm) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/themkhuvuc`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(duLieuForm)
+      });
+      if (!phanHoi.ok) throw new Error("Không thể thêm khu vực mới!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại KhuVuc_Service.themKhuVucMoi:", loi);
+      throw loi;
+    }
+  },
+
+  capNhatKhuVuc: async (maKhuVuc, duLieuSua) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/suakhuvuc/${maKhuVuc}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(duLieuSua)
+      });
+      if (!phanHoi.ok) throw new Error("Không thể cập nhật thông tin khu vực!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại KhuVuc_Service.capNhatKhuVuc:", loi);
+      throw loi;
+    }
+  },
+
+  xoaKhuVuc: async (maKhuVuc) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/xoakhuvuc/${maKhuVuc}`, {
+        method: 'DELETE'
+      });
+      if (!phanHoi.ok) throw new Error("Không thể xóa khu vực!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại KhuVuc_Service.xoaKhuVuc:", loi);
+      throw loi;
+    }
+  }
+};
+
+export default KhuVuc_Service;

@@ -1,0 +1,370 @@
+/* ================= TRANG TÌM MÔN HỌC / LỚP HỌC ================= */
+.tmh-wrapper {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* --- Hero Section (Banner) --- */
+.tmh-hero {
+  background-image: linear-gradient(to right, rgba(0, 80, 136, 0.85), rgba(0, 80, 136, 0.2)), url('https://res.cloudinary.com/dg9s75xsf/image/upload/v1780471435/254e74a2-50cd-471c-be36-fa5c0cd7290e_dy938r.png');
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  padding: 60px 20px 80px 20px;
+  text-align: center;
+}
+
+.tmh-hero-title {
+  font-size: 36px;
+  margin: 0 0 16px 0;
+  font-weight: 800;
+}
+
+.tmh-hero-desc {
+  font-size: 16px;
+  color: #bae6fd;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* --- Bộ lọc tìm kiếm --- */
+.tmh-filter-section {
+  margin-top: -40px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.tmh-filter-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 1px solid #e2e8f0;
+}
+
+.tmh-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  align-items: end;
+}
+
+.tmh-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tmh-label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 14px;
+}
+
+.tmh-input, .tmh-select {
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tmh-input:focus, .tmh-select:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.tmh-input::placeholder {
+  color: #94a3b8;
+}
+
+.tmh-btn-search {
+  background-color: #f59e0b;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+  height: 47px; /* Cân bằng chiều cao với ô input */
+}
+
+.tmh-btn-search:hover {
+  background-color: #d97706;
+}
+
+/* --- Danh sách kết quả --- */
+.tmh-list-section {
+  max-width: 1100px;
+  margin: 50px auto 0;
+  padding: 0 20px;
+}
+
+.tmh-section-title {
+  color: #0f172a;
+  border-left: 5px solid #005088;
+  padding-left: 12px;
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.tmh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.tmh-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.tmh-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  border-color: #bae6fd;
+}
+
+.tmh-card-badge {
+  align-self: flex-start;
+  background-color: #e0f2fe;
+  color: #0284c7;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.tmh-card-title {
+  color: #0f172a;
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.tmh-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: #475569;
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.tmh-card-info p {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tmh-icon {
+  color: #005088;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.tmh-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.tmh-card-fee {
+  font-size: 18px;
+  font-weight: bold;
+  color: #dc2626;
+  margin: 0;
+}
+
+.tmh-btn-detail {
+  background-color: #005088;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tmh-btn-detail:hover {
+  background-color: #003d66;
+}
+
+/* ================= POPUP CHI TIẾT MÔN HỌC ================= */
+.ctmh-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.ctmh-container {
+  background: #ffffff;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh; /* Giới hạn chiều cao để cuộn bên trong */
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ctmh-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #f1f5f9;
+  border: none;
+  color: #64748b;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ctmh-close-btn:hover {
+  background: #e2e8f0;
+  color: #dc2626;
+}
+
+.ctmh-header { border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 24px; padding-right: 40px; }
+.ctmh-title { font-size: 26px; color: #0f172a; margin: 0 0 10px 0; }
+.ctmh-badge { display: inline-block; background-color: #e0f2fe; color: #0284c7; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; margin-bottom: 12px; }
+.ctmh-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+.ctmh-info-item { display: flex; align-items: flex-start; gap: 12px; color: #334155; font-size: 15px; }
+.ctmh-info-icon { color: #0ea5e9; font-size: 22px; }
+.ctmh-fee-highlight { font-size: 18px; font-weight: bold; color: #dc2626; margin-top: 4px; }
+.ctmh-schedule-section { background-color: #f8fafc; border-radius: 10px; padding: 20px; margin-top: 20px; border: 1px solid #e2e8f0; }
+.ctmh-schedule-title { font-size: 18px; color: #1e293b; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; }
+.ctmh-slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+.ctmh-slot-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; text-align: center; }
+.ctmh-slot-day { font-weight: bold; color: #0f172a; font-size: 15px; margin-bottom: 8px; text-transform: capitalize; }
+.ctmh-slot-time { color: #0284c7; font-weight: 600; font-size: 14px; background: #f0f9ff; padding: 6px; border-radius: 6px; display: inline-block; }
+.ctmh-btn-register { width: 100%; background-color: #f59e0b; color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 30px; transition: background-color 0.2s; }
+.ctmh-btn-register:hover { background-color: #d97706; }
+
+/* ================= BIỂU MẪU ĐĂNG KÝ MÔN HỌC KHUNG GIỜ ================= */
+.dkmh-form-container {
+  margin-top: 24px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.dkmh-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.dkmh-input-group {
+  margin-bottom: 16px;
+}
+
+.dkmh-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.dkmh-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.dkmh-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+
+.dkmh-checkbox-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.dkmh-checkbox-card:hover {
+  border-color: #0284c7;
+}
+
+.dkmh-checkbox-card.selected {
+  border-color: #0284c7;
+  background: #f0f9ff;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.05);
+}
+
+.dkmh-summary-box {
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 12px;
+  color: #0369a1;
+}
+
+.dkmh-total-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0284c7;
+  margin-top: 2px;
+}

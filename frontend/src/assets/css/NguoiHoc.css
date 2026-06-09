@@ -1,0 +1,862 @@
+/* ================= HỆ THỐNG LAYOUT NGƯỜI HỌC ================= */
+.nh-container {
+  display: flex;
+  min-height: calc(100vh - 80px);
+  width: 100%;
+  background-color: #f8fafc;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================= SIDEBAR (MENU TRÁI) ================= */
+.nh-sidebar {
+  width: 260px;
+  background-color: #005088; /* Màu xanh chủ đạo */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.nh-sidebar .sidebar-brand {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.nh-sidebar .sidebar-brand h1 {
+  font-size: 20px;
+  margin: 0 0 4px 0;
+  color: #fff;
+}
+
+.nh-sidebar .sidebar-brand p {
+  font-size: 13px;
+  color: #bae6fd;
+  margin: 0;
+}
+
+.nh-sidebar .sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 0;
+}
+
+.nh-sidebar .sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nh-sidebar .sidebar-item a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  color: #e0f2fe;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nh-sidebar .sidebar-item a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.nh-sidebar .sidebar-item.active a {
+  background-color: #0284c7;
+  color: #fff;
+  border-left: 4px solid #38bdf8;
+}
+
+.nh-sidebar .sidebar-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-nh-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btn-nh-logout:hover {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+/* ================= KHU VỰC NỘI DUNG CHÍNH (PHẢI) ================= */
+.nh-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ================= TOPBAR (HEADER) ================= */
+.nh-topbar {
+  height: 70px;
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.nh-topbar .topbar-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f1f5f9;
+  padding: 8px 16px;
+  border-radius: 20px;
+  width: 300px;
+}
+
+.nh-topbar .topbar-search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  color: #334155;
+}
+
+.nh-topbar .topbar-search-box .material-symbols-outlined {
+  color: #64748b;
+  font-size: 20px;
+}
+
+.nh-topbar .topbar-right-zone {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nh-topbar .icon-badge-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  position: relative;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nh-topbar .icon-badge-btn:hover {
+  color: #005088;
+}
+
+.nh-topbar .notification-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444;
+  border-radius: 50%;
+}
+
+.nh-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+
+.nh-avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #005088;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* ================= CANVAS (KHU VỰC ĐỔ DỮ LIỆU) ================= */
+.nh-canvas {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 30px;
+}
+
+.nh-breadcrumbs {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.nh-breadcrumbs a {
+  color: #0284c7;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nh-breadcrumbs .current-page {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.nh-content-area {
+  min-height: calc(100vh - 160px);
+}
+
+/* ================= TRANG CÁ NHÂN NGƯỜI HỌC ================= */
+.nh-profile-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.nh-profile-header {
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.nh-profile-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.nh-profile-subtitle {
+  margin: 8px 0 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.nh-profile-body {
+  padding: 30px;
+}
+
+.nh-profile-form {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* --- Cột Avatar --- */
+.nh-avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+}
+
+.nh-avatar-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.nh-avatar-large {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f1f5f9;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.nh-avatar-placeholder-large {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: #0284c7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  border: 4px solid #f1f5f9;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-nh-outline {
+  padding: 8px 16px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #0f172a;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.btn-nh-outline:hover {
+  background-color: #e2e8f0;
+}
+
+.nh-avatar-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* --- Cột Form Nhập Liệu --- */
+.nh-form-col {
+  flex: 1;
+  min-width: 300px;
+}
+
+.nh-form-group {
+  margin-bottom: 20px;
+}
+
+.nh-form-group.last {
+  margin-bottom: 30px;
+}
+
+.nh-form-label {
+  display: block;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.nh-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  font-size: 15px;
+  transition: border-color 0.2s;
+}
+
+.nh-input:focus {
+  border-color: #0284c7;
+}
+
+.nh-input:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.btn-nh-submit {
+  padding: 12px 24px;
+  background-color: #0284c7;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.btn-nh-submit:hover:not(:disabled) {
+  background-color: #0369a1;
+}
+
+.btn-nh-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* ================= QUẢN LÝ HỌC VIÊN BỞI NGƯỜI HỌC ================= */
+.nh-hv-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  padding: 24px;
+}
+
+.nh-hv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.nh-hv-title-group h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.nh-hv-title-group p {
+  margin: 6px 0 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.nh-hv-limit-warning {
+  background-color: #fffbeb;
+  border-left: 4px solid #d97706;
+  color: #b45309;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* --- Bảng hiển thị danh sách --- */
+.nh-hv-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.nh-hv-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 15px;
+}
+
+.nh-hv-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  padding: 14px;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.nh-hv-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+  vertical-align: top;
+}
+
+.nh-hv-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.nh-badge-hocluc {
+  background-color: #f0fdf4;
+  color: #166534;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nh-hv-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-hv-action-edit {
+  background: none;
+  border: none;
+  color: #0284c7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.btn-hv-action-edit:hover {
+  color: #0369a1;
+}
+
+.btn-hv-action-lock {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.btn-hv-action-lock:hover {
+  color: #991b1b;
+}
+
+/* --- Hộp thoại Modal biểu mẫu --- */
+.nh-hv-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.nh-hv-modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.nh-hv-modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nh-hv-modal-header h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.nh-hv-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.nh-hv-modal-close:hover {
+  color: #64748b;
+}
+
+.nh-hv-modal-body {
+  padding: 24px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.nh-hv-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #f8fafc;
+}
+
+.ql-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ql-title {
+  font-size: 24px;
+  color: #1e293b;
+  margin-bottom: 24px;
+  border-left: 4px solid #3b82f6;
+  padding-left: 12px;
+}
+
+.ql-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ql-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.ql-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.ql-monhoc {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.ql-status {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ql-status.open { background-color: #ecfdf5; color: #10b981; }
+.ql-status.closed { background-color: #f1f5f9; color: #64748b; }
+
+.ql-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #475569;
+}
+
+/* Khu vực danh sách Gia sư ứng tuyển */
+.ql-applicants-area {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.ql-applicant-card {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ql-applicant-card:last-child { margin-bottom: 0; }
+
+.ql-tutor-info {
+  font-size: 14px;
+  color: #334155;
+}
+.ql-tutor-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 4px;
+}
+
+/* Nút bấm */
+.ql-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.ql-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.2s;
+}
+.ql-btn:hover { opacity: 0.9; }
+
+.ql-btn.edit { background-color: #f59e0b; color: white; }
+.ql-btn.delete { background-color: #ef4444; color: white; }
+.ql-btn.approve { background-color: #10b981; color: white; }
+.ql-btn.reject { background-color: #ef4444; color: white; }
+.ql-btn.contact { background-color: #3b82f6; color: white; }
+
+/* ====================================================================
+   TABS ĐIỀU HƯỚNG BÊN TRONG QUẢN LÝ YÊU CẦU
+==================================================================== */
+.ql-main-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.ql-main-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ql-main-tab-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.ql-main-tab-btn.active {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+/* ====================================================================
+   GIAO DIỆN FORM 3 BƯỚC TẠO YÊU CẦU (YeuCauTimGiaSu)
+==================================================================== */
+.yctg-container {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.yctg-header {
+  background-color: #f8fafc;
+  padding: 24px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.yctg-title { margin: 0; font-size: 22px; color: #0f172a; }
+.yctg-subtitle { margin: 8px 0 0 0; font-size: 14px; color: #64748b; }
+
+/* Thanh Tiến Trình (Stepper) */
+.yctg-stepper {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 40px;
+  border-bottom: 1px dashed #e2e8f0;
+  position: relative;
+}
+
+.yctg-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.yctg-step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+.yctg-step.active .yctg-step-circle { background-color: #0284c7; }
+.yctg-step.completed .yctg-step-circle { background-color: #10b981; }
+
+.yctg-step-label {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.yctg-step.active .yctg-step-label { color: #0284c7; }
+.yctg-step.completed .yctg-step-label { color: #10b981; }
+
+/* Đường nối */
+.yctg-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background-color: #e2e8f0;
+  z-index: -1;
+}
+.yctg-step.completed:not(:last-child)::after { background-color: #10b981; }
+
+/* Form Content */
+.yctg-form-content { padding: 30px 40px; }
+.yctg-form-group { margin-bottom: 20px; }
+.yctg-form-label { display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 14px; }
+.yctg-form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14.5px;
+  outline: none;
+  background-color: #fff;
+  transition: 0.2s;
+}
+.yctg-form-control:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+textarea.yctg-form-control { min-height: 100px; resize: vertical; }
+
+.yctg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* Khung giờ */
+.yctg-timeslot-box {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+.yctg-btn-remove {
+  background: #fee2e2; color: #ef4444; border: none; border-radius: 6px;
+  height: 42px; width: 42px; cursor: pointer;
+}
+.yctg-btn-add {
+  background: #e0f2fe; color: #0284c7; border: 1px dashed #7dd3fc;
+  width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
+}
+
+/* Thẻ Học viên */
+.yctg-student-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.yctg-student-card {
+  border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; cursor: pointer;
+  display: flex; align-items: flex-start; gap: 12px; transition: 0.2s;
+}
+.yctg-student-card:hover { border-color: #bae6fd; background: #f0f9ff; }
+.yctg-student-card.selected { border-color: #0284c7; background: #f0f9ff; }
+.yctg-student-checkbox { width: 20px; height: 20px; accent-color: #0284c7; margin-top: 2px; }
+
+/* Footer Buttons */
+.yctg-footer {
+  display: flex; justify-content: space-between; padding: 20px 40px; background: #f8fafc; border-top: 1px solid #e2e8f0;
+}
+.yctg-btn {
+  padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14.5px;
+  cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
+}
+.yctg-btn-prev { background: #e2e8f0; color: #475569; }
+.yctg-btn-next { background: #0284c7; color: #fff; margin-left: auto; }
+.yctg-btn-submit { background: #10b981; color: #fff; margin-left: auto; }
+
+@media (max-width: 600px) {
+  .yctg-row, .yctg-student-grid { grid-template-columns: 1fr; }
+  .yctg-form-content, .yctg-footer { padding: 20px; }
+  .yctg-timeslot-box { flex-direction: column; align-items: stretch; }
+  .yctg-btn-remove { width: 100%; }
+}

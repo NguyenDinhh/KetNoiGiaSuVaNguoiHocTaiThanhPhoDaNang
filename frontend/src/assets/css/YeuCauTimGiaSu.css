@@ -1,0 +1,240 @@
+/* ====================================================================
+   BẢNG TIN TÌM GIA SƯ (PUBLIC - BaiDangTimGiaSu.jsx)
+==================================================================== */
+
+.pb-wrapper {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* Hero Banner */
+.pb-hero {
+  background-image: linear-gradient(to right, rgba(0, 80, 136, 0.85), rgba(0, 80, 136, 0.2)), url('https://res.cloudinary.com/dg9s75xsf/image/upload/v1780471526/28c911a9-2fb1-4f6b-9b89-90da52a8c87e_k6bbgw.png');
+  background-size: cover;
+  background-position: center;
+  padding: 60px 20px 100px 20px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.pb-hero-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+}
+
+.pb-hero-desc {
+  font-size: 16px;
+  color: #e0f2fe;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Floating Filter Bar */
+.pb-filter-container {
+  max-width: 1000px;
+  margin: -50px auto 40px auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.pb-filter-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.pb-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.pb-filter-item label {
+  display: block;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.pb-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.pb-select:focus {
+  border-color: #0284c7;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+/* Lưới Thẻ Bài Đăng */
+.pb-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.pb-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  color: #475569;
+}
+
+.pb-list-header h2 {
+  color: #0f172a;
+  font-size: 24px;
+  margin: 0;
+}
+
+.pb-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* Thẻ Lớp Học */
+.pb-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pb-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+  border-color: #bae6fd;
+}
+
+.pb-card-header {
+  background-color: #f0f9ff;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.pb-icon-circle {
+  width: 56px;
+  height: 56px;
+  background-color: #e0f2fe;
+  color: #0284c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pb-icon-circle .material-symbols-outlined { font-size: 32px; }
+
+.pb-card-title {
+  margin: 0 0 4px 0;
+  color: #1e3a8a;
+  font-size: 18px;
+}
+
+.pb-card-location {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pb-card-body {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pb-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  color: #334155;
+}
+
+.pb-info-row .material-symbols-outlined {
+  color: #94a3b8;
+  font-size: 20px;
+}
+
+.pb-students-box {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+  margin-top: 8px;
+}
+
+.pb-students-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.pb-student-item {
+  font-size: 13.5px;
+  color: #1e293b;
+  padding: 2px 0;
+}
+
+.pb-card-footer {
+  padding: 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.pb-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pb-price-label { color: #64748b; font-size: 14px; }
+.pb-price-value { color: #ef4444; font-size: 18px; font-weight: 800; }
+
+.pb-btn-apply {
+  width: 100%;
+  padding: 12px;
+  background-color: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.pb-btn-apply:hover { background-color: #0369a1; }

@@ -1,0 +1,626 @@
+/* ================= TỔNG QUAN ================= */
+.tgs-wrapper {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f9ff;
+  color: #111c2d;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+.tgs-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.tgs-text-center {
+  text-align: center;
+}
+
+/* ================= HERO SECTION ================= */
+.tgs-hero {
+  background-image: linear-gradient(to right, rgba(0, 80, 136, 0.85), rgba(0, 80, 136, 0.2)), url('https://res.cloudinary.com/dg9s75xsf/image/upload/v1780471335/ec732559-325a-4c42-9f99-37e109a5c5a1_v1vuh9.png');
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  padding: 64px 0 100px 0; /* Padding dưới to để chừa chỗ cho thanh tìm kiếm nổi */
+}
+
+.tgs-hero-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.tgs-hero-desc {
+  font-size: 18px;
+  opacity: 0.9;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ================= BỘ LỌC (FILTER) ================= */
+.tgs-filter-section {
+  margin-top: -50px; /* Kéo hộp tìm kiếm trồi lên trên nền xanh */
+  position: relative;
+  z-index: 10;
+}
+
+.tgs-filter-card {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.tgs-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); /* Mobile 1 cột */
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .tgs-filter-grid {
+    grid-template-columns: repeat(5, 1fr); /* Desktop 5 cột */
+  }
+}
+
+.tgs-filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tgs-flex-end {
+  justify-content: flex-end;
+}
+
+.tgs-filter-item label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.tgs-input-wrapper {
+  position: relative;
+}
+
+.tgs-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  appearance: none; /* Ẩn mũi tên mặc định của select */
+  transition: all 0.2s;
+}
+
+.tgs-input:focus {
+  border-color: #005088;
+  box-shadow: 0 0 0 2px rgba(0, 80, 136, 0.2);
+}
+
+.tgs-icon-select {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.tgs-btn-search {
+  width: 100%;
+  height: 44px;
+  background-color: #005088;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.tgs-btn-search:hover {
+  background-color: #003d6a;
+}
+
+/* ================= DANH SÁCH GIA SƯ ================= */
+.tgs-list-section {
+  padding: 48px 0;
+}
+
+.tgs-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.tgs-list-header h2 {
+  font-size: 24px;
+  color: #005088;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tgs-list-header span {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Lưới hiển thị Card */
+.tgs-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .tgs-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .tgs-cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Thẻ Gia Sư */
+.tgs-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.tgs-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 80, 136, 0.15);
+  border-color: #005088;
+}
+
+.tgs-card-cover {
+  position: relative;
+  height: 192px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+.tgs-card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.tgs-card:hover .tgs-card-cover img {
+  transform: scale(1.05);
+}
+
+.tgs-badge-verified {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: #e6fcf5;
+  color: #007057;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tgs-badge-verified span {
+  font-size: 16px;
+}
+
+.tgs-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.tgs-tutor-info h3 {
+  font-size: 18px;
+  color: #005088;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.tgs-tutor-info p {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tgs-tutor-info p span {
+  font-size: 18px;
+}
+
+.tgs-card-desc {
+  margin: 16px 0;
+  font-size: 14px;
+  color: #64748b;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.tgs-card-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tgs-price-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tgs-price-label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.tgs-price-value {
+  font-size: 15px;
+  color: #006b54;
+  font-weight: 700;
+}
+
+.tgs-btn-detail {
+  padding: 8px 16px;
+  background-color: #005088;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.tgs-btn-detail:hover {
+  opacity: 0.9;
+}
+
+/* ================= TRẠNG THÁI LOADING/LỖI ================= */
+.tgs-state-msg {
+  text-align: center;
+  padding: 80px 0;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.tgs-state-msg.tgs-error {
+  color: #ef4444;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 40px;
+}
+
+.tgs-icon-large {
+  font-size: 40px;
+  color: #005088;
+  margin-bottom: 16px;
+}
+
+.tgs-spin {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* ================= TÌM KIẾM GIA SƯ THEO TÊN ================= */
+.tgs-filter-card-custom {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.tgs-filter-label {
+  font-weight: bold;
+  color: #005088;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.tgs-filter-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.tgs-search-input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+}
+
+.tgs-search-input:focus {
+  border-color: #005088;
+}
+
+.tgs-btn-search-custom {
+  padding: 0 24px;
+  border-radius: 8px;
+  white-space: nowrap;
+  background-color: #005088;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+}
+
+.tgs-btn-search-custom:hover {
+  background-color: #003d66;
+}
+
+/* ================= CARD HIỂN THỊ GIA SƯ ================= */
+.tgs-card-avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tgs-card-avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-bottom: -20px; /* Hiệu ứng lún xuống card body */
+  z-index: 2;
+  position: relative;
+  background-color: #fff;
+}
+
+.tgs-card-body-custom {
+  padding-top: 30px;
+}
+
+.tgs-card-top-custom {
+  text-align: center;
+}
+
+.tgs-tutor-name {
+  font-size: 18px;
+  margin: 0 0 4px 0;
+  color: #0f172a;
+}
+
+.tgs-tutor-subinfo {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.tgs-tutor-subinfo-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.tgs-card-desc-custom {
+  text-align: center;
+  margin: 16px 0;
+  font-size: 14px;
+  color: #475569;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tgs-card-footer-custom {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tgs-price-label-custom {
+  display: block;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.tgs-price-value-custom {
+  font-weight: bold;
+  color: #005088;
+}
+
+.tgs-btn-detail-custom {
+  padding: 8px 16px;
+  background-color: #005088;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tgs-btn-detail-custom:hover {
+  background-color: #003d66;
+}
+
+/* ================= MODAL CHI TIẾT GIA SƯ ================= */
+.tgs-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.6); /* Nền tối mờ */
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+
+.tgs-modal-content {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tgs-modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: #f1f5f9;
+  border: none;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.tgs-modal-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.tgs-modal-header {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.tgs-modal-avatar {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.tgs-modal-info h2 {
+  margin: 0 0 12px 0;
+  color: #0f172a;
+  font-size: 28px;
+}
+
+.tgs-modal-tags {
+  display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+}
+
+.tgs-modal-tag {
+  background: #f1f5f9;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #334155;
+  font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.tgs-modal-body {
+  padding: 32px;
+}
+
+.tgs-modal-section-title {
+  font-size: 18px;
+  color: #0f172a;
+  margin-bottom: 16px;
+  border-left: 4px solid #005088;
+  padding-left: 12px;
+  font-weight: 700;
+}
+
+.tgs-modal-desc {
+  color: #475569;
+  line-height: 1.7;
+  font-size: 15px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+
+/* Lưới hiển thị các lớp đang mở */
+.tgs-class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.tgs-class-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 16px;
+  background: #ffffff;
+  transition: transform 0.2s;
+}
+
+.tgs-class-card:hover {
+  border-color: #005088;
+  transform: translateY(-2px);
+}
+
+.tgs-class-name {
+  font-weight: 700;
+  color: #005088;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.tgs-class-detail {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,0 +1,311 @@
+/* ==========================================================================
+   FILE: src/assets/css/RegisterModal.css
+   MÔ TẢ: CSS chay hoàn chỉnh cho Cửa sổ Đăng ký (Register Modal)
+   ========================================================================== */
+
+/* 1. LỚP PHỦ NỀN MỜ (OVERLAY) - Khóa cứng đè lên trang Home */
+.register-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.45); /* Làm tối nền trang chủ phía sau */
+  backdrop-filter: blur(5px);           /* Làm mờ nhẹ trang chủ để làm nổi bật form */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;                        /* Số to tuyệt đối để đè lên mọi thứ (Header, Banner...) */
+  padding: 20px;
+}
+
+/* 2. KHUNG CARD ĐĂNG KÝ CHÍNH */
+.register-card {
+  width: 100%;
+  max-width: 600px;                     /* Thu hẹp nhẹ để form nhìn gọn gàng, ôm dáng */
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 36px 40px;
+  box-shadow: 0 16px 48px rgba(0, 63, 135, 0.1);
+  z-index: 10000;
+}
+
+/* Điểm neo để định vị nút X và tạo hiệu ứng bung ra */
+.relative-card {
+  position: relative;
+  animation: scaleUpModal 0.25s ease-out; /* Hiệu ứng nhẹ lúc kích mở */
+}
+
+@keyframes scaleUpModal {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* NÚT BẤM HỦY (X) Ở GÓC PHẢI CARD */
+.btn-close-modal {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.btn-close-modal:hover {
+  color: #ef4444; /* Di chuột vào đổi sang màu đỏ cảnh báo */
+}
+
+/* 3. TIÊU ĐỀ KHỐI ĐẦU */
+.register-card-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.register-card-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #003f87; /* Màu xanh biển đậm thương hiệu */
+  margin-bottom: 6px;
+}
+
+.register-card-header p {
+  font-size: 13.5px;
+  color: #424752;
+}
+
+.register-main-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 4. VÒNG TRÒN UPLOAD ẢNH ĐẠI DIỆN */
+.avatar-upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.avatar-picker-circle {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 2px dashed #c2c6d4;
+  background-color: #f0eded;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.avatar-image-inside {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-placeholder-inside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #424752;
+}
+
+.avatar-placeholder-inside span {
+  font-size: 30px;
+  margin-bottom: 2px;
+}
+
+.avatar-placeholder-text {
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.hidden-file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Icon cây bút edit nhỏ ở góc đít avatar */
+.avatar-edit-pencil-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #003f87;
+  color: #ffffff;
+  padding: 5px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-edit-pencil-badge span {
+  font-size: 14px;
+}
+
+/* 5. KHỐI CHỌN VAI TRÒ (HỌC VIÊN / GIA SƯ) */
+.role-selector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.btn-role-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #c2c6d4;
+  background-color: transparent;
+  cursor: pointer;
+  color: #424752;
+  transition: all 0.2s ease;
+}
+
+.btn-role-text {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* Trạng thái chưa chọn */
+.role-inactive:hover {
+  border-color: #003f87;
+  color: #003f87;
+}
+
+/* Trạng thái khi KÍCH CHỌN HỌC VIÊN (Lên màu xanh dương) */
+.role-active-blue {
+  border-color: #003f87;
+  background-color: #d7e2ff;
+  color: #003f87;
+  font-weight: 700;
+}
+
+/* Trạng thái khi KÍCH CHỌN GIA SƯ (Lên màu xanh lá thương hiệu) */
+.role-active-green {
+  border-color: #006e25;
+  background-color: #83fc8e;
+  color: #006e25;
+  font-weight: 700;
+}
+
+/* 6. HỆ THỐNG Ô CĂN NHẬP LIỆU (INPUT FIELDS) */
+.input-row-flex-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 768px) {
+  .input-row-flex-grid {
+    grid-template-columns: 1fr 1fr; /* Chia đôi họ tên và sđt nằm hàng ngang */
+  }
+}
+
+.form-input-item-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-input-item-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1b1c1c;
+  padding-left: 2px;
+}
+
+.form-input-item-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #c2c6d4;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13.5px;
+  background-color: #ffffff;
+  color: #1b1c1c;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input-item-group input:focus {
+  border-color: #003f87;
+  box-shadow: 0 0 0 3px rgba(0, 63, 135, 0.12);
+}
+
+/* Ô nhập password đặc thù có nút con mắt */
+.password-input-inner-box {
+  position: relative;
+  width: 100%;
+}
+
+.btn-toggle-password-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #424752;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.btn-toggle-password-eye span {
+  font-size: 20px;
+}
+
+/* 7. NÚT KÍCH GỬI ĐĂNG KÝ CHÍNH ĐÁY TRANG */
+.submit-action-btn-zone {
+  padding-top: 8px;
+}
+
+.btn-register-submit-trigger {
+  width: 100%;
+  background-color: #003f87;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 63, 135, 0.15);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-register-submit-trigger:hover {
+  background-color: #0056b3;
+}
+
+.btn-register-submit-trigger:active {
+  transform: scale(0.99); /* Hiệu ứng lún nút khi nhấn chuột xuống */
+}
