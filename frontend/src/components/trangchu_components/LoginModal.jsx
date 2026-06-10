@@ -63,7 +63,7 @@ const LoginModal = ({ onClose }) => {
 
         <header className="login-header">
           <h2>Đăng nhập</h2>
-          <p>Chào mừng bạn trở lại Gia Sư Đà Nẵng P2P</p>
+          <p>Chào mừng bạn trở lại kết nối gia sư và người học</p>
         </header>
 
         <form onSubmit={handleLoginSubmit} className="login-form">
