@@ -880,9 +880,8 @@
 
 /* Container chính của trang */
 .baidang-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 16px 24px;
+  width: 100%;
 }
 
 .baidang-title {

@@ -187,64 +187,191 @@ body {
 }
 /* --- 6. FOOTER STYLE --- */
 .footer-container {
-  margin-top: 80px;
+  margin-top: 0;
   width: 100%;
+  background-color: #005088;
+  color: #e2e8f0;
 }
 
-/* Khối màu xanh lá ở trên footer */
-.footer-cta-banner {
-  background-color: #11caa0;
-  padding: 30px 20px;
-  display: flex;
-  justify-content: center;
+/* Phần nội dung chính của Footer */
+.footer-main {
+  padding: 60px 40px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 40px;
 }
 
-.btn-footer-cta {
-  background-color: #ffffff;
-  color: #005088;
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-column-title {
+  color: #ffffff;
+  font-size: 18px;
   font-weight: 700;
-  padding: 14px 40px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s;
+  margin-bottom: 8px;
+  position: relative;
+  padding-bottom: 12px;
 }
 
-.btn-footer-cta:hover {
-  transform: scale(1.03);
+.footer-column-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 3px;
+  background-color: #11caa0;
+  border-radius: 2px;
 }
 
-/* Dải màu xanh dương ở đáy cùng */
-.footer-bottom-bar {
-  background-color: #005088;
-  padding: 20px 80px;
+.footer-description {
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Social Links */
+.footer-social {
   display: flex;
-  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.footer-social-link {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 16px;
 }
 
-.footer-links {
+.footer-social-link:hover {
+  background-color: #11caa0;
+  transform: translateY(-3px);
+}
+
+/* Link Lists */
+.footer-link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
-  gap: 30px;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .footer-link {
-  color: #ffffff;
+  color: #cbd5e1;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
 }
 
 .footer-link:hover {
-  text-decoration: underline;
+  color: #11caa0;
+  padding-left: 8px;
+}
+
+/* Contact Info */
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.footer-contact-item i {
+  color: #11caa0;
+  width: 20px;
+  font-size: 16px;
+}
+
+/* Dải màu xanh dương đậm hơn ở đáy cùng */
+.footer-bottom-bar {
+  background-color: #003d66;
+  padding: 20px 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .footer-copy {
-  color: #e2e8f0;
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 0;
+}
+
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-bottom-link {
+  color: #cbd5e1;
+  text-decoration: none;
   font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.footer-bottom-link:hover {
+  color: #11caa0;
+}
+
+.footer-divider {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-main {
+    padding: 40px 20px 30px;
+  }
+  
+  .footer-content-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-bottom-bar {
+    padding: 20px;
+  }
+  
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 /* --- FORM TÌM KIẾM NHANH --- */

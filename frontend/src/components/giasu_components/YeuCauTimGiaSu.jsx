@@ -33,10 +33,19 @@ const BaiDangTimGiaSu = () => {
   const [boLocKhuVuc, setBoLocKhuVuc] = useState('');
   const [boLocHeLop, setBoLocHeLop] = useState('');
   const [boLocMonHoc, setBoLocMonHoc] = useState('');
+  const [boLocHocPhiMin, setBoLocHocPhiMin] = useState('');
+  const [boLocHocPhiMax, setBoLocHocPhiMax] = useState('');
   const [chiHienMonPhuHop, setChiHienMonPhuHop] = useState(false);
 
   // STATE LƯU TRẠNG THÁI ỨNG TUYỂN DƯỚI DẠNG DICTIONARY { mayeucau: trangthai }
   const [danhSachDaUngTuyen, setDanhSachDaUngTuyen] = useState({});
+
+  // 🟢 STATE QUẢN LÝ THU/PHÓNG TAB "ĐÃ ỨNG TUYỂN"
+  const [expanded, setExpanded] = useState({
+    choDuyet: true,
+    dangDay: true,
+    hoanThanh: false
+  });
 
   // STATE PHỤC VỤ HIỂN THỊ MODAL XEM ĐÁNH GIÁ
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -132,7 +141,6 @@ const BaiDangTimGiaSu = () => {
           const nguoiHoc = listNguoiDung.find(nd => Number(nd.id) === Number(yc.manguoidung)) || {};
           const danhGiaCuaDon = listDanhGia.find(dg => dg.mayeucau === yc.mayeucau);
 
-          // 🟢 ĐẾM SỐ LƯỢNG GIA SƯ ĐÃ NỘP ĐƠN
           const soLuongUngTuyen = listTatCaUngTuyen.filter(ut => ut.mayeucau === yc.mayeucau).length;
 
           return {
@@ -147,7 +155,7 @@ const BaiDangTimGiaSu = () => {
             nguoihoc_sdt: nguoiHoc.phone || 'Chưa cập nhật',
             nguoihoc_email: nguoiHoc.email || 'Chưa cập nhật',
             danhGiaCuaDon: danhGiaCuaDon || null,
-            soLuongUngTuyen: soLuongUngTuyen // 🟢
+            soLuongUngTuyen: soLuongUngTuyen
           };
         });
 
@@ -179,7 +187,6 @@ const BaiDangTimGiaSu = () => {
 
         setDanhSachDaUngTuyen(prev => ({ ...prev, [mayeucau]: 0 }));
         
-        // 🟢 Tăng số đếm ở giao diện lên 1 ngay lập tức để UX mượt mà
         setDanhSachBaiDang(prevList => prevList.map(yc => 
           yc.mayeucau === mayeucau ? { ...yc, soLuongUngTuyen: yc.soLuongUngTuyen + 1 } : yc
         ));
@@ -219,7 +226,6 @@ const BaiDangTimGiaSu = () => {
         return newState;
       });
 
-      // 🟢 Giảm số đếm ở giao diện xuống 1
       setDanhSachBaiDang(prevList => prevList.map(yc => 
         yc.mayeucau === mayeucau ? { ...yc, soLuongUngTuyen: Math.max(0, yc.soLuongUngTuyen - 1) } : yc
       ));
@@ -240,28 +246,192 @@ const BaiDangTimGiaSu = () => {
     }
   };
 
+  // 🟢 HÀM RENDER THẺ BÀI ĐĂNG TÁI SỬ DỤNG
+  const renderCard = (baiDang) => {
+    const trangThaiUT = danhSachDaUngTuyen[baiDang.mayeucau];
+    const trangThaiYeuCau = baiDang.trangthai;
+    const daUngTuyen = trangThaiUT !== undefined;
+    const duDieuKien = danhSachMonCoTheDay.includes(baiDang.mamonhoc);
+
+    return (
+      <div className="baidang-card" key={baiDang.mayeucau}>
+        <div className="baidang-header">
+          <h3 className="baidang-monhoc">{baiDang.tenmonhoc}</h3>
+          <span className="baidang-khuvuc">{baiDang.tenkhuvuc}</span>
+        </div>
+
+        <div className="baidang-info">
+          <div className="baidang-info-row">
+            <span className="material-symbols-outlined">payments</span>
+            <span>Tổng học phí: <span className="baidang-hocphi">
+              {baiDang.tonghocphi ? baiDang.tonghocphi.toLocaleString() : 0} VNĐ
+            </span></span>
+          </div>
+          <div className="baidang-info-row">
+            <span className="material-symbols-outlined">calendar_month</span>
+            <span>Bắt đầu: {baiDang.ngaybatdau_str} ({baiDang.sobuoihoc} buổi)</span>
+          </div>
+          <div className="baidang-info-row">
+            <span className="material-symbols-outlined">schedule</span>
+            <span>Lịch: {baiDang.lichhoc_str}</span>
+          </div>
+          <div className="baidang-info-row">
+            <span className="material-symbols-outlined" style={{color: '#0284c7'}}>group</span>
+            <span>Gia sư ứng tuyển: <strong style={{color: '#0284c7'}}>{baiDang.soLuongUngTuyen}</strong> người</span>
+          </div>
+        </div>
+
+        <div className="baidang-hocvien-box">
+          <div className="baidang-hocvien-title">Học viên tham gia ({baiDang.danhsachhocvien.length})</div>
+          {baiDang.danhsachhocvien.length > 0 ? (
+            baiDang.danhsachhocvien.map((hv) => (
+              <div className="baidang-hocvien-item" key={hv.mahocvien}>
+                • <strong>{hv.tenhocvien}</strong> (Năm sinh: {hv.namsinh} - Lực học: {hv.hocluc})
+              </div>
+            ))
+          ) : (
+            <div className="baidang-hocvien-item" style={{ fontStyle: 'italic', color: '#94a3b8' }}>
+              Chưa có thông tin học viên
+            </div>
+          )}
+        </div>
+
+        {/* HIỂN THỊ LIÊN HỆ KHI MÌNH LÀ NGƯỜI ĐƯỢC DUYỆT */}
+        {trangThaiUT === 1 && (
+          <div className="baidang-contact-box">
+            <div style={{fontWeight: '700', color: '#1e3a8a', marginBottom: '8px'}}>
+              <span className="material-symbols-outlined" style={{fontSize: '18px', verticalAlign: 'middle', marginRight: '4px'}}>contact_phone</span>
+              Liên hệ với Người Học:
+            </div>
+            <div style={{fontSize: '14px', color: '#1e40af', lineHeight: '1.6'}}>
+              <div><strong>Họ Tên:</strong> {baiDang.nguoihoc_ten}</div>
+              <div><strong>SĐT:</strong> {baiDang.nguoihoc_sdt}</div>
+              <div><strong>Email:</strong> {baiDang.nguoihoc_email}</div>
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {daUngTuyen ? (
+            trangThaiUT === 1 ? (
+              trangThaiYeuCau === 2 ? (
+                <>
+                  <button className="btn-ungtuyen" disabled style={{ flex: 1, backgroundColor: '#10b981', color: '#fff', cursor: 'default' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>task_alt</span>
+                    Đã Hoàn Thành
+                  </button>
+                  <button className="btn-ungtuyen" onClick={() => handleXemDanhGia(baiDang)} style={{ flex: 1, backgroundColor: '#0284c7', color: '#fff' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>star</span>
+                    Xem Đánh Giá
+                  </button>
+                </>
+              ) : (
+                <button className="btn-ungtuyen approved" disabled style={{ flex: 1 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>check_circle</span>
+                  Đã Duyệt - Đang Dạy
+                </button>
+              )
+            ) : trangThaiUT === 2 ? (
+              <button className="btn-ungtuyen rejected" disabled style={{ flex: 1 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>cancel</span>
+                Đã Từ Chối
+              </button>
+            ) : (
+              <>
+                <button className="btn-ungtuyen pending" disabled style={{ flex: 1 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
+                  Đang Chờ Duyệt
+                </button>
+                <button 
+                  className="btn-ungtuyen" 
+                  onClick={() => handleHuyUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)}
+                  style={{ flex: '0 0 auto', backgroundColor: '#ef4444', color: '#fff', border: 'none' }}
+                  title="Rút hồ sơ ứng tuyển"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
+                  Rút Đơn
+                </button>
+              </>
+            )
+          ) : (
+            !duDieuKien ? (
+              <button className="btn-ungtuyen disabled" disabled title="Bạn chưa cập nhật bằng cấp/chứng chỉ tương ứng cho môn này" style={{ flex: 1 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>block</span>
+                Không Đủ Điều Kiện
+              </button>
+            ) : (
+              <button className="btn-ungtuyen" onClick={() => handleUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)} style={{ flex: 1 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>how_to_reg</span>
+                Ứng Tuyển Ngay
+              </button>
+            )
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // 🟢 HÀM RENDER KHỐI CÓ THU PHÓNG (ACCORDION)
+  const renderSection = (title, list, expandedKey, color, icon) => {
+    if (list.length === 0) return null;
+    const isExpanded = expanded[expandedKey];
+
+    return (
+      <div style={{ marginBottom: '24px' }}>
+        <h3 
+          onClick={() => setExpanded(prev => ({...prev, [expandedKey]: !prev[expandedKey]}))}
+          style={{ 
+            color: color, 
+            borderBottom: `2px solid ${color}40`, 
+            paddingBottom: '8px', 
+            marginBottom: '16px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          <span className="material-symbols-outlined">{isExpanded ? 'expand_more' : 'chevron_right'}</span>
+          <span className="material-symbols-outlined">{icon}</span> 
+          {title} ({list.length})
+        </h3>
+        {isExpanded && (
+          <div className="baidang-grid">
+            {list.map(baiDang => renderCard(baiDang))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const monHocDropdown = boLocHeLop
     ? danhSachMonHoc.filter(m => m.mahelop === Number(boLocHeLop))
     : danhSachMonHoc;
 
-  const danhSachHienThi = danhSachBaiDang.filter(bai => {
-    const trangThaiUT = danhSachDaUngTuyen[bai.mayeucau];
-    const daUngTuyen = trangThaiUT !== undefined;
+  // Lọc danh sách cho Tab 1 (Tìm Lớp Mới)
+  const listTimLopMoi = danhSachBaiDang.filter(bai => {
+    if (danhSachDaUngTuyen[bai.mayeucau] !== undefined) return false;
+    if (bai.trangthai !== 0) return false;
 
-    if (activeTab === 'tim_lop') {
-      if (daUngTuyen) return false;
-      if (bai.trangthai !== 0) return false;
+    if (boLocKhuVuc && bai.makhuvuc !== Number(boLocKhuVuc)) return false;
+    if (boLocHeLop && bai.mahelop !== Number(boLocHeLop)) return false;
+    if (boLocMonHoc && bai.mamonhoc !== Number(boLocMonHoc)) return false;
 
-      if (boLocKhuVuc && bai.makhuvuc !== Number(boLocKhuVuc)) return false;
-      if (boLocHeLop && bai.mahelop !== Number(boLocHeLop)) return false;
-      if (boLocMonHoc && bai.mamonhoc !== Number(boLocMonHoc)) return false;
-      if (chiHienMonPhuHop && !danhSachMonCoTheDay.includes(bai.mamonhoc)) return false;
-    } else {
-      if (!daUngTuyen) return false;
-    }
+    // 🟢 LỌC THEO HỌC PHÍ - Khoảng từ min đến max
+    const hocPhi = Number(bai.tonghocphi) || 0;
+    if (boLocHocPhiMin && hocPhi < Number(boLocHocPhiMin)) return false;
+    if (boLocHocPhiMax && hocPhi > Number(boLocHocPhiMax)) return false;
 
+    if (chiHienMonPhuHop && !danhSachMonCoTheDay.includes(bai.mamonhoc)) return false;
     return true;
   });
+
+  // Lọc và Phân nhóm cho Tab 2 (Đã Ứng Tuyển)
+  const listDaUngTuyenRaw = danhSachBaiDang.filter(bai => danhSachDaUngTuyen[bai.mayeucau] !== undefined);
+  const listChoDuyet = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 0);
+  const listDangDay = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 1 && bai.trangthai !== 2);
+  const listHoanThanh = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 1 && bai.trangthai === 2);
 
   return (
     <div className="baidang-container">
@@ -274,202 +444,112 @@ const BaiDangTimGiaSu = () => {
           onClick={() => setActiveTab('tim_lop')}
         >
           <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '6px' }}>search</span>
-          Tìm Lớp Mới
+          Danh sách các yêu cầu
         </button>
         <button
           className={`baidang-tab ${activeTab === 'da_ung_tuyen' ? 'active' : ''}`}
           onClick={() => setActiveTab('da_ung_tuyen')}
         >
           <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '6px' }}>history</span>
-          Đã Ứng Tuyển / Khóa Học
+          Các yêu cầu đã ứng tuyển
         </button>
       </div>
 
-      {/* KHU VỰC BỘ LỌC */}
-      {activeTab === 'tim_lop' && (
-        <div className="baidang-filter-container">
-          <div className="baidang-filter-grid">
-            <div className="baidang-filter-group">
-              <label>Lọc theo Khu Vực</label>
-              <select className="baidang-filter-input" value={boLocKhuVuc} onChange={e => setBoLocKhuVuc(e.target.value)}>
-                <option value="">Tất cả khu vực</option>
-                {danhSachKhuVuc.map(k => (
-                  <option key={k.makhuvuc} value={k.makhuvuc}>{k.tenkhuvuc}</option>
-                ))}
-              </select>
-            </div>
-            <div className="baidang-filter-group">
-              <label>Lọc theo Hệ Lớp</label>
-              <select className="baidang-filter-input" value={boLocHeLop} onChange={e => {
-                setBoLocHeLop(e.target.value);
-                setBoLocMonHoc('');
-              }}>
-                <option value="">Tất cả hệ lớp</option>
-                {danhSachHeLop.map(hl => (
-                  <option key={hl.mahelop} value={hl.mahelop}>{hl.tenhelop}</option>
-                ))}
-              </select>
-            </div>
-            <div className="baidang-filter-group">
-              <label>Lọc theo Môn Học</label>
-              <select className="baidang-filter-input" value={boLocMonHoc} onChange={e => setBoLocMonHoc(e.target.value)}>
-                <option value="">Tất cả môn học</option>
-                {monHocDropdown.map(m => (
-                  <option key={m.mamonhoc} value={m.mamonhoc}>{m.tenmonhoc}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <label className="baidang-filter-checkbox">
-            <input
-              type="checkbox"
-              checked={chiHienMonPhuHop}
-              onChange={e => setChiHienMonPhuHop(e.target.checked)}
-            />
-            Chỉ hiển thị các lớp tôi có đủ Bằng cấp / Chứng chỉ để dạy
-          </label>
-        </div>
-      )}
-
-      {/* DANH SÁCH BÀI ĐĂNG */}
       {dangTai ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Đang tải dữ liệu, vui lòng đợi...</div>
-      ) : danhSachHienThi.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', background: '#fff', borderRadius: '12px' }}>
-          {activeTab === 'tim_lop'
-            ? "Không tìm thấy bài đăng nào phù hợp với bộ lọc."
-            : "Bạn chưa ứng tuyển lớp nào cả."}
-        </div>
-      ) : (
-        <div className="baidang-grid">
-          {danhSachHienThi.map((baiDang) => {
-
-            const trangThaiUT = danhSachDaUngTuyen[baiDang.mayeucau];
-            const trangThaiYeuCau = baiDang.trangthai;
-
-            const daUngTuyen = trangThaiUT !== undefined;
-            const duDieuKien = danhSachMonCoTheDay.includes(baiDang.mamonhoc);
-
-            return (
-              <div className="baidang-card" key={baiDang.mayeucau}>
-                <div className="baidang-header">
-                  <h3 className="baidang-monhoc">{baiDang.tenmonhoc}</h3>
-                  <span className="baidang-khuvuc">{baiDang.tenkhuvuc}</span>
-                </div>
-
-                <div className="baidang-info">
-                  <div className="baidang-info-row">
-                    <span className="material-symbols-outlined">payments</span>
-                    <span>Tổng học phí: <span className="baidang-hocphi">
-                      {baiDang.tonghocphi ? baiDang.tonghocphi.toLocaleString() : 0} VNĐ
-                    </span></span>
-                  </div>
-                  <div className="baidang-info-row">
-                    <span className="material-symbols-outlined">calendar_month</span>
-                    <span>Bắt đầu: {baiDang.ngaybatdau_str} ({baiDang.sobuoihoc} buổi)</span>
-                  </div>
-                  <div className="baidang-info-row">
-                    <span className="material-symbols-outlined">schedule</span>
-                    <span>Lịch: {baiDang.lichhoc_str}</span>
-                  </div>
-                  {/* 🟢 HIỂN THỊ SỐ LƯỢNG GIA SƯ ĐÃ NỘP ĐƠN */}
-                  <div className="baidang-info-row">
-                    <span className="material-symbols-outlined" style={{color: '#0284c7'}}>group</span>
-                    <span>Gia sư ứng tuyển: <strong style={{color: '#0284c7'}}>{baiDang.soLuongUngTuyen}</strong> người</span>
-                  </div>
-                </div>
-
-                <div className="baidang-hocvien-box">
-                  <div className="baidang-hocvien-title">Học viên tham gia ({baiDang.danhsachhocvien.length})</div>
-                  {baiDang.danhsachhocvien.length > 0 ? (
-                    baiDang.danhsachhocvien.map((hv) => (
-                      <div className="baidang-hocvien-item" key={hv.mahocvien}>
-                        • <strong>{hv.tenhocvien}</strong> (Năm sinh: {hv.namsinh} - Lực học: {hv.hocluc})
-                      </div>
-                    ))
-                  ) : (
-                    <div className="baidang-hocvien-item" style={{ fontStyle: 'italic', color: '#94a3b8' }}>
-                      Chưa có thông tin học viên
-                    </div>
-                  )}
-                </div>
-
-                {/* HIỂN THỊ THÔNG TIN LIÊN HỆ KHI MÌNH CHÍNH LÀ NGƯỜI ĐƯỢC DUYỆT */}
-                {trangThaiUT === 1 && (
-                  <div className="baidang-contact-box">
-                    <div style={{fontWeight: '700', color: '#1e3a8a', marginBottom: '8px'}}>
-                      <span className="material-symbols-outlined" style={{fontSize: '18px', verticalAlign: 'middle', marginRight: '4px'}}>contact_phone</span>
-                      Liên hệ với Người Học:
-                    </div>
-                    <div style={{fontSize: '14px', color: '#1e40af', lineHeight: '1.6'}}>
-                      <div><strong>Họ Tên:</strong> {baiDang.nguoihoc_ten}</div>
-                      <div><strong>SĐT:</strong> {baiDang.nguoihoc_sdt}</div>
-                      <div><strong>Email:</strong> {baiDang.nguoihoc_email}</div>
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {daUngTuyen ? (
-                    trangThaiUT === 1 ? (
-                      trangThaiYeuCau === 2 ? (
-                        <>
-                          <button className="btn-ungtuyen" disabled style={{ flex: 1, backgroundColor: '#10b981', color: '#fff', cursor: 'default' }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>task_alt</span>
-                            Đã Hoàn Thành
-                          </button>
-                          <button className="btn-ungtuyen" onClick={() => handleXemDanhGia(baiDang)} style={{ flex: 1, backgroundColor: '#0284c7', color: '#fff' }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>star</span>
-                            Xem Đánh Giá
-                          </button>
-                        </>
-                      ) : (
-                        <button className="btn-ungtuyen approved" disabled style={{ flex: 1 }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>check_circle</span>
-                          Đã Duyệt - Đang Dạy
-                        </button>
-                      )
-                    ) : trangThaiUT === 2 ? (
-                      <button className="btn-ungtuyen rejected" disabled style={{ flex: 1 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>cancel</span>
-                        Đã Từ Chối
-                      </button>
-                    ) : (
-                      // trangThaiUT === 0 - Đang chờ duyệt
-                      <>
-                        <button className="btn-ungtuyen pending" disabled style={{ flex: 1 }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
-                          Đang Chờ Duyệt
-                        </button>
-                        <button 
-                          className="btn-ungtuyen" 
-                          onClick={() => handleHuyUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)}
-                          style={{ flex: '0 0 auto', backgroundColor: '#ef4444', color: '#fff', border: 'none' }}
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
-                          Hủy
-                        </button>
-                      </>
-                    )
-                  ) : (
-                    !duDieuKien ? (
-                      <button className="btn-ungtuyen disabled" disabled title="Bạn chưa cập nhật bằng cấp/chứng chỉ tương ứng cho môn này" style={{ flex: 1 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>block</span>
-                        Không Đủ Điều Kiện
-                      </button>
-                    ) : (
-                      <button className="btn-ungtuyen" onClick={() => handleUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)} style={{ flex: 1 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>how_to_reg</span>
-                        Ứng Tuyển Ngay
-                      </button>
-                    )
-                  )}
-                </div>
-
+      ) : activeTab === 'tim_lop' ? (
+        <>
+          {/* KHU VỰC BỘ LỌC TAB 1 */}
+          <div className="baidang-filter-container">
+            <div className="baidang-filter-grid">
+              <div className="baidang-filter-group">
+                <label>Lọc theo Khu Vực</label>
+                <select className="baidang-filter-input" value={boLocKhuVuc} onChange={e => setBoLocKhuVuc(e.target.value)}>
+                  <option value="">Tất cả khu vực</option>
+                  {danhSachKhuVuc.map(k => (
+                    <option key={k.makhuvuc} value={k.makhuvuc}>{k.tenkhuvuc}</option>
+                  ))}
+                </select>
               </div>
-            );
-          })}
-        </div>
+              <div className="baidang-filter-group">
+                <label>Lọc theo Hệ Lớp</label>
+                <select className="baidang-filter-input" value={boLocHeLop} onChange={e => {
+                  setBoLocHeLop(e.target.value);
+                  setBoLocMonHoc('');
+                }}>
+                  <option value="">Tất cả hệ lớp</option>
+                  {danhSachHeLop.map(hl => (
+                    <option key={hl.mahelop} value={hl.mahelop}>{hl.tenhelop}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="baidang-filter-group">
+                <label>Lọc theo Môn Học</label>
+                <select className="baidang-filter-input" value={boLocMonHoc} onChange={e => setBoLocMonHoc(e.target.value)}>
+                  <option value="">Tất cả môn học</option>
+                  {monHocDropdown.map(m => (
+                    <option key={m.mamonhoc} value={m.mamonhoc}>{m.tenmonhoc}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="baidang-filter-group">
+                <label>Học phí tối thiểu (VNĐ)</label>
+                <input
+                  type="number"
+                  className="baidang-filter-input"
+                  placeholder="VD: 100000"
+                  value={boLocHocPhiMin}
+                  onChange={e => setBoLocHocPhiMin(e.target.value)}
+                  min="0"
+                />
+              </div>
+              <div className="baidang-filter-group">
+                <label>Học phí tối đa (VNĐ)</label>
+                <input
+                  type="number"
+                  className="baidang-filter-input"
+                  placeholder="VD: 2000000"
+                  value={boLocHocPhiMax}
+                  onChange={e => setBoLocHocPhiMax(e.target.value)}
+                  min="0"
+                />
+              </div>
+            </div>
+            <label className="baidang-filter-checkbox">
+              <input
+                type="checkbox"
+                checked={chiHienMonPhuHop}
+                onChange={e => setChiHienMonPhuHop(e.target.checked)}
+              />
+              Chỉ hiển thị các lớp tôi có đủ Bằng cấp / Chứng chỉ để dạy
+            </label>
+          </div>
+
+          {listTimLopMoi.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', background: '#fff', borderRadius: '12px' }}>
+              Không tìm thấy bài đăng nào phù hợp với bộ lọc.
+            </div>
+          ) : (
+            <div className="baidang-grid">
+              {listTimLopMoi.map(baiDang => renderCard(baiDang))}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {/* NỘI DUNG TAB 2 (ĐÃ ỨNG TUYỂN) CHIA NHÓM VÀ THU PHÓNG */}
+          {listDaUngTuyenRaw.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', background: '#fff', borderRadius: '12px' }}>
+              Bạn chưa nộp hồ sơ ứng tuyển lớp nào.
+            </div>
+          ) : (
+            <div>
+              {renderSection('Đang chờ Phụ huynh duyệt', listChoDuyet, 'choDuyet', '#d97706', 'hourglass_empty')}
+              {renderSection('Lớp đang diễn ra', listDangDay, 'dangDay', '#0284c7', 'school')}
+              {renderSection('Lớp đã hoàn thành', listHoanThanh, 'hoanThanh', '#10b981', 'task_alt')}
+            </div>
+          )}
+        </>
       )}
 
       {/* MODAL XEM ĐÁNH GIÁ CỦA PHỤ HUYNH */}

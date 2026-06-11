@@ -37,6 +37,14 @@ const QuanLyYeuCau = () => {
   const [reviewData, setReviewData] = useState({ madanhgia: null, mayeucau: null, sosao: 5, nhanxet: '' });
   const [hoveredStar, setHoveredStar] = useState(0);
 
+  // 🟢 STATES QUẢN LÝ THU/PHÓNG (EXPAND/COLLAPSE)
+  const [expanded, setExpanded] = useState({
+    choDuyet: true,
+    dangHoc: true,
+    hoanThanh: false,
+    tuChoi: false
+  });
+
   // ================= STATE FORM TẠO MỚI YÊU CẦU =================
   const [danhSachKhuVuc, setDanhSachKhuVuc] = useState([]);
   const [danhSachMonHoc, setDanhSachMonHoc] = useState([]);
@@ -345,6 +353,40 @@ const QuanLyYeuCau = () => {
   const listHoanThanh = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 2);
   const listTuChoi = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 3);
 
+  // 🟢 HÀM RENDER KHỐI DANH SÁCH (CÓ THU PHÓNG)
+  const renderSection = (title, list, expandedKey, color, icon, canEditDelete = false) => {
+    if (list.length === 0) return null;
+    const isExpanded = expanded[expandedKey];
+    
+    return (
+      <div>
+        <h3 
+          onClick={() => setExpanded(prev => ({...prev, [expandedKey]: !prev[expandedKey]}))}
+          style={{ 
+            color: color, 
+            borderBottom: `2px solid ${color}40`, 
+            paddingBottom: '8px', 
+            marginBottom: '16px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          <span className="material-symbols-outlined">{isExpanded ? 'expand_more' : 'chevron_right'}</span>
+          <span className="material-symbols-outlined">{icon}</span> 
+          {title} ({list.length})
+        </h3>
+        {isExpanded && (
+          <div className="ql-grid">
+            {list.map(yc => renderCardYeuCau(yc, canEditDelete))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderCardYeuCau = (yc, canEditDelete = false) => {
     let statusText = 'Đang tìm Gia sư';
     let statusClass = 'open';
@@ -480,51 +522,10 @@ const QuanLyYeuCau = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-
-              {listChoDuyet.length > 0 && (
-                <div>
-                  <h3 style={{ color: '#d97706', borderBottom: '2px solid #fde68a', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="material-symbols-outlined">hourglass_empty</span> Yêu cầu đang chờ duyệt / Tìm Gia sư ({listChoDuyet.length})
-                  </h3>
-                  <div className="ql-grid">
-                    {listChoDuyet.map(yc => renderCardYeuCau(yc, true))}
-                  </div>
-                </div>
-              )}
-
-              {listDangHoc.length > 0 && (
-                <div>
-                  <h3 style={{ color: '#0284c7', borderBottom: '2px solid #bae6fd', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="material-symbols-outlined">local_library</span> Lớp học đang diễn ra ({listDangHoc.length})
-                  </h3>
-                  <div className="ql-grid">
-                    {listDangHoc.map(yc => renderCardYeuCau(yc, false))}
-                  </div>
-                </div>
-              )}
-
-              {listHoanThanh.length > 0 && (
-                <div>
-                  <h3 style={{ color: '#10b981', borderBottom: '2px solid #a7f3d0', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="material-symbols-outlined">task_alt</span> Khóa học đã hoàn thành ({listHoanThanh.length})
-                  </h3>
-                  <div className="ql-grid">
-                    {listHoanThanh.map(yc => renderCardYeuCau(yc, false))}
-                  </div>
-                </div>
-              )}
-
-              {listTuChoi.length > 0 && (
-                <div>
-                  <h3 style={{ color: '#ef4444', borderBottom: '2px solid #fca5a5', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="material-symbols-outlined">block</span> Yêu cầu đã từ chối / Hủy bỏ ({listTuChoi.length})
-                  </h3>
-                  <div className="ql-grid">
-                    {listTuChoi.map(yc => renderCardYeuCau(yc, false))}
-                  </div>
-                </div>
-              )}
-
+              {renderSection('Yêu cầu đang chờ duyệt / Tìm Gia sư', listChoDuyet, 'choDuyet', '#d97706', 'hourglass_empty', true)}
+              {renderSection('Lớp học đang diễn ra', listDangHoc, 'dangHoc', '#0284c7', 'local_library', false)}
+              {renderSection('Khóa học đã hoàn thành', listHoanThanh, 'hoanThanh', '#10b981', 'task_alt', false)}
+              {renderSection('Yêu cầu đã từ chối / Hủy bỏ', listTuChoi, 'tuChoi', '#ef4444', 'block', false)}
             </div>
           )}
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import '../../assets/css/NguoiHoc.css';
 import HocVien_Service from '../../services/HocVien_Service';
 
 const HocVien = () => {
@@ -137,7 +138,7 @@ const HocVien = () => {
   };
 
   if (loading) {
-    return <div style={{ padding: '24px', textAlign: 'center', color: '#0284c7', fontWeight: 'bold' }}>Đang tải danh sách học viên...</div>;
+    return <div className="dkl-loading-message">Đang tải danh sách học viên...</div>;
   }
 
   const datGioiHanBaNguoi = danhSachHocVien.length >= 3;
@@ -153,10 +154,9 @@ const HocVien = () => {
         {/* Nút thêm mới tự động ẩn/khóa thuộc tính khi đạt giới hạn 3 người */}
         <button
           type="button"
-          className="btn-nh-submit"
+          className="btn-nh-submit hv-btn-add"
           onClick={handleOpenModalThemMoi}
           disabled={datGioiHanBaNguoi}
-          style={{ width: 'auto', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
           <span className="material-symbols-outlined">add</span> Thêm học viên mới
         </button>
@@ -172,7 +172,7 @@ const HocVien = () => {
       {/* BẢNG DỮ LIỆU */}
       <div className="nh-hv-table-responsive">
         {danhSachHocVien.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', fontStyle: 'italic' }}>
+          <div className="dkl-empty-state">
             Hệ thống chưa ghi nhận hồ sơ học viên nào đang hoạt động dưới tài khoản này.
           </div>
         ) : (
@@ -190,11 +190,11 @@ const HocVien = () => {
             <tbody>
               {danhSachHocVien.map((hv) => (
                 <tr key={hv.mahocvien}>
-                  <td style={{ fontWeight: '600', color: '#0f172a' }}>{hv.tenhocvien}</td>
+                  <td className="hv-name-cell">{hv.tenhocvien}</td>
                   <td>{hv.namsinh}</td>
                   <td><span className="nh-badge-hocluc">{hv.hocluc}</span></td>
-                  <td style={{ maxWidth: '200px' }}>{hv.diachi}</td>
-                  <td style={{ maxWidth: '220px', color: '#64748b', fontSize: '14px' }}>{hv.ghichu || '---'}</td>
+                  <td className="hv-address-cell">{hv.diachi}</td>
+                  <td className="hv-note-cell">{hv.ghichu || '---'}</td>
                   <td>
                     <div className="nh-hv-actions">
                       <button
@@ -285,7 +285,7 @@ const HocVien = () => {
                   />
                 </div>
 
-                <div className="nh-form-group" style={{ marginBottom: 0 }}>
+                <div className="nh-form-group hv-last-form-group">
                   <label className="nh-form-label">Ghi chú yêu cầu học tập (Nếu có)</label>
                   <textarea
                     name="ghichu"
@@ -299,8 +299,8 @@ const HocVien = () => {
               </div>
 
               <div className="nh-hv-modal-footer">
-                <button type="button" className="btn-nh-outline" style={{ width: 'auto' }} onClick={() => setIsModalOpen(false)}>Hủy bỏ</button>
-                <button type="submit" className="btn-nh-submit" style={{ width: 'auto' }} disabled={submitting}>
+                <button type="button" className="btn-nh-outline hv-modal-btn" onClick={() => setIsModalOpen(false)}>Hủy bỏ</button>
+                <button type="submit" className="btn-nh-submit hv-modal-btn" disabled={submitting}>
                   {submitting ? 'Đang lưu kết nối...' : 'Lưu hồ sơ'}
                 </button>
               </div>

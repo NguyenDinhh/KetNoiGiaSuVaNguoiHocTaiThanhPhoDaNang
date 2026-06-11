@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
+import '../../assets/css/NguoiHoc.css';
 import DangKyLich_Service from '../../services/DangKyLich_Service';
 import ChiTietDangKyLich_Service from '../../services/ChiTietDangKyLich_Service';
 import KhungGio_GiaSu_MonHoc_Service from '../../services/KhungGio_GiaSu_MonHoc_Service';
 import GiaSu_MonHoc_Service from '../../services/GiaSu_MonHoc_Service';
 import MonHoc_Service from '../../services/MonHoc_Service';
-
+import YeuCauTimGiaSu_Service from '../../services/YeuCauTimGiaSu_Service';
+import ChiTietYeuCau_Service from '../../services/ChiTietYeuCau_Service';
 import GiaSu_Service from '../../services/GiaSu_Service';
 import NguoiDung_Service from '../../services/NguoiDung_Service';
 import HocVien_Service from '../../services/HocVien_Service';
@@ -16,6 +18,7 @@ const DangKyLich = () => {
   const [activeMainTab, setActiveMainTab] = useState('danh_sach'); // 'danh_sach' | 'lich_hoc'
 
   const [danhSachDangKy, setDanhSachDangKy] = useState([]);
+  const [danhSachYeuCau, setDanhSachYeuCau] = useState([]); // Danh sách từ YeuCauTimGiaSu
   const [loading, setLoading] = useState(true);
 
   // States phục vụ việc Chỉnh sửa đơn
@@ -56,7 +59,8 @@ const DangKyLich = () => {
 
       const [
         resDangKy, resChiTiet, resGiaSuMon, resMonHoc,
-        resGiaSu, resNguoiDung, resYeuCauHV, resHocVien, resDanhGia
+        resGiaSu, resNguoiDung, resYeuCauHV, resHocVien, resDanhGia,
+        resYeuCauTimGiaSu, resChiTietYeuCau
       ] = await Promise.all([
         DangKyLich_Service.layDanhSachDangKyLich().catch(() => []),
         ChiTietDangKyLich_Service.layDanhSachChiTietDangKyLich().catch(() => []),
@@ -66,7 +70,9 @@ const DangKyLich = () => {
         NguoiDung_Service.layDanhSachNguoiDung().catch(() => []),
         YeuCau_HocVien_Service.layDanhSachYeuCauHocVien().catch(() => []),
         HocVien_Service.layDanhSachHocVien().catch(() => []),
-        DanhGia_Service.layDanhSachDanhGia().catch(() => [])
+        DanhGia_Service.layDanhSachDanhGia().catch(() => []),
+        YeuCauTimGiaSu_Service.layDanhSachYeuCau().catch(() => []),
+        ChiTietYeuCau_Service.layDanhSachChiTietYeuCau().catch(() => [])
       ]);
 
       const listMonHoc = Array.isArray(resMonHoc) ? resMonHoc : (resMonHoc?.data || []);
@@ -108,12 +114,49 @@ const DangKyLich = () => {
       });
 
       // Sắp xếp: Chờ duyệt (0) lên đầu, Đang học (1), sau đó mới tới Đã Hủy/Từ Chối.
-      // Cùng trạng thái thì ưu tiên mới nhất lên trên
       setDanhSachDangKy(dataHoanChinh.sort((a, b) => {
         if (Number(a.trangthai) !== Number(b.trangthai)) {
           return Number(a.trangthai) - Number(b.trangthai);
         }
         return Number(b.madangky) - Number(a.madangky);
+      }));
+
+      // 🟢 XỬ LÝ DATA TỪ YEU CẦU TÌM GIA SƯ (người học tạo yêu cầu, gia sư ứng tuyển)
+      const arrYeuCau = Array.isArray(resYeuCauTimGiaSu) ? resYeuCauTimGiaSu : (resYeuCauTimGiaSu?.data || []);
+      const arrChiTietYC = Array.isArray(resChiTietYeuCau) ? resChiTietYeuCau : (resChiTietYeuCau?.data || []);
+
+      const yeuCauCuaToi = arrYeuCau.filter(yc => Number(yc.manguoidung) === Number(maND));
+
+      const dataYeuCau = yeuCauCuaToi.map(yc => {
+        const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc));
+        const giaSu = arrGiaSu.find(gs => Number(gs.magiasu) === Number(yc.magiasu)) || {};
+        const thongTinGS = arrNguoiDung.find(nd => Number(nd.manguoidung || nd.id) === Number(giaSu.manguoidung)) || {};
+
+        const khungGioYC = arrChiTietYC.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau));
+
+        const cacYeuCauHV = arrYeuCauHV.filter(ychv => Number(ychv.mayeucau) === Number(yc.mayeucau));
+        const danhSachHocVienYC = cacYeuCauHV.map(ychv => arrHocVien.find(hv => Number(hv.mahocvien) === Number(ychv.mahocvien))).filter(Boolean);
+
+        return {
+          mayeucau: yc.mayeucau,
+          nguon: 'yeucau', // Đánh dấu nguồn data
+          trangthai: yc.trangthai,
+          tenmonhoc: mon ? mon.tenmonhoc : 'Môn học ẩn',
+          giasu_ten: thongTinGS.name || thongTinGS.hoten || 'Chưa cập nhật',
+          giasu_sdt: thongTinGS.phone || thongTinGS.sodienthoai || 'Chưa cập nhật',
+          giasu_email: thongTinGS.email || 'Chưa cập nhật',
+          danhSachKhungGioChon: khungGioYC,
+          danhSachHocVien: danhSachHocVienYC,
+          tonghocphi: yc.hocphi,
+          ghichu: yc.ghichu
+        };
+      });
+
+      setDanhSachYeuCau(dataYeuCau.sort((a, b) => {
+        if (Number(a.trangthai) !== Number(b.trangthai)) {
+          return Number(a.trangthai) - Number(b.trangthai);
+        }
+        return Number(b.mayeucau) - Number(a.mayeucau);
       }));
       
     } catch (error) {
@@ -123,7 +166,7 @@ const DangKyLich = () => {
     }
   };
 
-  // 🟢 HÀM HỦY ĐƠN VÀ DỌN DẸP DỮ LIỆU CHUẨN MỰC
+  // 🟢 HÀM HỦY ĐƠN VÀ DỌN DẸP DỮ LIỆU
   const handleHuyDonDangKy = async (dk) => {
     if (Number(dk.trangthai) !== 0) {
         return alert("Chỉ có thể hủy những đơn đang ở trạng thái 'Chờ gia sư duyệt'!");
@@ -132,17 +175,13 @@ const DangKyLich = () => {
     if (!window.confirm("⚠️ BẠN CÓ CHẮC CHẮN MUỐN HỦY ĐƠN ĐĂNG KÝ NÀY?\n\nHành động này sẽ XÓA VĨNH VIỄN toàn bộ dữ liệu của đơn này.\nĐồng thời, các Khung giờ bạn đã giữ chỗ sẽ được mở lại cho người khác.")) return;
     
     try {
-      // 1. GIẢI PHÓNG KHUNG GIỜ: Phải nhả tài nguyên ra trước để Gia sư còn nhận người khác
       if (dk.danhSachKhungGioChon && dk.danhSachKhungGioChon.length > 0) {
         for (const ct of dk.danhSachKhungGioChon) {
-          // Trả trạng thái Khung giờ về 1 (Rảnh)
           await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, { trangthai: 1 });
-          // XÓA Chi tiết đăng ký liên kết
           await ChiTietDangKyLich_Service.xoaChiTietDangKyLich(ct.machitietdangky);
         }
       }
 
-      // 2. DỌN DẸP BẢNG TRUNG GIAN YÊU CẦU_HỌC VIÊN
       const resYCHV = await YeuCau_HocVien_Service.layDanhSachYeuCauHocVien();
       const arrYCHV = Array.isArray(resYCHV) ? resYCHV : (resYCHV?.data || []);
       const cacYCHVCanXoa = arrYCHV.filter(yc => Number(yc.madangky) === Number(dk.madangky));
@@ -151,10 +190,7 @@ const DangKyLich = () => {
         await YeuCau_HocVien_Service.xoaYeuCauHocVien(yc.mayeucau_hocvien);
       }
 
-      // 3. CUỐI CÙNG LÀ TRẢM THẰNG CHA
       const xoaGoc = await DangKyLich_Service.xoaDangKyLich(dk.madangky);
-      
-      // Bắt lỗi nếu Backend báo "Thành công giả" giống vụ hôm nọ
       if (xoaGoc.code && xoaGoc.code !== "200" && xoaGoc.code !== 200) {
           throw new Error(xoaGoc.message || "Backend từ chối xóa gốc");
       }
@@ -207,18 +243,14 @@ const DangKyLich = () => {
       };
 
       if (reviewData.madanhgia) {
-        // Cập nhật đánh giá
         await DanhGia_Service.capNhatDanhGia(reviewData.madanhgia, payloadDanhGia);
         alert("🎉 Đã cập nhật đánh giá thành công!");
       } else {
-        // Thêm đánh giá mới
         await DanhGia_Service.themDanhGiaMoi(payloadDanhGia);
 
         if (donDangChon) {
-          // 1. Chuyển trạng thái đơn Đăng ký thành 3 (Đã hoàn thành)
           await DangKyLich_Service.capNhatDangKyLich(donDangChon.madangky, { ...donDangChon, trangthai: 3 });
 
-          // 2. GIẢI PHÓNG KHUNG GIỜ CHO GIA SƯ
           if (donDangChon.danhSachKhungGioChon && donDangChon.danhSachKhungGioChon.length > 0) {
             for (const ct of donDangChon.danhSachKhungGioChon) {
               await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, { trangthai: 1 });
@@ -234,11 +266,18 @@ const DangKyLich = () => {
     }
   };
 
+  // 🟢 HÀM LẤY LỊCH HỌC CHO TAB 2 - Từ cả DangKyLich và YeuCauTimGiaSu
   const getLichHocData = () => {
     let dsCaHoc = [];
-    const cacLopDangHoc = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
+    
+    // 1. Lấy từ DangKyLich (trangthai = 1: đang học)
+    const cacLopDangHocTuDangKy = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
+    
+    // 2. Lấy từ YeuCauTimGiaSu (trangthai = 1: đang học)
+    const cacLopDangHocTuYeuCau = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 1);
 
-    cacLopDangHoc.forEach(dk => {
+    // Xử lý DangKyLich
+    cacLopDangHocTuDangKy.forEach(dk => {
       const coHocVienDuocChon = tabHocVien === 'Tất cả'
         ? true
         : dk.danhSachHocVien.some(hv => Number(hv.mahocvien) === Number(tabHocVien));
@@ -260,13 +299,36 @@ const DangKyLich = () => {
       }
     });
 
+    // Xử lý YeuCauTimGiaSu
+    cacLopDangHocTuYeuCau.forEach(yc => {
+      const coHocVienDuocChon = tabHocVien === 'Tất cả'
+        ? true
+        : yc.danhSachHocVien.some(hv => Number(hv.mahocvien) === Number(tabHocVien));
+
+      if (coHocVienDuocChon) {
+        yc.danhSachKhungGioChon?.forEach(ct => {
+          dsCaHoc.push({
+            machitiet: ct.machitietyeucau,
+            thu: ct.ngayhoc,
+            giobatdau: String(ct.thoigianbatdau).slice(0, 5),
+            gioketthuc: String(ct.thoigianketthuc).slice(0, 5),
+            tenmonhoc: yc.tenmonhoc,
+            giasu_ten: yc.giasu_ten,
+            giasu_sdt: yc.giasu_sdt,
+            ghichudon: yc.ghichu,
+            hocvien: yc.danhSachHocVien
+          });
+        });
+      }
+    });
+
     dsCaHoc.sort((a, b) => a.giobatdau.localeCompare(b.giobatdau));
     return dsCaHoc.filter(ca => tabThu === 'Tất cả' || ca.thu === tabThu);
   };
 
   const lichHocHienThi = getLichHocData();
 
-  // PHÂN NHÓM DANH SÁCH
+  // PHÂN NHÓM DANH SÁCH CHO TAB 1
   const listChoDuyet = danhSachDangKy.filter(dk => Number(dk.trangthai) === 0);
   const listDangHoc = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
   const listTuChoi = danhSachDangKy.filter(dk => Number(dk.trangthai) === 2);
@@ -312,82 +374,82 @@ const DangKyLich = () => {
           {title} ({list.length})
         </h3>
         {isExpanded && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="dkl-section-items">
             {list.map(dk => (
-              <div key={dk.madangky} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div key={dk.madangky} className="dkl-card">
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0', paddingBottom: '12px', marginBottom: '16px' }}>
-                  <span style={{ fontWeight: '700', color: '#1e3a8a', fontSize: '16px' }}>📚 Khóa học: {dk.tenmonhoc}</span>
-                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#ffffff', backgroundColor: badgeColor, padding: '4px 12px', borderRadius: '20px' }}>
+                <div className="dkl-card-header">
+                  <span className="dkl-card-title">📚 Khóa học: {dk.tenmonhoc}</span>
+                  <span className="dkl-status-badge" style={{ backgroundColor: badgeColor }}>
                     {badgeText}
                   </span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '16px', fontSize: '14px', color: '#334155' }}>
-                  <div style={{ background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-                    <div style={{ fontWeight: '700', color: '#0369a1', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>school</span> Thông tin Gia sư
+                <div className="dkl-info-grid">
+                  <div className="dkl-info-box giasu">
+                    <div className="dkl-info-box-title giasu">
+                      <span className="material-symbols-outlined dkl-info-box-icon">school</span> Thông tin Gia sư
                     </div>
-                    <div style={{lineHeight: '1.6'}}>• <strong>Họ tên:</strong> {dk.giasu_ten}</div>
-                    <div style={{lineHeight: '1.6'}}>• <strong>SĐT:</strong> {dk.giasu_sdt}</div>
-                    <div style={{lineHeight: '1.6'}}>• <strong>Email:</strong> {dk.giasu_email}</div>
+                    <div className="dkl-info-item">• <strong>Họ tên:</strong> {dk.giasu_ten}</div>
+                    <div className="dkl-info-item">• <strong>SĐT:</strong> {dk.giasu_sdt}</div>
+                    <div className="dkl-info-item">• <strong>Email:</strong> {dk.giasu_email}</div>
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontWeight: '700', color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>face</span> Học viên tham gia
+                  <div className="dkl-info-box default">
+                    <div className="dkl-info-box-title default">
+                      <span className="material-symbols-outlined dkl-info-box-icon primary">face</span> Học viên tham gia
                     </div>
                     {dk.danhSachHocVien.length === 0 ? (
-                      <div style={{ fontStyle: 'italic', color: '#94a3b8' }}>Chưa cập nhật</div>
+                      <div className="dkl-info-empty">Chưa cập nhật</div>
                     ) : (
                       dk.danhSachHocVien.map(hv => (
-                        <div key={hv.mahocvien} style={{ marginBottom: '4px', fontSize: '13px' }}>
+                        <div key={hv.mahocvien} className="dkl-info-item small">
                           • <strong>{hv.tenhocvien}</strong> (SN: {hv.namsinh})
                         </div>
                       ))
                     )}
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontWeight: '700', color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>alarm</span> Khung lịch đã chọn
+                  <div className="dkl-info-box default">
+                    <div className="dkl-info-box-title default">
+                      <span className="material-symbols-outlined dkl-info-box-icon primary">alarm</span> Khung lịch đã chọn
                     </div>
                     {dk.danhSachKhungGioChon?.map(ct => (
-                      <div key={ct.machitietdangky} style={{ fontSize: '13px', padding: '2px 0' }}>
+                      <div key={ct.machitietdangky} className="dkl-schedule-item">
                         • <strong>{ct.ngayhoc}</strong>: {String(ct.thoigianbatdau).slice(0, 5)} - {String(ct.thoigianketthuc).slice(0, 5)}
                       </div>
                     ))}
-                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
-                      • <strong>Học phí:</strong> <span style={{ color: '#ef4444', fontWeight: '700' }}>{dk.tonghocphi?.toLocaleString()} đ</span>
+                    <div className="dkl-schedule-divider">
+                      • <strong>Học phí:</strong> <span className="dkl-fee-text">{dk.tonghocphi?.toLocaleString()} đ</span>
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', background: '#f8fafc', padding: '10px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '10px' }}>
-                  <div style={{ fontSize: '13.5px', color: '#475569' }}>
-                    <div>Khai giảng dự kiến: <strong style={{ color: '#0f172a' }}>{dk.ngaybatdauhoc ? new Date(dk.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></div>
-                    {dk.ghichu && <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>💬 Ghi chú: "{dk.ghichu}"</div>}
+                <div className="dkl-card-footer">
+                  <div className="dkl-footer-info">
+                    <div>Khai giảng dự kiến: <strong>{dk.ngaybatdauhoc ? new Date(dk.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></div>
+                    {dk.ghichu && <div className="dkl-footer-note">💬 Ghi chú: "{dk.ghichu}"</div>}
                   </div>
 
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div className="dkl-footer-actions">
                     {Number(dk.trangthai) === 0 && (
                       <>
-                        <button onClick={() => handleMoModalSua(dk)} style={{ padding: '6px 14px', background: '#ffffff', color: '#0284c7', border: '1px solid #0284c7', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit</span> Sửa
+                        <button onClick={() => handleMoModalSua(dk)} className="dkl-btn edit">
+                          <span className="material-symbols-outlined dkl-btn-icon">edit</span> Sửa
                         </button>
-                        <button onClick={() => handleHuyDonDangKy(dk)} style={{ padding: '6px 14px', background: '#ef4444', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span> Hủy đơn
+                        <button onClick={() => handleHuyDonDangKy(dk)} className="dkl-btn delete">
+                          <span className="material-symbols-outlined dkl-btn-icon">delete</span> Hủy đơn
                         </button>
                       </>
                     )}
                     {Number(dk.trangthai) === 1 && (
-                      <button onClick={() => handleMoDanhGia(dk)} style={{ padding: '6px 14px', background: '#10b981', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>task_alt</span> Hoàn thành khóa học
+                      <button onClick={() => handleMoDanhGia(dk)} className="dkl-btn complete">
+                        <span className="material-symbols-outlined dkl-btn-icon">task_alt</span> Hoàn thành khóa học
                       </button>
                     )}
                     {Number(dk.trangthai) === 3 && (
-                      <button onClick={() => handleMoDanhGia(dk)} style={{ padding: '6px 14px', background: '#f0f9ff', color: '#0284c7', border: '1px solid #bae6fd', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit_square</span> Sửa đánh giá
+                      <button onClick={() => handleMoDanhGia(dk)} className="dkl-btn review-edit">
+                        <span className="material-symbols-outlined dkl-btn-icon">edit_square</span> Sửa đánh giá
                       </button>
                     )}
                   </div>
@@ -402,76 +464,76 @@ const DangKyLich = () => {
 
   return (
     <div className="nh-content-card">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-        <span className="material-symbols-outlined" style={{ fontSize: '36px', color: '#0284c7' }}>calendar_month</span>
+      <div className="dkl-header-section">
+        <span className="material-symbols-outlined dkl-header-icon">calendar_month</span>
         <div>
-          <h2 style={{ margin: 0, color: '#1e293b', fontSize: '20px' }}>Quản lý đăng ký học</h2>
-          <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '13.5px' }}>Xem tiến độ phê duyệt và thời khóa biểu của các lớp học từ Gia sư.</p>
+          <h2 className="dkl-header-title">Quản lý đăng ký học</h2>
+          <p className="dkl-header-subtitle">Xem tiến độ phê duyệt và thời khóa biểu của các lớp học từ Gia sư.</p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', background: '#f8fafc', padding: '6px', borderRadius: '10px', width: 'fit-content', border: '1px solid #e2e8f0' }}>
+      <div className="dkl-tabs-container">
         <button
           onClick={() => setActiveMainTab('danh_sach')}
-          style={{ padding: '8px 18px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '700', backgroundColor: activeMainTab === 'danh_sach' ? '#0284c7' : 'transparent', color: activeMainTab === 'danh_sach' ? '#fff' : '#475569', transition: 'all 0.2s' }}
+          className={`dkl-tab-button ${activeMainTab === 'danh_sach' ? 'active-danh-sach' : 'inactive'}`}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>list_alt</span>
+          <span className="material-symbols-outlined dkl-tab-icon">list_alt</span>
           Danh sách Đơn đăng ký
         </button>
         <button
           onClick={() => setActiveMainTab('lich_hoc')}
-          style={{ padding: '8px 18px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '700', backgroundColor: activeMainTab === 'lich_hoc' ? '#10b981' : 'transparent', color: activeMainTab === 'lich_hoc' ? '#fff' : '#475569', transition: 'all 0.2s' }}
+          className={`dkl-tab-button ${activeMainTab === 'lich_hoc' ? 'active-lich-hoc' : 'inactive'}`}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>view_timeline</span>
+          <span className="material-symbols-outlined dkl-tab-icon">view_timeline</span>
           Lịch học của Học viên
         </button>
       </div>
 
       {loading ? (
-        <div style={{ padding: '20px', color: '#475569', fontStyle: 'italic' }}>Đang đồng bộ dữ liệu học tập của bạn...</div>
+        <div className="dkl-loading-message">Đang đồng bộ dữ liệu học tập của bạn...</div>
       ) : activeMainTab === 'danh_sach' ? (
 
         <>
           {/* KHỐI THỐNG KÊ */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#475569' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>receipt_long</span>
+          <div className="dkl-stats-grid">
+            <div className="dkl-stat-card">
+              <div className="dkl-stat-icon-wrapper neutral">
+                <span className="material-symbols-outlined dkl-stat-icon">receipt_long</span>
               </div>
               <div>
-                <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '600' }}>Tổng số đơn</div>
-                <div style={{ fontSize: '24px', color: '#0f172a', fontWeight: 'bold' }}>{tongDon}</div>
+                <div className="dkl-stat-label">Tổng số đơn</div>
+                <div className="dkl-stat-value neutral">{tongDon}</div>
               </div>
             </div>
 
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#e0f2fe', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#0284c7' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>menu_book</span>
+            <div className="dkl-stat-card">
+              <div className="dkl-stat-icon-wrapper primary">
+                <span className="material-symbols-outlined dkl-stat-icon">menu_book</span>
               </div>
               <div>
-                <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '600' }}>Lớp đang học</div>
-                <div style={{ fontSize: '24px', color: '#0284c7', fontWeight: 'bold' }}>{donDangHoc}</div>
+                <div className="dkl-stat-label">Lớp đang học</div>
+                <div className="dkl-stat-value primary">{donDangHoc}</div>
               </div>
             </div>
 
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#ecfdf5', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#10b981' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>verified</span>
+            <div className="dkl-stat-card">
+              <div className="dkl-stat-icon-wrapper success">
+                <span className="material-symbols-outlined dkl-stat-icon">verified</span>
               </div>
               <div>
-                <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '600' }}>Đã hoàn thành</div>
-                <div style={{ fontSize: '24px', color: '#10b981', fontWeight: 'bold' }}>{donHoanThanh}</div>
+                <div className="dkl-stat-label">Đã hoàn thành</div>
+                <div className="dkl-stat-value success">{donHoanThanh}</div>
               </div>
             </div>
           </div>
 
           {/* DANH SÁCH ĐƠN SỬ DỤNG RENDER SECTION ĐỂ THU PHÓNG */}
           {danhSachDangKy.length === 0 ? (
-            <div style={{ padding: '40px', background: '#f8fafc', borderRadius: '10px', border: '1px dashed #cbd5e1', textAlign: 'center', color: '#64748b' }}>
+            <div className="dkl-empty-state">
               Bạn chưa thực hiện gửi đơn đăng ký lịch học nào.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="dkl-sections-container">
               {renderSection('Đơn đang chờ duyệt', listChoDuyet, 'choDuyet', '#d97706', 'hourglass_empty')}
               {renderSection('Lớp đang diễn ra', listDangHoc, 'dangHoc', '#0284c7', 'school')}
               {renderSection('Lớp đã hoàn thành', listHoanThanh, 'hoanThanh', '#10b981', 'task_alt')}
@@ -484,23 +546,17 @@ const DangKyLich = () => {
         // =================================================================================
         // TAB 2: LỊCH HỌC TỪNG HỌC VIÊN
         // =================================================================================
-        <div style={{ marginTop: '10px' }}>
+        <div className="dkl-schedule-container">
 
-          <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-            <div style={{ fontWeight: '600', color: '#334155', marginBottom: '10px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#10b981' }}>face</span>
+          <div className="dkl-filter-box">
+            <div className="dkl-filter-label">
+              <span className="material-symbols-outlined dkl-filter-label-icon">face</span>
               Chọn xem lịch của học viên:
             </div>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <div className="dkl-filter-buttons">
               <button
                 onClick={() => setTabHocVien('Tất cả')}
-                style={{
-                  padding: '6px 16px', borderRadius: '20px', border: '1px solid', cursor: 'pointer', fontSize: '13px', fontWeight: '600',
-                  borderColor: tabHocVien === 'Tất cả' ? '#10b981' : '#cbd5e1',
-                  backgroundColor: tabHocVien === 'Tất cả' ? '#10b981' : '#ffffff',
-                  color: tabHocVien === 'Tất cả' ? '#ffffff' : '#475569',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`dkl-filter-button ${tabHocVien === 'Tất cả' ? 'student-active' : 'student-inactive'}`}
               >
                 Tất cả học viên
               </button>
@@ -508,13 +564,7 @@ const DangKyLich = () => {
                 <button
                   key={hv.mahocvien}
                   onClick={() => setTabHocVien(hv.mahocvien)}
-                  style={{
-                    padding: '6px 16px', borderRadius: '20px', border: '1px solid', cursor: 'pointer', fontSize: '13px', fontWeight: '600',
-                    borderColor: tabHocVien === hv.mahocvien ? '#10b981' : '#cbd5e1',
-                    backgroundColor: tabHocVien === hv.mahocvien ? '#10b981' : '#ffffff',
-                    color: tabHocVien === hv.mahocvien ? '#ffffff' : '#475569',
-                    transition: 'all 0.2s ease'
-                  }}
+                  className={`dkl-filter-button ${tabHocVien === hv.mahocvien ? 'student-active' : 'student-inactive'}`}
                 >
                   Bé {hv.tenhocvien}
                 </button>
@@ -522,18 +572,12 @@ const DangKyLich = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' }}>
+          <div className="dkl-day-buttons">
             {cacThuTrongTuan.map(thu => (
               <button
                 key={thu}
                 onClick={() => setTabThu(thu)}
-                style={{
-                  padding: '6px 16px', borderRadius: '20px', border: '1px solid', cursor: 'pointer', fontWeight: '600', fontSize: '13px',
-                  borderColor: tabThu === thu ? '#0284c7' : '#e2e8f0',
-                  backgroundColor: tabThu === thu ? '#e0f2fe' : '#ffffff',
-                  color: tabThu === thu ? '#0284c7' : '#64748b',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`dkl-filter-button ${tabThu === thu ? 'day-active' : 'day-inactive'}`}
               >
                 {thu}
               </button>
@@ -541,44 +585,44 @@ const DangKyLich = () => {
           </div>
 
           {lichHocHienThi.length === 0 ? (
-            <div style={{ padding: '40px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1', textAlign: 'center', color: '#64748b' }}>
+            <div className="dkl-empty-state">
               Không có tiết học nào phù hợp với bộ lọc.
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '20px' }}>
+            <div className="dkl-schedule-grid">
               {lichHocHienThi.map((ca, idx) => (
-                <div key={idx} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', borderLeft: '5px solid #10b981', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
+                <div key={idx} className="dkl-schedule-card">
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <span style={{ backgroundColor: '#ecfdf5', color: '#10b981', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
+                  <div className="dkl-schedule-card-header">
+                    <span className="dkl-day-badge">
                       {ca.thu}
                     </span>
-                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#64748b' }}>schedule</span>
+                    <span className="dkl-time-display">
+                      <span className="material-symbols-outlined dkl-time-icon">schedule</span>
                       {ca.giobatdau} - {ca.gioketthuc}
                     </span>
                   </div>
 
-                  <h4 style={{ color: '#065f46', fontSize: '16px', margin: '0 0 12px 0' }}>Môn: {ca.tenmonhoc}</h4>
+                  <h4 className="dkl-schedule-subject">Môn: {ca.tenmonhoc}</h4>
 
-                  <div style={{ fontSize: '13.5px', color: '#334155', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0369a1' }}>school</span>
+                  <div className="dkl-schedule-tutor">
+                    <span className="material-symbols-outlined dkl-schedule-tutor-icon">school</span>
                     <span><strong>Gia sư:</strong> {ca.giasu_ten} ({ca.giasu_sdt})</span>
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
-                    <div style={{ fontWeight: '600', color: '#475569', fontSize: '13px', marginBottom: '6px' }}>Người đi học ca này:</div>
-                    {ca.hocvien.length === 0 ? <span style={{fontSize: '12px', color: '#94a3b8'}}>Chưa cập nhật</span> :
+                  <div className="dkl-schedule-students-box">
+                    <div className="dkl-schedule-students-title">Người đi học ca này:</div>
+                    {ca.hocvien.length === 0 ? <span className="dkl-schedule-student-empty">Chưa cập nhật</span> :
                       ca.hocvien.map((hv, hIdx) => (
-                        <div key={hIdx} style={{ fontSize: '13px', color: '#0f172a', marginBottom: '4px' }}>
-                          • <strong>Bé {hv.tenhocvien}</strong> <span style={{ color: '#64748b' }}>(SN: {hv.namsinh})</span>
+                        <div key={hIdx} className="dkl-schedule-student-item">
+                          • <strong>Bé {hv.tenhocvien}</strong> <span className="dkl-schedule-student-year">(SN: {hv.namsinh})</span>
                         </div>
                       ))
                     }
                   </div>
 
                   {ca.ghichudon && (
-                    <div style={{ marginTop: '12px', fontSize: '12.5px', color: '#64748b', fontStyle: 'italic', paddingLeft: '8px', borderLeft: '3px solid #bae6fd' }}>
+                    <div className="dkl-schedule-note">
                       "{ca.ghichudon}"
                     </div>
                   )}
@@ -592,33 +636,29 @@ const DangKyLich = () => {
 
       {/* MODAL ĐÁNH GIÁ VÀ MODAL SỬA */}
       {isReviewOpen && (
-        <div className="bc-modal-overlay">
-          <div className="bc-modal-content" style={{ maxWidth: '420px', textAlign: 'center' }}>
-            <div className="bc-modal-header" style={{ justifyContent: 'center', position: 'relative' }}>
-              <h3 style={{ margin: 0, color: '#1e3a8a' }}>
+        <div className="dkl-modal-overlay">
+          <div className="dkl-modal-content small">
+            <div className="dkl-modal-header centered">
+              <h3 className="dkl-modal-title">
                 {reviewData.madanhgia ? 'Chỉnh sửa Đánh giá' : 'Đánh giá Gia sư'}
               </h3>
-              <button onClick={() => setIsReviewOpen(false)} className="bc-close-btn" style={{ position: 'absolute', right: '16px' }}>&times;</button>
+              <button onClick={() => setIsReviewOpen(false)} className="dkl-modal-close absolute">&times;</button>
             </div>
 
-            <form onSubmit={handleSubmitHoanThanhHoc} style={{ padding: '20px 0' }}>
-              <div style={{ marginBottom: '24px' }}>
-                <p style={{ fontWeight: '600', color: '#475569', marginBottom: '12px' }}>
+            <form onSubmit={handleSubmitHoanThanhHoc} className="dkl-modal-form">
+              <div className="dkl-rating-section">
+                <p className="dkl-rating-question">
                   {reviewData.madanhgia ? 'Bạn muốn thay đổi mức độ hài lòng?' : 'Mức độ hài lòng của bạn về khóa học?'}
                 </p>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                <div className="dkl-stars-container">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
                       key={star}
-                      className="material-symbols-outlined"
+                      className={`material-symbols-outlined dkl-star ${star <= (hoveredStar || reviewData.sosao) ? 'filled' : 'empty'}`}
                       onMouseEnter={() => setHoveredStar(star)}
                       onMouseLeave={() => setHoveredStar(0)}
                       onClick={() => setReviewData({ ...reviewData, sosao: star })}
                       style={{
-                        fontSize: '42px',
-                        cursor: 'pointer',
-                        color: star <= (hoveredStar || reviewData.sosao) ? '#f59e0b' : '#cbd5e1',
-                        transition: 'color 0.2s',
                         fontVariationSettings: star <= (hoveredStar || reviewData.sosao) ? "'FILL' 1" : "'FILL' 0"
                       }}
                     >
@@ -626,7 +666,7 @@ const DangKyLich = () => {
                     </span>
                   ))}
                 </div>
-                <div style={{ fontSize: '13px', color: '#f59e0b', fontWeight: 'bold', marginTop: '8px' }}>
+                <div className="dkl-rating-label">
                   {reviewData.sosao === 5 ? 'Rất tuyệt vời (5 Sao)' :
                    reviewData.sosao === 4 ? 'Hài lòng (4 Sao)' :
                    reviewData.sosao === 3 ? 'Bình thường (3 Sao)' :
@@ -634,20 +674,19 @@ const DangKyLich = () => {
                 </div>
               </div>
 
-              <div className="tcn-form-group" style={{ textAlign: 'left', marginBottom: '0' }}>
-                <label style={{ fontWeight: '600', color: '#475569' }}>Nhận xét chi tiết *</label>
+              <div className="nh-form-group">
+                <label className="nh-form-label">Nhận xét chi tiết *</label>
                 <textarea
-                  className="tcn-input" rows="4" required
+                  className="nh-input" rows="4" required
                   placeholder="Chia sẻ cảm nhận về thái độ, phương pháp giảng dạy..."
                   value={reviewData.nhanxet}
                   onChange={e => setReviewData({ ...reviewData, nhanxet: e.target.value })}
-                  style={{ background: '#f8fafc' }}
                 ></textarea>
               </div>
 
-              <div className="bc-modal-footer" style={{ marginTop: '24px', justifyContent: 'center', gap: '12px' }}>
-                <button type="button" onClick={() => setIsReviewOpen(false)} className="btn-outline" style={{ minWidth: '100px' }}>Hủy bỏ</button>
-                <button type="submit" className="btn-submit" style={{ background: '#0284c7', minWidth: '160px' }}>
+              <div className="dkl-modal-footer">
+                <button type="button" onClick={() => setIsReviewOpen(false)} className="dkl-modal-btn cancel">Hủy bỏ</button>
+                <button type="submit" className="dkl-modal-btn submit">
                   {reviewData.madanhgia ? 'Lưu thay đổi' : 'Gửi Đánh Giá'}
                 </button>
               </div>
@@ -657,38 +696,37 @@ const DangKyLich = () => {
       )}
 
       {isEditModalOpen && (
-        <div className="bc-modal-overlay">
-          <div className="bc-modal-content" style={{ maxWidth: '450px' }}>
-            <div className="bc-modal-header">
-              <h3>Chỉnh sửa thông tin đăng ký</h3>
-              <button type="button" onClick={() => setIsEditModalOpen(false)} className="bc-close-btn">&times;</button>
+        <div className="dkl-modal-overlay">
+          <div className="dkl-modal-content medium">
+            <div className="dkl-modal-header">
+              <h3 className="dkl-modal-title">Chỉnh sửa thông tin đăng ký</h3>
+              <button type="button" onClick={() => setIsEditModalOpen(false)} className="dkl-modal-close">&times;</button>
             </div>
-            <form onSubmit={handleLuuChinhSua} className="tcn-form-col" style={{ marginTop: '10px' }}>
-              <div className="tcn-form-group">
-                <label>Chọn lại ngày bắt đầu học</label>
+            <form onSubmit={handleLuuChinhSua} className="dkl-edit-form">
+              <div className="nh-form-group">
+                <label className="nh-form-label">Chọn lại ngày bắt đầu học</label>
                 <input
                   type="date"
-                  className="tcn-input"
+                  className="nh-input"
                   value={formSua.ngaybatdauhoc}
                   onChange={e => setFormSua({ ...formSua, ngaybatdauhoc: e.target.value })}
                   required
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
-              <div className="tcn-form-group">
-                <label>Nội dung lời nhắn cho Gia sư</label>
+              <div className="nh-form-group">
+                <label className="nh-form-label">Nội dung lời nhắn cho Gia sư</label>
                 <textarea
-                  className="tcn-input"
+                  className="nh-input dkl-textarea-no-resize"
                   rows="3"
                   placeholder="Nhập địa điểm học chi tiết hoặc ghi chú mới..."
                   value={formSua.ghichu}
                   onChange={e => setFormSua({ ...formSua, ghichu: e.target.value })}
-                  style={{ resize: 'none', padding: '8px' }}
                 />
               </div>
-              <div className="bc-modal-footer" style={{ marginTop: '10px' }}>
-                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn-outline">Hủy bỏ</button>
-                <button type="submit" className="btn-submit" style={{ backgroundColor: '#0284c7' }}>Lưu thay đổi</button>
+              <div className="dkl-modal-footer default">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn-nh-outline">Hủy bỏ</button>
+                <button type="submit" className="btn-nh-submit">Lưu thay đổi</button>
               </div>
             </form>
           </div>

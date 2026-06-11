@@ -560,9 +560,8 @@
 }
 
 .ql-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 16px 24px;
+  width: 100%;
 }
 
 .ql-title {
@@ -859,4 +858,746 @@ textarea.yctg-form-control { min-height: 100px; resize: vertical; }
   .yctg-form-content, .yctg-footer { padding: 20px; }
   .yctg-timeslot-box { flex-direction: column; align-items: stretch; }
   .yctg-btn-remove { width: 100%; }
+}
+
+
+/* ================= ĐĂNG KÝ LỊCH HỌC - QUẢN LÝ ĐƠN ĐĂNG KÝ ================= */
+.dkl-content-card {
+  /* Container chính */
+}
+
+.dkl-header-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.dkl-header-icon {
+  font-size: 36px;
+  color: #0284c7;
+}
+
+.dkl-header-title {
+  margin: 0;
+  color: #1e293b;
+  font-size: 20px;
+}
+
+.dkl-header-subtitle {
+  margin: 2px 0 0 0;
+  color: #64748b;
+  font-size: 13.5px;
+}
+
+.dkl-tabs-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: #f8fafc;
+  padding: 6px;
+  border-radius: 10px;
+  width: fit-content;
+  border: 1px solid #e2e8f0;
+}
+
+.dkl-tab-button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dkl-tab-button.active-danh-sach {
+  background-color: #0284c7;
+  color: #fff;
+}
+
+.dkl-tab-button.active-lich-hoc {
+  background-color: #10b981;
+  color: #fff;
+}
+
+.dkl-tab-button.inactive {
+  background-color: transparent;
+  color: #475569;
+}
+
+.dkl-tab-icon {
+  font-size: 18px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.dkl-loading-message {
+  padding: 20px;
+  color: #475569;
+  font-style: italic;
+}
+
+/* Thống kê */
+.dkl-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dkl-stat-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.dkl-stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dkl-stat-icon-wrapper.neutral {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.dkl-stat-icon-wrapper.primary {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.dkl-stat-icon-wrapper.success {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.dkl-stat-icon {
+  font-size: 24px;
+}
+
+.dkl-stat-label {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.dkl-stat-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.dkl-stat-value.neutral {
+  color: #0f172a;
+}
+
+.dkl-stat-value.primary {
+  color: #0284c7;
+}
+
+.dkl-stat-value.success {
+  color: #10b981;
+}
+
+/* Danh sách đơn */
+.dkl-empty-state {
+  padding: 40px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px dashed #cbd5e1;
+  text-align: center;
+  color: #64748b;
+}
+
+.dkl-sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dkl-section-header {
+  border-bottom: 2px solid;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dkl-section-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dkl-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.dkl-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.dkl-card-title {
+  font-weight: 700;
+  color: #1e3a8a;
+  font-size: 16px;
+}
+
+.dkl-status-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.dkl-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.dkl-info-box {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.dkl-info-box.giasu {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.dkl-info-box.default {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.dkl-info-box-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dkl-info-box-title.giasu {
+  color: #0369a1;
+}
+
+.dkl-info-box-title.default {
+  color: #0f172a;
+}
+
+.dkl-info-box-icon {
+  font-size: 18px;
+}
+
+.dkl-info-box-icon.primary {
+  color: #0284c7;
+}
+
+.dkl-info-item {
+  line-height: 1.6;
+}
+
+.dkl-info-item.small {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.dkl-info-empty {
+  font-style: italic;
+  color: #94a3b8;
+}
+
+.dkl-schedule-item {
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.dkl-schedule-divider {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.dkl-fee-text {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.dkl-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  background: #f8fafc;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dkl-footer-info {
+  font-size: 13.5px;
+  color: #475569;
+}
+
+.dkl-footer-note {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.dkl-footer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.dkl-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dkl-btn.edit {
+  background: #ffffff;
+  color: #0284c7;
+  border: 1px solid #0284c7;
+  font-weight: 500;
+}
+
+.dkl-btn.delete {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  font-weight: bold;
+}
+
+.dkl-btn.complete {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  font-weight: bold;
+}
+
+.dkl-btn.review-edit {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+  font-weight: bold;
+}
+
+.dkl-btn-icon {
+  font-size: 16px;
+}
+
+/* Lịch học */
+.dkl-schedule-container {
+  margin-top: 10px;
+}
+
+.dkl-filter-box {
+  margin-bottom: 16px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.dkl-filter-label {
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dkl-filter-label-icon {
+  font-size: 18px;
+  color: #10b981;
+}
+
+.dkl-filter-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dkl-filter-button {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.dkl-filter-button.student-active {
+  border-color: #10b981;
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.dkl-filter-button.student-inactive {
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+  color: #475569;
+}
+
+.dkl-filter-button.day-active {
+  border-color: #0284c7;
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.dkl-filter-button.day-inactive {
+  border-color: #e2e8f0;
+  background-color: #ffffff;
+  color: #64748b;
+}
+
+.dkl-day-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.dkl-schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 20px;
+}
+
+.dkl-schedule-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 5px solid #10b981;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.dkl-schedule-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dkl-day-badge {
+  background-color: #ecfdf5;
+  color: #10b981;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.dkl-time-display {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dkl-time-icon {
+  font-size: 18px;
+  color: #64748b;
+}
+
+.dkl-schedule-subject {
+  color: #065f46;
+  font-size: 16px;
+  margin: 0 0 12px 0;
+}
+
+.dkl-schedule-tutor {
+  font-size: 13.5px;
+  color: #334155;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dkl-schedule-tutor-icon {
+  font-size: 18px;
+  color: #0369a1;
+}
+
+.dkl-schedule-students-box {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.dkl-schedule-students-title {
+  font-weight: 600;
+  color: #475569;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.dkl-schedule-student-empty {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.dkl-schedule-student-item {
+  font-size: 13px;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.dkl-schedule-student-year {
+  color: #64748b;
+}
+
+.dkl-schedule-note {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: #64748b;
+  font-style: italic;
+  padding-left: 8px;
+  border-left: 3px solid #bae6fd;
+}
+
+/* Modal */
+.dkl-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.dkl-modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.dkl-modal-content.small {
+  max-width: 420px;
+  text-align: center;
+}
+
+.dkl-modal-content.medium {
+  max-width: 450px;
+}
+
+.dkl-modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dkl-modal-header.centered {
+  justify-content: center;
+  position: relative;
+}
+
+.dkl-modal-title {
+  margin: 0;
+  color: #1e3a8a;
+  font-size: 18px;
+}
+
+.dkl-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.dkl-modal-close.absolute {
+  position: absolute;
+  right: 16px;
+}
+
+.dkl-modal-close:hover {
+  color: #64748b;
+}
+
+.dkl-modal-form {
+  padding: 20px 0;
+}
+
+.dkl-rating-section {
+  margin-bottom: 24px;
+}
+
+.dkl-rating-question {
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.dkl-stars-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dkl-star {
+  font-size: 42px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.dkl-star.filled {
+  color: #f59e0b;
+}
+
+.dkl-star.empty {
+  color: #cbd5e1;
+}
+
+.dkl-rating-label {
+  font-size: 13px;
+  color: #f59e0b;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.dkl-modal-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.dkl-modal-footer.default {
+  margin-top: 10px;
+}
+
+.dkl-modal-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  border: none;
+}
+
+.dkl-modal-btn.cancel {
+  background: #e2e8f0;
+  color: #475569;
+  min-width: 100px;
+}
+
+.dkl-modal-btn.submit {
+  background: #0284c7;
+  color: #fff;
+  min-width: 160px;
+}
+
+/* HocVien Component Styles - Additional specific styles not in general nh-hv */
+.hv-content-wrapper {
+  /* Wrapper if needed */
+}
+
+
+/* HocVien table cell styles */
+.hv-name-cell {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.hv-address-cell {
+  max-width: 200px;
+}
+
+.hv-note-cell {
+  max-width: 220px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* HocVien component additional styles */
+.hv-btn-add {
+  width: auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hv-last-form-group {
+  margin-bottom: 0;
+}
+
+.hv-modal-btn {
+  width: auto;
+}
+
+.dkl-loading-message {
+  padding: 24px;
+  text-align: center;
+  color: #0284c7;
+  font-weight: bold;
+}
+
+
+/* DangKyLich edit form styles */
+.dkl-edit-form {
+  margin-top: 10px;
+}
+
+.dkl-textarea-no-resize {
+  resize: none;
+  padding: 8px;
 }
