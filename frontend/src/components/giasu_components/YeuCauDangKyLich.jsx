@@ -44,6 +44,12 @@ const YeuCauDangKyLich = () => {
   const [isEditKhungGio, setIsEditKhungGio] = useState(false);
   const [formKhungGio, setFormKhungGio] = useState({ makhunggio: null, magiasu_monhoc: null, ngayday: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30' });
 
+  // State cho thu/phóng các nhóm
+  const [isChoDuyetExpanded, setIsChoDuyetExpanded] = useState(true);
+  const [isDangDayExpanded, setIsDangDayExpanded] = useState(true);
+  const [isHoanThanhExpanded, setIsHoanThanhExpanded] = useState(false);
+  const [isTuChoiExpanded, setIsTuChoiExpanded] = useState(false);
+
   useEffect(() => {
     let isMounted = true;
     const loadDuLieu = async () => {
@@ -124,7 +130,11 @@ const YeuCauDangKyLich = () => {
       const listMonHoc = Array.isArray(resMonHoc) ? resMonHoc : (resMonHoc?.data || []);
       const arrDanhGia = Array.isArray(resDanhGia) ? resDanhGia : (resDanhGia?.data || []);
 
-      const lopCuaToi = cacLop.filter(l => Number(l.magiasu) === Number(maGS) && Number(l.trangthai) === 1);
+      const lopCuaToi = cacLop.filter(l => Number(l.magiasu) === Number(maGS));
+      
+      // Sắp xếp: Lớp đang hoạt động (trangthai=1) lên trên, lớp bị khóa (trangthai=0) xuống dưới
+      lopCuaToi.sort((a, b) => Number(b.trangthai) - Number(a.trangthai));
+      
       setDanhSachLop(lopCuaToi);
       setDanhSachKhungGio(cacKhungGio);
 
@@ -152,7 +162,14 @@ const YeuCauDangKyLich = () => {
         };
       });
 
-      danhSachDangKyHoanChinh.sort((a, b) => Number(a.trangthai) - Number(b.trangthai));
+      // Sắp xếp theo trạng thái trước (0 lên trên), sau đó sắp xếp mỗi nhóm theo madangky giảm dần (mới nhất lên trên)
+      danhSachDangKyHoanChinh.sort((a, b) => {
+        if (Number(a.trangthai) !== Number(b.trangthai)) {
+          return Number(a.trangthai) - Number(b.trangthai);
+        }
+        return Number(b.madangky) - Number(a.madangky);
+      });
+      
       setDanhSachDangKy(danhSachDangKyHoanChinh);
 
     } catch (error) {
@@ -275,6 +292,28 @@ const YeuCauDangKyLich = () => {
         await GiaSu_MonHoc_Service.khoaGiaSuMonHoc(id);
         alert("Đã khóa lớp học thành công!"); fetchDanhSachLopVaKhungGio(maGiaSu);
       } catch (error) { alert("Lỗi khi thực hiện khóa lớp!"); }
+    }
+  };
+
+  const handleMoLaiLop = async (lop) => {
+    if (window.confirm(`Bạn có chắc chắn muốn MỞ LẠI lớp học "${timTenMonHoc(lop.mamonhoc)}" không?`)) {
+      try {
+        const payload = {
+          magiasu: maGiaSu,
+          mamonhoc: Number(lop.mamonhoc),
+          makhuvuc: Number(lop.makhuvuc),
+          hocphimoibuoi: Number(lop.hocphimoibuoi),
+          thoiluonghoc: Number(lop.thoiluonghoc),
+          sobuoihoc: Number(lop.sobuoihoc),
+          trangthai: 1 // Mở lại = trạng thái 1
+        };
+        
+        await GiaSu_MonHoc_Service.capNhatGiaSuMonHoc(lop.magiasu_monhoc, payload);
+        alert("Đã mở lại lớp học thành công!");
+        fetchDanhSachLopVaKhungGio(maGiaSu);
+      } catch (error) {
+        alert("Lỗi khi mở lại lớp học!");
+      }
     }
   };
 
@@ -447,15 +486,29 @@ const YeuCauDangKyLich = () => {
           <div className="lh-grid">
             {danhSachLop.map((lop) => {
               const khungGioCuaLop = danhSachKhungGio.filter(kg => kg.magiasu_monhoc === lop.magiasu_monhoc && (kg.trangthai === 1 || kg.trangthai === 2 || kg.trangthai === 3));
+              
+              const isLopBiKhoa = Number(lop.trangthai) === 0;
+              
+              // ✅ LOGIC: Kiểm tra có khung giờ nào đang ở trạng thái 2 (đang dạy) hoặc 3 (chờ duyệt)
+              const coKhungGioDangDay = khungGioCuaLop.some(kg => kg.trangthai === 2);
+              const coKhungGioChoDuyet = khungGioCuaLop.some(kg => kg.trangthai === 3);
+              const hienNutChinhSua = !isLopBiKhoa && !coKhungGioDangDay && !coKhungGioChoDuyet;
 
               return (
-                <div key={lop.magiasu_monhoc} className="lh-card">
-                  <div className="lh-action-btns">
-                    <button className="lh-icon-btn edit" onClick={() => handleMoModalSuaLop(lop)} title="Sửa thông tin lớp"><span className="material-symbols-outlined">edit</span></button>
-                    <button className="lh-icon-btn delete" onClick={() => handleKhoaLop(lop.magiasu_monhoc)} title="Khóa lớp học"><span className="material-symbols-outlined">lock</span></button>
-                  </div>
+                <div key={lop.magiasu_monhoc} className="lh-card" style={{ opacity: isLopBiKhoa ? 0.7 : 1, border: isLopBiKhoa ? '2px dashed #cbd5e1' : '1px solid #e2e8f0' }}>
+                  {hienNutChinhSua && (
+                    <div className="lh-action-btns">
+                      <button className="lh-icon-btn edit" onClick={() => handleMoModalSuaLop(lop)} title="Sửa thông tin lớp"><span className="material-symbols-outlined">edit</span></button>
+                      <button className="lh-icon-btn delete" onClick={() => handleKhoaLop(lop.magiasu_monhoc)} title="Khóa lớp học"><span className="material-symbols-outlined">lock</span></button>
+                    </div>
+                  )}
 
-                  <span className="lh-badge">Đang hoạt động</span>
+                  {isLopBiKhoa ? (
+                    <span className="lh-badge" style={{ backgroundColor: '#ef4444' }}>Đã khóa</span>
+                  ) : (
+                    <span className="lh-badge">Đang hoạt động</span>
+                  )}
+                  
                   <h4 className="lh-card-title">{timTenMonHoc(lop.mamonhoc)}</h4>
 
                   <div className="lh-card-info">
@@ -475,42 +528,69 @@ const YeuCauDangKyLich = () => {
                     <strong>Khu vực:</strong> {timTenKhuVuc(lop.makhuvuc)}
                   </div>
 
-                  <div className="lh-schedule-box">
-                    <div className="lh-schedule-title">
-                      <span>LỊCH HỌC ({khungGioCuaLop.length})</span>
-                      <button className="lh-btn-add-schedule" onClick={() => handleMoModalThemKhungGio(lop.magiasu_monhoc)}>
-                        + Thêm lịch
+                  {isLopBiKhoa ? (
+                    <div style={{ marginTop: '16px', padding: '12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', textAlign: 'center' }}>
+                      <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#991b1b', fontWeight: 'bold' }}>
+                        Lớp học này đã bị khóa
+                      </p>
+                      <button 
+                        onClick={() => handleMoLaiLop(lop)}
+                        style={{ 
+                          background: '#10b981', 
+                          color: '#fff', 
+                          border: 'none', 
+                          padding: '8px 16px', 
+                          borderRadius: '6px', 
+                          cursor: 'pointer', 
+                          fontWeight: 'bold',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          margin: '0 auto'
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>lock_open</span>
+                        Mở lại lớp học
                       </button>
                     </div>
+                  ) : (
+                    <div className="lh-schedule-box">
+                      <div className="lh-schedule-title">
+                        <span>LỊCH HỌC ({khungGioCuaLop.length})</span>
+                        <button className="lh-btn-add-schedule" onClick={() => handleMoModalThemKhungGio(lop.magiasu_monhoc)}>
+                          + Thêm lịch
+                        </button>
+                      </div>
 
-                    <div className="lh-schedule-list" style={{ maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
-                      {khungGioCuaLop.length === 0 ? (
-                        <span style={{fontSize: '12px', color: '#94a3b8', fontStyle: 'italic'}}>Chưa xếp lịch.</span>
-                      ) : (
-                        khungGioCuaLop.map(kg => (
-                          <div key={kg.makhunggio} className="lh-schedule-item">
-                            <span style={{ fontSize: '13px' }}><strong>{kg.ngayday}</strong>: {String(kg.thoigianbatdau).slice(0, 5)} - {String(kg.thoigianketthuc).slice(0, 5)}</span>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                              {kg.trangthai === 1 ? (
-                                <>
-                                  <button className="lh-icon-btn edit" onClick={() => handleMoModalSuaKhungGio(kg)} style={{ padding: '2px' }} title="Sửa lịch học">
-                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>edit</span>
-                                  </button>
-                                  <button className="lh-icon-btn delete" onClick={() => handleKhoaKhungGio(kg.makhunggio, kg.trangthai)} style={{ padding: '2px' }} title="Hủy lịch học này">
-                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
-                                  </button>
-                                </>
-                              ) : kg.trangthai === 2 ? (
-                                <span style={{ fontSize: '10px', backgroundColor: '#10b981', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>Đang dạy</span>
-                              ) : (
-                                <span style={{ fontSize: '10px', backgroundColor: '#f59e0b', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>Chờ duyệt</span>
-                              )}
+                      <div className="lh-schedule-list" style={{ maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+                        {khungGioCuaLop.length === 0 ? (
+                          <span style={{fontSize: '12px', color: '#94a3b8', fontStyle: 'italic'}}>Chưa xếp lịch.</span>
+                        ) : (
+                          khungGioCuaLop.map(kg => (
+                            <div key={kg.makhunggio} className="lh-schedule-item">
+                              <span style={{ fontSize: '13px' }}><strong>{kg.ngayday}</strong>: {String(kg.thoigianbatdau).slice(0, 5)} - {String(kg.thoigianketthuc).slice(0, 5)}</span>
+                              <div style={{ display: 'flex', gap: '4px' }}>
+                                {kg.trangthai === 1 ? (
+                                  <>
+                                    <button className="lh-icon-btn edit" onClick={() => handleMoModalSuaKhungGio(kg)} style={{ padding: '2px' }} title="Sửa lịch học">
+                                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>edit</span>
+                                    </button>
+                                    <button className="lh-icon-btn delete" onClick={() => handleKhoaKhungGio(kg.makhunggio, kg.trangthai)} style={{ padding: '2px' }} title="Hủy lịch học này">
+                                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
+                                    </button>
+                                  </>
+                                ) : kg.trangthai === 2 ? (
+                                  <span style={{ fontSize: '10px', backgroundColor: '#10b981', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>Đang dạy</span>
+                                ) : (
+                                  <span style={{ fontSize: '10px', backgroundColor: '#f59e0b', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>Chờ duyệt</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))
-                      )}
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}
@@ -583,45 +663,113 @@ const YeuCauDangKyLich = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {listChoDuyet.length > 0 && (
               <div>
-                <h3 style={{ color: '#d97706', borderBottom: '2px solid #fde68a', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-outlined">hourglass_empty</span> Yêu cầu đang chờ duyệt ({listChoDuyet.length})
+                <h3 
+                  onClick={() => setIsChoDuyetExpanded(!isChoDuyetExpanded)}
+                  style={{ 
+                    color: '#d97706', 
+                    borderBottom: '2px solid #fde68a', 
+                    paddingBottom: '8px', 
+                    marginBottom: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                  <span className="material-symbols-outlined">{isChoDuyetExpanded ? 'expand_more' : 'chevron_right'}</span>
+                  <span className="material-symbols-outlined">hourglass_empty</span> 
+                  Yêu cầu đang chờ duyệt ({listChoDuyet.length})
                 </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {listChoDuyet.map(dk => renderCardDangKy(dk, 'Chờ xác nhận (0)', '#f59e0b'))}
-                </div>
+                {isChoDuyetExpanded && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {listChoDuyet.map(dk => renderCardDangKy(dk, 'Chờ xác nhận (0)', '#f59e0b'))}
+                  </div>
+                )}
               </div>
             )}
 
             {listDangDay.length > 0 && (
               <div>
-                <h3 style={{ color: '#0284c7', borderBottom: '2px solid #bae6fd', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-outlined">school</span> Lớp đang diễn ra ({listDangDay.length})
+                <h3 
+                  onClick={() => setIsDangDayExpanded(!isDangDayExpanded)}
+                  style={{ 
+                    color: '#0284c7', 
+                    borderBottom: '2px solid #bae6fd', 
+                    paddingBottom: '8px', 
+                    marginBottom: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                  <span className="material-symbols-outlined">{isDangDayExpanded ? 'expand_more' : 'chevron_right'}</span>
+                  <span className="material-symbols-outlined">school</span> 
+                  Lớp đang diễn ra ({listDangDay.length})
                 </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {listDangDay.map(dk => renderCardDangKy(dk, 'Đang dạy (1)', '#0284c7'))}
-                </div>
+                {isDangDayExpanded && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {listDangDay.map(dk => renderCardDangKy(dk, 'Đang dạy (1)', '#0284c7'))}
+                  </div>
+                )}
               </div>
             )}
 
             {listHoanThanh.length > 0 && (
               <div>
-                <h3 style={{ color: '#10b981', borderBottom: '2px solid #a7f3d0', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-outlined">task_alt</span> Lớp đã hoàn thành ({listHoanThanh.length})
+                <h3 
+                  onClick={() => setIsHoanThanhExpanded(!isHoanThanhExpanded)}
+                  style={{ 
+                    color: '#10b981', 
+                    borderBottom: '2px solid #a7f3d0', 
+                    paddingBottom: '8px', 
+                    marginBottom: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                  <span className="material-symbols-outlined">{isHoanThanhExpanded ? 'expand_more' : 'chevron_right'}</span>
+                  <span className="material-symbols-outlined">task_alt</span> 
+                  Lớp đã hoàn thành ({listHoanThanh.length})
                 </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {listHoanThanh.map(dk => renderCardDangKy(dk, 'Hoàn thành (3)', '#10b981'))}
-                </div>
+                {isHoanThanhExpanded && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {listHoanThanh.map(dk => renderCardDangKy(dk, 'Hoàn thành (3)', '#10b981'))}
+                  </div>
+                )}
               </div>
             )}
 
             {listTuChoi.length > 0 && (
               <div>
-                <h3 style={{ color: '#ef4444', borderBottom: '2px solid #fca5a5', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-outlined">block</span> Yêu cầu đã từ chối ({listTuChoi.length})
+                <h3 
+                  onClick={() => setIsTuChoiExpanded(!isTuChoiExpanded)}
+                  style={{ 
+                    color: '#ef4444', 
+                    borderBottom: '2px solid #fca5a5', 
+                    paddingBottom: '8px', 
+                    marginBottom: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                  <span className="material-symbols-outlined">{isTuChoiExpanded ? 'expand_more' : 'chevron_right'}</span>
+                  <span className="material-symbols-outlined">block</span> 
+                  Yêu cầu đã từ chối ({listTuChoi.length})
                 </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {listTuChoi.map(dk => renderCardDangKy(dk, 'Đã từ chối (2)', '#ef4444'))}
-                </div>
+                {isTuChoiExpanded && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {listTuChoi.map(dk => renderCardDangKy(dk, 'Đã từ chối (2)', '#ef4444'))}
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -129,10 +129,11 @@ const BaiDangTimGiaSu = () => {
           const nhungNguoiThamGia = listYCHV.filter(y => y.mayeucau === yc.mayeucau);
           const thongTinHocVien = nhungNguoiThamGia.map(y => listHV.find(h => h.mahocvien === y.mahocvien)).filter(Boolean);
 
-          // 🟢 ĐÃ SỬA CÁCH MATCH DATA: Dùng 'id' thay cho 'manguoidung' vì Service đã map dữ liệu
           const nguoiHoc = listNguoiDung.find(nd => Number(nd.id) === Number(yc.manguoidung)) || {};
-
           const danhGiaCuaDon = listDanhGia.find(dg => dg.mayeucau === yc.mayeucau);
+
+          // 🟢 ĐẾM SỐ LƯỢNG GIA SƯ ĐÃ NỘP ĐƠN
+          const soLuongUngTuyen = listTatCaUngTuyen.filter(ut => ut.mayeucau === yc.mayeucau).length;
 
           return {
             ...yc,
@@ -142,11 +143,11 @@ const BaiDangTimGiaSu = () => {
             lichhoc_str: chuoiLichHoc || 'Chưa xếp lịch',
             ngaybatdau_str: yc.ngaybatdauhoc ? new Date(yc.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Đang cập nhật',
             danhsachhocvien: thongTinHocVien,
-            // 🟢 ĐÃ SỬA CÁCH GỌI KEY: Dùng 'name', 'phone', 'email' từ kết quả của NguoiDung_Service
             nguoihoc_ten: nguoiHoc.name || 'Chưa cập nhật',
             nguoihoc_sdt: nguoiHoc.phone || 'Chưa cập nhật',
             nguoihoc_email: nguoiHoc.email || 'Chưa cập nhật',
-            danhGiaCuaDon: danhGiaCuaDon || null
+            danhGiaCuaDon: danhGiaCuaDon || null,
+            soLuongUngTuyen: soLuongUngTuyen // 🟢
           };
         });
 
@@ -177,12 +178,56 @@ const BaiDangTimGiaSu = () => {
         await GiaSu_UngTuyen_Service.themUngTuyenMoi(payloadUngTuyen);
 
         setDanhSachDaUngTuyen(prev => ({ ...prev, [mayeucau]: 0 }));
+        
+        // 🟢 Tăng số đếm ở giao diện lên 1 ngay lập tức để UX mượt mà
+        setDanhSachBaiDang(prevList => prevList.map(yc => 
+          yc.mayeucau === mayeucau ? { ...yc, soLuongUngTuyen: yc.soLuongUngTuyen + 1 } : yc
+        ));
+
         alert(`🎉 Đã ứng tuyển thành công! Vui lòng theo dõi ở tab "Đã Ứng Tuyển".`);
 
       } catch (error) {
         console.error("Lỗi khi ứng tuyển:", error);
         alert("Đã xảy ra lỗi khi gửi yêu cầu ứng tuyển. Vui lòng kiểm tra Console (F12)!");
       }
+    }
+  };
+
+  const handleHuyUngTuyen = async (mayeucau, tenMonHoc) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn RÚT HỒ SƠ ứng tuyển lớp [${tenMonHoc}] không?\nBạn vẫn có thể ứng tuyển lại vào lớp này sau khi rút.`)) {
+      return;
+    }
+
+    try {
+      const resUngTuyen = await GiaSu_UngTuyen_Service.layDanhSachUngTuyen();
+      const listUngTuyen = Array.isArray(resUngTuyen) ? resUngTuyen : resUngTuyen?.data || [];
+      
+      const ungTuyenCanHuy = listUngTuyen.find(ut => 
+        ut.mayeucau === mayeucau && ut.magiasu === maGiaSuHienTai
+      );
+
+      if (!ungTuyenCanHuy) {
+        return alert("Không tìm thấy thông tin ứng tuyển!");
+      }
+
+      const maUngTuyen = ungTuyenCanHuy.magiasu_ungtuyen || ungTuyenCanHuy.id;
+      await GiaSu_UngTuyen_Service.xoaUngTuyen(maUngTuyen); 
+
+      setDanhSachDaUngTuyen(prev => {
+        const newState = { ...prev };
+        delete newState[mayeucau]; 
+        return newState;
+      });
+
+      // 🟢 Giảm số đếm ở giao diện xuống 1
+      setDanhSachBaiDang(prevList => prevList.map(yc => 
+        yc.mayeucau === mayeucau ? { ...yc, soLuongUngTuyen: Math.max(0, yc.soLuongUngTuyen - 1) } : yc
+      ));
+      
+      alert("Đã rút hồ sơ ứng tuyển thành công! Bạn có thể ứng tuyển lại bất cứ lúc nào.");
+    } catch (error) {
+      console.error("Lỗi khi hủy ứng tuyển:", error);
+      alert("Đã xảy ra lỗi khi hủy ứng tuyển! Vui lòng kiểm tra kết nối mạng.");
     }
   };
 
@@ -327,6 +372,11 @@ const BaiDangTimGiaSu = () => {
                     <span className="material-symbols-outlined">schedule</span>
                     <span>Lịch: {baiDang.lichhoc_str}</span>
                   </div>
+                  {/* 🟢 HIỂN THỊ SỐ LƯỢNG GIA SƯ ĐÃ NỘP ĐƠN */}
+                  <div className="baidang-info-row">
+                    <span className="material-symbols-outlined" style={{color: '#0284c7'}}>group</span>
+                    <span>Gia sư ứng tuyển: <strong style={{color: '#0284c7'}}>{baiDang.soLuongUngTuyen}</strong> người</span>
+                  </div>
                 </div>
 
                 <div className="baidang-hocvien-box">
@@ -379,18 +429,27 @@ const BaiDangTimGiaSu = () => {
                           Đã Duyệt - Đang Dạy
                         </button>
                       )
+                    ) : trangThaiUT === 2 ? (
+                      <button className="btn-ungtuyen rejected" disabled style={{ flex: 1 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>cancel</span>
+                        Đã Từ Chối
+                      </button>
                     ) : (
-                      trangThaiYeuCau === 0 ? (
+                      // trangThaiUT === 0 - Đang chờ duyệt
+                      <>
                         <button className="btn-ungtuyen pending" disabled style={{ flex: 1 }}>
                           <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
                           Đang Chờ Duyệt
                         </button>
-                      ) : (
-                        <button className="btn-ungtuyen rejected" disabled style={{ flex: 1 }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>cancel</span>
-                          Bị Từ Chối (Đã chốt Gia sư khác)
+                        <button 
+                          className="btn-ungtuyen" 
+                          onClick={() => handleHuyUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)}
+                          style={{ flex: '0 0 auto', backgroundColor: '#ef4444', color: '#fff', border: 'none' }}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
+                          Hủy
                         </button>
-                      )
+                      </>
                     )
                   ) : (
                     !duDieuKien ? (

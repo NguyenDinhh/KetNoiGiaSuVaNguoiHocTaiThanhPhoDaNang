@@ -29,7 +29,8 @@ const QuanLyYeuCau = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailData, setDetailData] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [formSua, setFormSua] = useState({ mayeucau: '', ngaybatdauhoc: '', sobuoihoc: '', tonghocphi: '' });
+  const [formSua, setFormSua] = useState({ mayeucau: '', ngaybatdauhoc: '', sobuoihoc: '', tonghocphi: '', danhSachKhungGio: [] });
+  const [khungGioMoi, setKhungGioMoi] = useState({ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' });
 
   // STATE PHỤC VỤ ĐÁNH GIÁ (SAO & MODAL)
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -63,7 +64,8 @@ const QuanLyYeuCau = () => {
         const [
           resYeuCau, resMonHoc, resKhuVuc, resHeLop,
           resHocVien, resYCHV, resTatCaUngTuyen,
-          resGiaSu, resNguoiDung, resDanhGia
+          resGiaSu, resNguoiDung, resDanhGia,
+          resChiTietYC // BỔ SUNG: Lấy chi tiết yêu cầu (Khung giờ)
         ] = await Promise.all([
           YeuCauTimGiaSu_Service.layDanhSachYeuCau().catch(() => []),
           MonHoc_Service.layDanhSachMonHoc().catch(() => []),
@@ -74,7 +76,8 @@ const QuanLyYeuCau = () => {
           GiaSu_UngTuyen_Service.layDanhSachUngTuyen().catch(() => []),
           GiaSu_Service.layDanhSachGiaSu().catch(() => []),
           NguoiDung_Service.layDanhSachNguoiDung().catch(() => []),
-          DanhGia_Service.layDanhSachDanhGia().catch(() => [])
+          DanhGia_Service.layDanhSachDanhGia().catch(() => []),
+          ChiTietYeuCau_Service.layDanhSachChiTietYeuCau().catch(() => [])
         ]);
 
         if (!isMounted) return;
@@ -89,6 +92,7 @@ const QuanLyYeuCau = () => {
         const listGiaSu = Array.isArray(resGiaSu) ? resGiaSu : resGiaSu?.data || [];
         const listNguoiDung = Array.isArray(resNguoiDung) ? resNguoiDung : resNguoiDung?.data || [];
         const listDanhGia = Array.isArray(resDanhGia) ? resDanhGia : resDanhGia?.data || [];
+        const listChiTietYC = Array.isArray(resChiTietYC) ? resChiTietYC : resChiTietYC?.data || []; // Mảng chứa các khung giờ
 
         setDanhSachMonHoc(listMonHoc);
         setDanhSachKhuVuc(listKhuVuc);
@@ -113,8 +117,8 @@ const QuanLyYeuCau = () => {
           const danhSachUngTuyenCuaLopNay = listTatCaUngTuyen.filter(ut => Number(ut.mayeucau) === Number(yc.mayeucau));
           const mangYCHV_CuaLop = listYCHV.filter(y => Number(y.mayeucau) === Number(yc.mayeucau));
           const danhSachHocVienCuaLop = mangYCHV_CuaLop.map(y => listHocVien.find(h => Number(h.mahocvien) === Number(y.mahocvien))).filter(Boolean);
-
           const đánhGiáĐãCó = listDanhGia.find(dg => Number(dg.mayeucau) === Number(yc.mayeucau));
+          const danhSachKhungGio = listChiTietYC.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau)); // BỔ SUNG: Lọc khung giờ thuộc yêu cầu này
 
           return {
             ...yc,
@@ -123,7 +127,8 @@ const QuanLyYeuCau = () => {
             ngaybatdau_str: yc.ngaybatdauhoc ? new Date(yc.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa xếp',
             danhGiaCuaToi: đánhGiáĐãCó || null,
             danhSachUngTuyen: danhSachUngTuyenCuaLopNay,
-            danhSachHocVien: danhSachHocVienCuaLop
+            danhSachHocVien: danhSachHocVienCuaLop,
+            danhSachKhungGio: danhSachKhungGio // Đính kèm mảng khung giờ vào YeuCau
           };
         });
 
@@ -142,6 +147,47 @@ const QuanLyYeuCau = () => {
   // ====================================================================
   // LOGIC HÀNH ĐỘNG: DUYỆT - TỪ CHỐI - XÓA - SỬA
   // ====================================================================
+
+  // BỔ SUNG: Hàm xử lý xóa Chi Tiết Yêu Cầu (Khung giờ)
+  const handleDeleteChiTiet = async (maChiTietYeuCau) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa lịch học này không?")) return;
+    try {
+      await ChiTietYeuCau_Service.xoaChiTietYeuCau(maChiTietYeuCau);
+      alert("Đã xóa khung giờ thành công!");
+      window.location.reload(); // Reload lại để cập nhật danh sách mới nhất
+    } catch (error) {
+      alert("Xóa khung giờ thất bại!");
+    }
+  };
+
+  // BỔ SUNG: Hàm thêm khung giờ mới khi đang chỉnh sửa
+  const handleThemKhungGioMoi = async () => {
+    if (!khungGioMoi.thoigianbatdau || !khungGioMoi.thoigianketthuc) {
+      return alert("Vui lòng chọn đầy đủ thời gian bắt đầu và kết thúc!");
+    }
+    
+    try {
+      const payload = {
+        mayeucau: Number(formSua.mayeucau),
+        ngayhoc: String(khungGioMoi.ngayhoc),
+        thoigianbatdau: khungGioMoi.thoigianbatdau,
+        thoigianketthuc: khungGioMoi.thoigianketthuc,
+        ghichu: String(khungGioMoi.ghichu || "")
+      };
+      
+      await ChiTietYeuCau_Service.themChiTietYeuCauMoi(payload);
+      alert("Đã thêm khung giờ mới thành công!");
+      
+      // Reset form thêm khung giờ
+      setKhungGioMoi({ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' });
+      
+      // Reload lại để cập nhật danh sách mới nhất
+      window.location.reload();
+    } catch (error) {
+      alert("Thêm khung giờ thất bại!");
+    }
+  };
+
   const handleDuyetGiaSu = async (ungTuyenDuocChon, yeuCauHienTai) => {
     if (!window.confirm("Bạn có chắc chắn muốn duyệt Gia sư này?\nCác gia sư khác ứng tuyển lớp này sẽ tự động bị từ chối.")) return;
     try {
@@ -188,22 +234,31 @@ const QuanLyYeuCau = () => {
     } catch (error) { alert("Lỗi khi lưu thông tin cập nhật."); }
   };
 
+  // ====================================================================
+  // HÀM XÓA YÊU CẦU (Backend sẽ xóa cả ứng tuyển, học viên, khung giờ, đánh giá)
+  // ====================================================================
   const handleDelete = async (mayeucau) => {
-    if (!window.confirm("Bạn có chắc chắn muốn XÓA yêu cầu này không?")) return;
+    if (!window.confirm("⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA YÊU CẦU NÀY?\n\nHành động này sẽ XÓA VĨNH VIỄN:\n✗ Tất cả ứng tuyển (kể cả bị từ chối)\n✗ Danh sách học viên\n✗ Khung giờ\n✗ Đánh giá (nếu có)")) {
+      return;
+    }
+
     try {
       await YeuCauTimGiaSu_Service.xoaYeuCau(mayeucau);
-      alert("Đã xóa yêu cầu thành công!");
+      alert("🎉 Đã xóa yêu cầu và tất cả dữ liệu liên quan!");
       window.location.reload();
-    } catch (error) { alert("Xóa thất bại!"); }
+    } catch (error) {
+      console.error("Lỗi khi xóa Yêu cầu:", error);
+      alert("🚨 Xóa thất bại! Vui lòng kiểm tra lại.");
+    }
   };
 
   const handleMoDanhGia = (yc) => {
-    if (yc.danhGiaCShadow) {
+    if (yc.danhGiaCuaToi) { // Fix lỗi typo từ yc.danhGiaCShadow
       setReviewData({
-        madanhgia: yc.danhGiaCuToi.madanhgia,
+        madanhgia: yc.danhGiaCuaToi.madanhgia,
         mayeucau: yc.mayeucau,
-        sosao: yc.danhGiaCuToi.sodiem,
-        nhanxet: yc.danhGiaCuToi.noidung
+        sosao: yc.danhGiaCuaToi.sodiem,
+        nhanxet: yc.danhGiaCuaToi.noidung
       });
     } else {
       setReviewData({ madanhgia: null, mayeucau: yc.mayeucau, sosao: 5, nhanxet: '' });
@@ -290,13 +345,21 @@ const QuanLyYeuCau = () => {
   const listHoanThanh = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 2);
   const listTuChoi = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 3);
 
-  // Cấu trúc hàm render card dùng chung để tránh trùng lặp code
   const renderCardYeuCau = (yc, canEditDelete = false) => {
     let statusText = 'Đang tìm Gia sư';
     let statusClass = 'open';
     if (Number(yc.trangthai) === 1) { statusText = 'Đang học'; statusClass = 'closed'; }
     if (Number(yc.trangthai) === 2) { statusText = 'Đã hoàn thành'; statusClass = 'completed'; }
     if (Number(yc.trangthai) === 3) { statusText = 'Đã từ chối'; statusClass = 'rejected'; }
+
+    // ✅ LOGIC MỚI: Kiểm tra có ứng tuyển đang chờ không
+    const coGiaSuDangCho = yc.danhSachUngTuyen.some(ut => Number(ut.trangthai) === 0);
+    const tatCaBiTuChoi = yc.danhSachUngTuyen.length > 0 && yc.danhSachUngTuyen.every(ut => Number(ut.trangthai) === 2);
+
+    // Hiện nút sửa/xóa khi:
+    // - canEditDelete = true (trangthai = 0)
+    // - VÀ (không có ứng tuyển HOẶC tất cả ứng tuyển đều bị từ chối)
+    const hienNutSuaXoa = canEditDelete && (!coGiaSuDangCho || tatCaBiTuChoi);
 
     return (
       <div className="ql-card" key={yc.mayeucau}>
@@ -317,9 +380,13 @@ const QuanLyYeuCau = () => {
           </button>
 
           <div style={{ display: 'flex', gap: '8px' }}>
-            {canEditDelete && (
+            {hienNutSuaXoa && (
               <>
-                <button className="ql-btn edit" onClick={() => { setFormSua({...yc, ngaybatdauhoc: yc.ngaybatdauhoc ? new Date(yc.ngaybatdauhoc).toISOString().split('T')[0] : ''}); setIsEditOpen(true); }}><span className="material-symbols-outlined" style={{fontSize:'16px'}}>edit</span> Sửa</button>
+                <button className="ql-btn edit" onClick={() => { 
+                  setFormSua({...yc, ngaybatdauhoc: yc.ngaybatdauhoc ? new Date(yc.ngaybatdauhoc).toISOString().split('T')[0] : ''}); 
+                  setKhungGioMoi({ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' });
+                  setIsEditOpen(true); 
+                }}><span className="material-symbols-outlined" style={{fontSize:'16px'}}>edit</span> Sửa</button>
                 <button className="ql-btn delete" onClick={() => handleDelete(yc.mayeucau)}><span className="material-symbols-outlined" style={{fontSize:'16px'}}>delete</span> Xóa</button>
               </>
             )}
@@ -387,7 +454,7 @@ const QuanLyYeuCau = () => {
 
         /* ================= TAB 1: DANH SÁCH YÊU CẦU ================= */
         <>
-          {/* 🟢 KHỐI Ô THỐNG KÊ SỐ LƯỢNG YÊU CẦU TRỰC QUAN */}
+          {/* KHỐI Ô THỐNG KÊ */}
           <div className="nh-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
             <div className="nh-stat-card" style={{ background: '#fff', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '5px solid #f59e0b' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fef3c7', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#d97706' }}><span className="material-symbols-outlined">hourglass_top</span></div>
@@ -414,7 +481,6 @@ const QuanLyYeuCau = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
-              {/* 🟢 KHỐI 1: ĐANG CHỜ DUYỆT (TRẠNG THÁI 0) */}
               {listChoDuyet.length > 0 && (
                 <div>
                   <h3 style={{ color: '#d97706', borderBottom: '2px solid #fde68a', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -426,7 +492,6 @@ const QuanLyYeuCau = () => {
                 </div>
               )}
 
-              {/* 🟢 KHỐI 2: ĐANG HỌC (TRẠNG THÁI 1) */}
               {listDangHoc.length > 0 && (
                 <div>
                   <h3 style={{ color: '#0284c7', borderBottom: '2px solid #bae6fd', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -438,7 +503,6 @@ const QuanLyYeuCau = () => {
                 </div>
               )}
 
-              {/* 🟢 KHỐI 3: ĐÃ HOÀN THÀNH (TRẠNG THÁI 2) */}
               {listHoanThanh.length > 0 && (
                 <div>
                   <h3 style={{ color: '#10b981', borderBottom: '2px solid #a7f3d0', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -450,7 +514,6 @@ const QuanLyYeuCau = () => {
                 </div>
               )}
 
-              {/* 🟢 KHỐI 4: ĐÃ TỪ CHỐI (TRẠNG THÁI 3 - NẾU CÓ) */}
               {listTuChoi.length > 0 && (
                 <div>
                   <h3 style={{ color: '#ef4444', borderBottom: '2px solid #fca5a5', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -465,7 +528,7 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* MODAL ĐÁNH GIÁ (GIỮ NGUYÊN) */}
+          {/* MODAL ĐÁNH GIÁ */}
           {isReviewOpen && (
             <div className="bc-modal-overlay">
               <div className="bc-modal-content" style={{ maxWidth: '420px', textAlign: 'center' }}>
@@ -489,8 +552,7 @@ const QuanLyYeuCau = () => {
                           onMouseLeave={() => setHoveredStar(0)}
                           onClick={() => setReviewData({ ...reviewData, sosao: star })}
                           style={{
-                            fontSize: '42px',
-                            cursor: 'pointer',
+                            fontSize: '42px', cursor: 'pointer',
                             color: star <= (hoveredStar || reviewData.sosao) ? '#f59e0b' : '#cbd5e1',
                             transition: 'color 0.2s',
                             fontVariationSettings: star <= (hoveredStar || reviewData.sosao) ? "'FILL' 1" : "'FILL' 0"
@@ -520,7 +582,7 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* Modal Xem chi tiết (GIỮ NGUYÊN) */}
+          {/* BỔ SUNG: Modal Xem chi tiết (Hiển thị mảng khung giờ) */}
           {isDetailOpen && detailData && (
             <div className="bc-modal-overlay">
               <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
@@ -529,6 +591,21 @@ const QuanLyYeuCau = () => {
                   <p><strong>📚 Môn học:</strong> {detailData.tenmonhoc}</p><p><strong>📍 Khu vực:</strong> {detailData.tenkhuvuc}</p>
                   <p><strong>📅 Dự kiến bắt đầu:</strong> {detailData.ngaybatdau_str}</p><p><strong>⏰ Số buổi:</strong> {detailData.sobuoihoc} buổi</p>
                   <p><strong>💰 Mức học phí:</strong> <span style={{ color: '#ef4444', fontWeight: 'bold' }}>{detailData.tonghocphi?.toLocaleString()} VNĐ</span></p>
+                  
+                  <div style={{ marginTop: '16px', background: '#f0f9ff', padding: '12px', borderRadius: '8px' }}>
+                    <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#0284c7' }}>🕒 Lịch học ({detailData.danhSachKhungGio?.length || 0}):</p>
+                    {detailData.danhSachKhungGio?.length === 0 ? <span>Chưa thiết lập khung giờ</span> : (
+                      <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                        {detailData.danhSachKhungGio.map((kg, idx) => (
+                          <li key={idx} style={{ marginBottom: '4px' }}>
+                            <strong>{kg.ngayhoc}</strong> ({kg.thoigianbatdau} - {kg.thoigianketthuc})
+                            {kg.ghichu && <span style={{ fontStyle: 'italic', color: '#64748b' }}> - {kg.ghichu}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
                   <div style={{ marginTop: '16px', background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
                     <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>🧑‍🎓 Học viên tham gia ({detailData.danhSachHocVien.length}):</p>
                     {detailData.danhSachHocVien.length === 0 ? <span>Chưa cập nhật</span> : <ul>{detailData.danhSachHocVien.map((hv, idx) => <li key={idx}><strong>{hv.tenhocvien}</strong> (SN: {hv.namsinh})</li>)}</ul>}
@@ -539,11 +616,12 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* Modal Sửa (GIỮ NGUYÊN) */}
+          {/* BỔ SUNG: Modal Sửa (Hiển thị mảng khung giờ & nút xóa khung giờ) */}
           {isEditOpen && (
             <div className="bc-modal-overlay">
-              <div className="bc-modal-content" style={{ maxWidth: '450px' }}>
+              <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
                 <div className="bc-modal-header"><h3>Chỉnh sửa yêu cầu</h3><button onClick={() => setIsEditOpen(false)} className="bc-close-btn">&times;</button></div>
+                
                 <form onSubmit={handleLuuSua} style={{ marginTop: '16px' }}>
                   <div className="tcn-form-group"><label>Khai giảng</label><input type="date" className="tcn-input" value={formSua.ngaybatdauhoc} onChange={e => setFormSua({ ...formSua, ngaybatdauhoc: e.target.value })} required/></div>
                   <div className="tcn-row">
@@ -554,6 +632,112 @@ const QuanLyYeuCau = () => {
                     <button type="button" onClick={() => setIsEditOpen(false)} className="btn-outline">Hủy bỏ</button><button type="submit" className="btn-submit">Lưu cập nhật</button>
                   </div>
                 </form>
+
+                {/* KHU VỰC QUẢN LÝ LỊCH HỌC TRONG MODAL SỬA */}
+                <div style={{ marginTop: '24px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
+                  <h4 style={{ marginBottom: '12px', color: '#334155' }}>Quản lý khung giờ (Lịch học)</h4>
+                  
+                  {/* DANH SÁCH KHUNG GIỜ HIỆN CÓ */}
+                  {formSua.danhSachKhungGio && formSua.danhSachKhungGio.length > 0 ? (
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                      {formSua.danhSachKhungGio.map(kg => (
+                        <li key={kg.machitietyeucau} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '8px 12px', borderRadius: '6px', marginBottom: '8px', border: '1px solid #e2e8f0' }}>
+                          <div>
+                            <strong>{kg.ngayhoc}</strong>: {kg.thoigianbatdau} - {kg.thoigianketthuc}
+                            {kg.ghichu && <div style={{ fontSize: '12px', color: '#64748b' }}>Ghi chú: {kg.ghichu}</div>}
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => handleDeleteChiTiet(kg.machitietyeucau)} 
+                            style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '6px', borderRadius: '4px', cursor: 'pointer', display: 'flex' }}
+                            title="Xóa lịch học này"
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>Chưa thiết lập khung giờ nào.</p>
+                  )}
+
+                  {/* FORM THÊM KHUNG GIỜ MỚI */}
+                  <div style={{ marginTop: '16px', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                    <p style={{ fontWeight: 'bold', color: '#0284c7', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add_circle</span>
+                      Thêm khung giờ mới
+                    </p>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                      <div style={{ flex: '1 1 120px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>Ngày học</label>
+                        <select 
+                          className="tcn-input" 
+                          value={khungGioMoi.ngayhoc} 
+                          onChange={e => setKhungGioMoi({ ...khungGioMoi, ngayhoc: e.target.value })}
+                          style={{ width: '100%', fontSize: '13px' }}
+                        >
+                          {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'].map(t => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div style={{ flex: '1 1 100px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>Từ</label>
+                        <input 
+                          type="time" 
+                          className="tcn-input" 
+                          value={khungGioMoi.thoigianbatdau} 
+                          onChange={e => setKhungGioMoi({ ...khungGioMoi, thoigianbatdau: e.target.value })}
+                          style={{ width: '100%', fontSize: '13px' }}
+                        />
+                      </div>
+                      <div style={{ flex: '1 1 100px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>Đến</label>
+                        <input 
+                          type="time" 
+                          className="tcn-input" 
+                          value={khungGioMoi.thoigianketthuc} 
+                          onChange={e => setKhungGioMoi({ ...khungGioMoi, thoigianketthuc: e.target.value })}
+                          style={{ width: '100%', fontSize: '13px' }}
+                        />
+                      </div>
+                      <div style={{ flex: '1 1 100%', marginTop: '4px' }}>
+                        <input 
+                          type="text" 
+                          className="tcn-input" 
+                          value={khungGioMoi.ghichu} 
+                          onChange={e => setKhungGioMoi({ ...khungGioMoi, ghichu: e.target.value })}
+                          placeholder="Ghi chú (tùy chọn)"
+                          style={{ width: '100%', fontSize: '13px' }}
+                        />
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={handleThemKhungGioMoi}
+                        style={{ 
+                          flex: '1 1 100%', 
+                          background: '#0284c7', 
+                          color: '#ffffff', 
+                          border: 'none', 
+                          padding: '8px 12px', 
+                          borderRadius: '6px', 
+                          fontSize: '13px', 
+                          fontWeight: 'bold', 
+                          cursor: 'pointer', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          gap: '6px',
+                          marginTop: '8px'
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add</span>
+                        Thêm khung giờ này
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           )}

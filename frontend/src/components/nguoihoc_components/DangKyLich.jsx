@@ -28,6 +28,14 @@ const DangKyLich = () => {
   const [reviewData, setReviewData] = useState({ madanhgia: null, madangky: null, sosao: 5, nhanxet: '' });
   const [hoveredStar, setHoveredStar] = useState(0);
 
+  // 🟢 STATES QUẢN LÝ THU/PHÓNG (EXPAND/COLLAPSE)
+  const [expanded, setExpanded] = useState({
+    choDuyet: true,
+    dangHoc: true,
+    hoanThanh: false,
+    tuChoi: false
+  });
+
   // STATES PHỤC VỤ LỊCH HỌC CỦA TỪNG HỌC VIÊN
   const [danhSachHocVienCuaToi, setDanhSachHocVienCuaToi] = useState([]);
   const [tabHocVien, setTabHocVien] = useState('Tất cả');
@@ -99,7 +107,15 @@ const DangKyLich = () => {
         };
       });
 
-      setDanhSachDangKy(dataHoanChinh.sort((a, b) => Number(a.trangthai) - Number(b.trangthai)));
+      // Sắp xếp: Chờ duyệt (0) lên đầu, Đang học (1), sau đó mới tới Đã Hủy/Từ Chối.
+      // Cùng trạng thái thì ưu tiên mới nhất lên trên
+      setDanhSachDangKy(dataHoanChinh.sort((a, b) => {
+        if (Number(a.trangthai) !== Number(b.trangthai)) {
+          return Number(a.trangthai) - Number(b.trangthai);
+        }
+        return Number(b.madangky) - Number(a.madangky);
+      }));
+      
     } catch (error) {
       console.error("Lỗi tải tiến trình lịch đăng ký:", error);
     } finally {
@@ -107,19 +123,47 @@ const DangKyLich = () => {
     }
   };
 
+  // 🟢 HÀM HỦY ĐƠN VÀ DỌN DẸP DỮ LIỆU CHUẨN MỰC
   const handleHuyDonDangKy = async (dk) => {
-    if (!window.confirm("Bạn có chắc chắn muốn HỦY đơn đăng ký khóa học này không?\nHệ thống sẽ rút lại các khung giờ đã giữ chỗ.")) return;
+    if (Number(dk.trangthai) !== 0) {
+        return alert("Chỉ có thể hủy những đơn đang ở trạng thái 'Chờ gia sư duyệt'!");
+    }
+
+    if (!window.confirm("⚠️ BẠN CÓ CHẮC CHẮN MUỐN HỦY ĐƠN ĐĂNG KÝ NÀY?\n\nHành động này sẽ XÓA VĨNH VIỄN toàn bộ dữ liệu của đơn này.\nĐồng thời, các Khung giờ bạn đã giữ chỗ sẽ được mở lại cho người khác.")) return;
+    
     try {
+      // 1. GIẢI PHÓNG KHUNG GIỜ: Phải nhả tài nguyên ra trước để Gia sư còn nhận người khác
       if (dk.danhSachKhungGioChon && dk.danhSachKhungGioChon.length > 0) {
         for (const ct of dk.danhSachKhungGioChon) {
+          // Trả trạng thái Khung giờ về 1 (Rảnh)
           await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, { trangthai: 1 });
+          // XÓA Chi tiết đăng ký liên kết
+          await ChiTietDangKyLich_Service.xoaChiTietDangKyLich(ct.machitietdangky);
         }
       }
-      await DangKyLich_Service.xoaDangKyLich(dk.madangky);
-      alert("Đã hủy và xóa yêu cầu đăng ký lịch học thành công!");
+
+      // 2. DỌN DẸP BẢNG TRUNG GIAN YÊU CẦU_HỌC VIÊN
+      const resYCHV = await YeuCau_HocVien_Service.layDanhSachYeuCauHocVien();
+      const arrYCHV = Array.isArray(resYCHV) ? resYCHV : (resYCHV?.data || []);
+      const cacYCHVCanXoa = arrYCHV.filter(yc => Number(yc.madangky) === Number(dk.madangky));
+      
+      for (const yc of cacYCHVCanXoa) {
+        await YeuCau_HocVien_Service.xoaYeuCauHocVien(yc.mayeucau_hocvien);
+      }
+
+      // 3. CUỐI CÙNG LÀ TRẢM THẰNG CHA
+      const xoaGoc = await DangKyLich_Service.xoaDangKyLich(dk.madangky);
+      
+      // Bắt lỗi nếu Backend báo "Thành công giả" giống vụ hôm nọ
+      if (xoaGoc.code && xoaGoc.code !== "200" && xoaGoc.code !== 200) {
+          throw new Error(xoaGoc.message || "Backend từ chối xóa gốc");
+      }
+
+      alert("🎉 Đã hủy đơn và dọn dẹp hệ thống thành công!");
       fetchLichDaDangKy();
     } catch (error) {
-      alert("Hủy đơn thất bại, vui lòng thử lại!");
+      console.error("Lỗi khi hủy đơn:", error);
+      alert("❌ Hủy đơn thất bại! Vui lòng kiểm tra lại đường truyền.");
     }
   };
 
@@ -174,8 +218,7 @@ const DangKyLich = () => {
           // 1. Chuyển trạng thái đơn Đăng ký thành 3 (Đã hoàn thành)
           await DangKyLich_Service.capNhatDangKyLich(donDangChon.madangky, { ...donDangChon, trangthai: 3 });
 
-          // 🟢 2. LOGIC MỚI: GIẢI PHÓNG KHUNG GIỜ CHO GIA SƯ
-          // Khóa học hoàn thành thì lịch của Gia sư phải được trống trở lại (trangthai = 1)
+          // 2. GIẢI PHÓNG KHUNG GIỜ CHO GIA SƯ
           if (donDangChon.danhSachKhungGioChon && donDangChon.danhSachKhungGioChon.length > 0) {
             for (const ct of donDangChon.danhSachKhungGioChon) {
               await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, { trangthai: 1 });
@@ -193,7 +236,6 @@ const DangKyLich = () => {
 
   const getLichHocData = () => {
     let dsCaHoc = [];
-    // 🟢 Trạng thái 1 vẫn là Đang học (Hợp lệ)
     const cacLopDangHoc = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
 
     cacLopDangHoc.forEach(dk => {
@@ -224,10 +266,139 @@ const DangKyLich = () => {
 
   const lichHocHienThi = getLichHocData();
 
-  // 🟢 THAY ĐỔI LOGIC ĐẾM THỐNG KÊ THEO MÃ TRẠNG THÁI MỚI
+  // PHÂN NHÓM DANH SÁCH
+  const listChoDuyet = danhSachDangKy.filter(dk => Number(dk.trangthai) === 0);
+  const listDangHoc = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
+  const listTuChoi = danhSachDangKy.filter(dk => Number(dk.trangthai) === 2);
+  const listHoanThanh = danhSachDangKy.filter(dk => Number(dk.trangthai) === 3);
+  
   const tongDon = danhSachDangKy.length;
-  const donDangHoc = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1).length; // 1: Đang học
-  const donHoanThanh = danhSachDangKy.filter(dk => Number(dk.trangthai) === 3).length; // 3: Đã hoàn thành
+  const donDangHoc = listDangHoc.length;
+  const donHoanThanh = listHoanThanh.length;
+
+  // 🟢 HÀM RENDER KHỐI DANH SÁCH (CÓ THU PHÓNG)
+  const renderSection = (title, list, expandedKey, color, icon) => {
+    if (list.length === 0) return null;
+    const isExpanded = expanded[expandedKey];
+    
+    let badgeText = '';
+    let badgeColor = '';
+    switch(expandedKey) {
+      case 'choDuyet': badgeText = 'Chờ gia sư duyệt'; badgeColor = '#f59e0b'; break;
+      case 'dangHoc': badgeText = 'Đang học (Gia sư đã nhận)'; badgeColor = '#0284c7'; break;
+      case 'hoanThanh': badgeText = 'Đã Hoàn Thành'; badgeColor = '#10b981'; break;
+      case 'tuChoi': badgeText = 'Gia sư từ chối'; badgeColor = '#ef4444'; break;
+      default: break;
+    }
+
+    return (
+      <div>
+        <h3 
+          onClick={() => setExpanded(prev => ({...prev, [expandedKey]: !prev[expandedKey]}))}
+          style={{ 
+            color: color, 
+            borderBottom: `2px solid ${color}40`, 
+            paddingBottom: '8px', 
+            marginBottom: '16px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          <span className="material-symbols-outlined">{isExpanded ? 'expand_more' : 'chevron_right'}</span>
+          <span className="material-symbols-outlined">{icon}</span> 
+          {title} ({list.length})
+        </h3>
+        {isExpanded && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {list.map(dk => (
+              <div key={dk.madangky} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0', paddingBottom: '12px', marginBottom: '16px' }}>
+                  <span style={{ fontWeight: '700', color: '#1e3a8a', fontSize: '16px' }}>📚 Khóa học: {dk.tenmonhoc}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#ffffff', backgroundColor: badgeColor, padding: '4px 12px', borderRadius: '20px' }}>
+                    {badgeText}
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '16px', fontSize: '14px', color: '#334155' }}>
+                  <div style={{ background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                    <div style={{ fontWeight: '700', color: '#0369a1', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>school</span> Thông tin Gia sư
+                    </div>
+                    <div style={{lineHeight: '1.6'}}>• <strong>Họ tên:</strong> {dk.giasu_ten}</div>
+                    <div style={{lineHeight: '1.6'}}>• <strong>SĐT:</strong> {dk.giasu_sdt}</div>
+                    <div style={{lineHeight: '1.6'}}>• <strong>Email:</strong> {dk.giasu_email}</div>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontWeight: '700', color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>face</span> Học viên tham gia
+                    </div>
+                    {dk.danhSachHocVien.length === 0 ? (
+                      <div style={{ fontStyle: 'italic', color: '#94a3b8' }}>Chưa cập nhật</div>
+                    ) : (
+                      dk.danhSachHocVien.map(hv => (
+                        <div key={hv.mahocvien} style={{ marginBottom: '4px', fontSize: '13px' }}>
+                          • <strong>{hv.tenhocvien}</strong> (SN: {hv.namsinh})
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontWeight: '700', color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>alarm</span> Khung lịch đã chọn
+                    </div>
+                    {dk.danhSachKhungGioChon?.map(ct => (
+                      <div key={ct.machitietdangky} style={{ fontSize: '13px', padding: '2px 0' }}>
+                        • <strong>{ct.ngayhoc}</strong>: {String(ct.thoigianbatdau).slice(0, 5)} - {String(ct.thoigianketthuc).slice(0, 5)}
+                      </div>
+                    ))}
+                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
+                      • <strong>Học phí:</strong> <span style={{ color: '#ef4444', fontWeight: '700' }}>{dk.tonghocphi?.toLocaleString()} đ</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', background: '#f8fafc', padding: '10px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '10px' }}>
+                  <div style={{ fontSize: '13.5px', color: '#475569' }}>
+                    <div>Khai giảng dự kiến: <strong style={{ color: '#0f172a' }}>{dk.ngaybatdauhoc ? new Date(dk.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></div>
+                    {dk.ghichu && <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>💬 Ghi chú: "{dk.ghichu}"</div>}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    {Number(dk.trangthai) === 0 && (
+                      <>
+                        <button onClick={() => handleMoModalSua(dk)} style={{ padding: '6px 14px', background: '#ffffff', color: '#0284c7', border: '1px solid #0284c7', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit</span> Sửa
+                        </button>
+                        <button onClick={() => handleHuyDonDangKy(dk)} style={{ padding: '6px 14px', background: '#ef4444', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span> Hủy đơn
+                        </button>
+                      </>
+                    )}
+                    {Number(dk.trangthai) === 1 && (
+                      <button onClick={() => handleMoDanhGia(dk)} style={{ padding: '6px 14px', background: '#10b981', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>task_alt</span> Hoàn thành khóa học
+                      </button>
+                    )}
+                    {Number(dk.trangthai) === 3 && (
+                      <button onClick={() => handleMoDanhGia(dk)} style={{ padding: '6px 14px', background: '#f0f9ff', color: '#0284c7', border: '1px solid #bae6fd', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit_square</span> Sửa đánh giá
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="nh-content-card">
@@ -261,7 +432,7 @@ const DangKyLich = () => {
       ) : activeMainTab === 'danh_sach' ? (
 
         <>
-          {/* KHỐI THỐNG KÊ (DASHBOARD SUMMARY) */}
+          {/* KHỐI THỐNG KÊ */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
             <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#475569' }}>
@@ -294,104 +465,17 @@ const DangKyLich = () => {
             </div>
           </div>
 
-          {/* DANH SÁCH ĐƠN */}
+          {/* DANH SÁCH ĐƠN SỬ DỤNG RENDER SECTION ĐỂ THU PHÓNG */}
           {danhSachDangKy.length === 0 ? (
             <div style={{ padding: '40px', background: '#f8fafc', borderRadius: '10px', border: '1px dashed #cbd5e1', textAlign: 'center', color: '#64748b' }}>
               Bạn chưa thực hiện gửi đơn đăng ký lịch học nào.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {danhSachDangKy.map((dk) => {
-                // 🟢 THAY ĐỔI LOGIC MÀU SẮC HUY HIỆU THEO CHUẨN MỚI
-                let badgeColor = '#f59e0b';
-                let badgeText = 'Chờ gia sư duyệt';
-                if (Number(dk.trangthai) === 1) { badgeColor = '#0284c7'; badgeText = 'Đang học (Gia sư đã nhận)'; }
-                if (Number(dk.trangthai) === 2) { badgeColor = '#ef4444'; badgeText = 'Gia sư từ chối'; }
-                if (Number(dk.trangthai) === 3) { badgeColor = '#10b981'; badgeText = 'Đã Hoàn Thành'; }
-
-                return (
-                  <div key={dk.madangky} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0', paddingBottom: '12px', marginBottom: '16px' }}>
-                      <span style={{ fontWeight: '700', color: '#1e3a8a', fontSize: '16px' }}>📚 Khóa học: {dk.tenmonhoc}</span>
-                      <span style={{ fontSize: '12px', fontWeight: '700', color: '#ffffff', backgroundColor: badgeColor, padding: '4px 12px', borderRadius: '20px' }}>
-                        {badgeText}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '16px', fontSize: '14px', color: '#334155' }}>
-                      <div style={{ background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-                        <div style={{ fontWeight: '700', color: '#0369a1', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>school</span> Thông tin Gia sư
-                        </div>
-                        <div style={{lineHeight: '1.6'}}>• <strong>Họ tên:</strong> {dk.giasu_ten}</div>
-                        <div style={{lineHeight: '1.6'}}>• <strong>SĐT:</strong> {dk.giasu_sdt}</div>
-                        <div style={{lineHeight: '1.6'}}>• <strong>Email:</strong> {dk.giasu_email}</div>
-                      </div>
-
-                      <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontWeight: '700', color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>face</span> Học viên tham gia
-                        </div>
-                        {dk.danhSachHocVien.length === 0 ? (
-                          <div style={{ fontStyle: 'italic', color: '#94a3b8' }}>Chưa cập nhật</div>
-                        ) : (
-                          dk.danhSachHocVien.map(hv => (
-                            <div key={hv.mahocvien} style={{ marginBottom: '4px', fontSize: '13px' }}>
-                              • <strong>{hv.tenhocvien}</strong> (SN: {hv.namsinh})
-                            </div>
-                          ))
-                        )}
-                      </div>
-
-                      <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontWeight: '700', color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>alarm</span> Khung lịch đã chọn
-                        </div>
-                        {dk.danhSachKhungGioChon?.map(ct => (
-                          <div key={ct.machitietdangky} style={{ fontSize: '13px', padding: '2px 0' }}>
-                            • <strong>{ct.ngayhoc}</strong>: {String(ct.thoigianbatdau).slice(0, 5)} - {String(ct.thoigianketthuc).slice(0, 5)}
-                          </div>
-                        ))}
-                        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
-                          • <strong>Học phí:</strong> <span style={{ color: '#ef4444', fontWeight: '700' }}>{dk.tonghocphi?.toLocaleString()} đ</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', background: '#f8fafc', padding: '10px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '10px' }}>
-                      <div style={{ fontSize: '13.5px', color: '#475569' }}>
-                        <div>Khai giảng dự kiến: <strong style={{ color: '#0f172a' }}>{dk.ngaybatdauhoc ? new Date(dk.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></div>
-                        {dk.ghichu && <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>💬 Ghi chú: "{dk.ghichu}"</div>}
-                      </div>
-
-                      {/* 🟢 ĐIỀU CHỈNH LOGIC ĐIỀU KIỆN RENDER NÚT BẤM */}
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        {Number(dk.trangthai) === 0 && (
-                          <>
-                            <button onClick={() => handleMoModalSua(dk)} style={{ padding: '6px 14px', background: '#ffffff', color: '#0284c7', border: '1px solid #0284c7', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit</span> Sửa
-                            </button>
-                            <button onClick={() => handleHuyDonDangKy(dk)} style={{ padding: '6px 14px', background: '#ef4444', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span> Hủy đơn
-                            </button>
-                          </>
-                        )}
-                        {Number(dk.trangthai) === 1 && (
-                          <button onClick={() => handleMoDanhGia(dk)} style={{ padding: '6px 14px', background: '#10b981', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>task_alt</span> Hoàn thành khóa học
-                          </button>
-                        )}
-                        {Number(dk.trangthai) === 3 && (
-                          <button onClick={() => handleMoDanhGia(dk)} style={{ padding: '6px 14px', background: '#f0f9ff', color: '#0284c7', border: '1px solid #bae6fd', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit_square</span> Sửa đánh giá
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {renderSection('Đơn đang chờ duyệt', listChoDuyet, 'choDuyet', '#d97706', 'hourglass_empty')}
+              {renderSection('Lớp đang diễn ra', listDangHoc, 'dangHoc', '#0284c7', 'school')}
+              {renderSection('Lớp đã hoàn thành', listHoanThanh, 'hoanThanh', '#10b981', 'task_alt')}
+              {renderSection('Đơn đã bị từ chối / Hủy', listTuChoi, 'tuChoi', '#ef4444', 'block')}
             </div>
           )}
         </>
