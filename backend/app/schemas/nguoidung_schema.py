@@ -30,7 +30,9 @@ class Login_Schema(BaseModel):
         from_attributes = True
 
 class Update_NguoiDung_Schema(BaseModel):
-    hoten: str
-    sodienthoai: str
-    anhdaidien: str
+    hoten: str | None = None
+    sodienthoai: str | None = None
+    anhdaidien: str | None = None
+    matkhau: str | None = None
+    vaitro: int | None = None
 

@@ -127,13 +127,36 @@ const ThongKeGS = () => {
 
       // 4. LẤY 5 GIAO DỊCH GẦN NHẤT ĐỂ HIỂN THỊ LỊCH SỬ
       const top5GiaoDich = [...tatCaGiaoDich]
-        .sort((a, b) => b.ngaytao - a.ngaytao)
+        .sort((a, b) => b.ngaytao - a.ngaytao) // Sắp xếp mới nhất lên đầu
         .slice(0, 5)
-        .map(gd => {
+        .map((gd, index) => {
           const userHocVien = cacNguoiDung.find(nd => Number(nd.id || nd.manguoidung) === Number(gd.manguoidung));
+          
+          // Tính thời gian tương đối
+          const now = new Date();
+          const diffMs = now - gd.ngaytao;
+          const diffMins = Math.floor(diffMs / 60000);
+          const diffHours = Math.floor(diffMs / 3600000);
+          const diffDays = Math.floor(diffMs / 86400000);
+          
+          let thoiGianText = '';
+          if (diffMins < 1) {
+            thoiGianText = 'Vừa xong';
+          } else if (diffMins < 60) {
+            thoiGianText = `${diffMins} phút trước`;
+          } else if (diffHours < 24) {
+            thoiGianText = `${diffHours} giờ trước`;
+          } else if (diffDays < 7) {
+            thoiGianText = `${diffDays} ngày trước`;
+          } else {
+            thoiGianText = gd.ngaytao.toLocaleDateString('vi-VN');
+          }
+          
           return {
             ...gd,
-            tenHocVien: userHocVien?.name || userHocVien?.hoten || 'Học viên ẩn danh'
+            tenHocVien: userHocVien?.name || userHocVien?.hoten || 'Học viên ẩn danh',
+            thoiGianText,
+            thuTu: index + 1 // 1 = mới nhất
           };
         });
 
@@ -177,11 +200,11 @@ const ThongKeGS = () => {
   const offsetTuChoi = `-${(Number(tyLeThanhCong) + Number(tyLeCho)).toFixed(2)}`;
 
   return (
-    <>
+    <div className="tk-dashboard-wrapper">
       <header className="tk-header">
         <div>
-          <h2 className="tk-header-title">Tổng Quan Lớp Học</h2>
-          <p className="tk-header-sub">Thống kê hiệu suất từ Đăng ký lịch và Ứng tuyển yêu cầu.</p>
+          <h2 className="tk-header-title">📊 Tổng Quan Hoạt Động Giảng Dạy</h2>
+          <p className="tk-header-sub">Thống kê hiệu suất từ Đăng ký lịch học và Ứng tuyển yêu cầu tìm gia sư.</p>
         </div>
         <button onClick={tinhToanThongKe} className="btn-tk-refresh">
           <span className="material-symbols-outlined">refresh</span>
@@ -190,60 +213,80 @@ const ThongKeGS = () => {
       </header>
 
       <div className="tk-content">
+        {/* PHẦN THỐNG KÊ TỔNG QUAN */}
         <div className="tk-stats-grid">
           <div className="tk-stat-card gradient-purple">
             <div className="tk-stat-icon">
               <span className="material-symbols-outlined">payments</span>
             </div>
             <div className="tk-stat-info">
-              <p className="tk-stat-label">Doanh thu tích lũy</p>
+              <p className="tk-stat-label">Tổng doanh thu</p>
               <h3 className="tk-stat-value">
-                {kpi.tongDoanhThu > 0 ? `${(kpi.tongDoanhThu / 1000000).toFixed(1)}Tr` : '0đ'}
+                {kpi.tongDoanhThu > 0 
+                  ? (kpi.tongDoanhThu >= 1000000 
+                      ? `${(kpi.tongDoanhThu / 1000000).toFixed(1)} triệu` 
+                      : `${(kpi.tongDoanhThu / 1000).toFixed(0)}K`)
+                  : '0đ'}
               </h3>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>
+                Từ {thanhCong} lớp thành công
+              </p>
             </div>
           </div>
 
           <div className="tk-stat-card gradient-blue">
             <div className="tk-stat-icon">
-              <span className="material-symbols-outlined">school</span>
+              <span className="material-symbols-outlined">group</span>
             </div>
             <div className="tk-stat-info">
-              <p className="tk-stat-label">Học viên tích lũy</p>
+              <p className="tk-stat-label">Tổng học viên</p>
               <h3 className="tk-stat-value">{kpi.soHocVien}</h3>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>
+                Đã và đang giảng dạy
+              </p>
             </div>
           </div>
 
           <div className="tk-stat-card gradient-green">
             <div className="tk-stat-icon">
-              <span className="material-symbols-outlined">class</span>
+              <span className="material-symbols-outlined">school</span>
             </div>
             <div className="tk-stat-info">
-              <p className="tk-stat-label">Lớp đang hoạt động</p>
+              <p className="tk-stat-label">Lớp đang dạy</p>
               <h3 className="tk-stat-value">{kpi.soLopDay}</h3>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>
+                Lớp học đang hoạt động
+              </p>
             </div>
           </div>
 
           <div className="tk-stat-card gradient-orange">
             <div className="tk-stat-icon">
-              <span className="material-symbols-outlined">pending_actions</span>
+              <span className="material-symbols-outlined">hourglass_top</span>
             </div>
             <div className="tk-stat-info">
-              <p className="tk-stat-label">Kết nối chờ duyệt</p>
+              <p className="tk-stat-label">Chờ phê duyệt</p>
               <h3 className="tk-stat-value">{kpi.soDonCho}</h3>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>
+                Đơn đang chờ xét duyệt
+              </p>
             </div>
           </div>
         </div>
 
+        {/* PHẦN BIỂU ĐỒ VÀ LỊCH SỬ */}
         <div className="tk-main-grid">
+          
+          {/* BIỂU ĐỒ TRÒN */}
           <div className="tk-card">
             <h3 className="tk-card-title">
-              <span className="material-symbols-outlined">pie_chart</span>
-              Tỷ lệ kết nối thành công
+              <span className="material-symbols-outlined" style={{ color: '#8b5cf6' }}>pie_chart</span>
+              Phân tích kết quả kết nối
             </h3>
             <div className="tk-pie-chart">
               <div className="pie-visual">
                 <svg viewBox="0 0 200 200" className="pie-svg">
-                  {/* Thành công (Đang dạy + Hoàn thành) -> Xanh */}
+                  {/* Thành công (Đang dạy + Hoàn thành) -> Xanh lá */}
                   <circle cx="100" cy="100" r="80" fill="none" stroke="#10b981" strokeWidth="40" strokeDasharray={`${tyLeThanhCong} 503`} transform="rotate(-90 100 100)" />
                   {/* Chờ duyệt -> Cam */}
                   <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" strokeWidth="40" strokeDasharray={`${tyLeCho} 503`} strokeDashoffset={offsetCho} transform="rotate(-90 100 100)" />
@@ -252,35 +295,68 @@ const ThongKeGS = () => {
                 </svg>
                 <div className="pie-center-text">
                   <div className="pie-total">{tong}</div>
-                  <div className="pie-label">Lượt kết nối</div>
+                  <div className="pie-label">Tổng lượt</div>
                 </div>
               </div>
               <div className="pie-legend">
                 <div className="legend-item">
                   <span className="legend-dot" style={{ background: '#10b981' }}></span>
-                  <span>Nhận lớp/Hoàn thành ({thanhCong})</span>
+                  <div>
+                    <strong>Thành công</strong>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      {thanhCong} lượt ({tong > 0 ? ((thanhCong/tong)*100).toFixed(1) : 0}%)
+                    </div>
+                  </div>
                 </div>
                 <div className="legend-item">
                   <span className="legend-dot" style={{ background: '#f59e0b' }}></span>
-                  <span>Đang chờ duyệt ({choDuyet})</span>
+                  <div>
+                    <strong>Chờ duyệt</strong>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      {choDuyet} lượt ({tong > 0 ? ((choDuyet/tong)*100).toFixed(1) : 0}%)
+                    </div>
+                  </div>
                 </div>
                 <div className="legend-item">
                   <span className="legend-dot" style={{ background: '#ef4444' }}></span>
-                  <span>Đã từ chối ({tuChoi})</span>
+                  <div>
+                    <strong>Bị từ chối</strong>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      {tuChoi} lượt ({tong > 0 ? ((tuChoi/tong)*100).toFixed(1) : 0}%)
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            {/* TỈ LỆ THÀNH CÔNG */}
+            {tong > 0 && (
+              <div style={{ marginTop: '20px', padding: '16px', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #86efac' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <span className="material-symbols-outlined" style={{ color: '#10b981', fontSize: '20px' }}>trending_up</span>
+                  <strong style={{ color: '#166534' }}>Tỉ lệ thành công</strong>
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#10b981' }}>
+                  {((thanhCong/tong)*100).toFixed(1)}%
+                </div>
+                <div style={{ fontSize: '12px', color: '#15803d', marginTop: '4px' }}>
+                  {thanhCong}/{tong} lượt kết nối thành công
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="tk-card full-width">
+          {/* LỊCH SỬ KẾT NỐI GẦN ĐÂY */}
+          <div className="tk-card">
             <h3 className="tk-card-title">
-              <span className="material-symbols-outlined">history</span>
-              Lịch sử kết nối gần đây
+              <span className="material-symbols-outlined" style={{ color: '#3b82f6' }}>history</span>
+              Hoạt động gần đây (Top 5)
             </h3>
             <div className="tk-top-list">
               {giaoDichMoi.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '20px', color: '#64748b' }}>
-                  Chưa có lượt tương tác nào.
+                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '48px', opacity: 0.3 }}>inbox</span>
+                  <p style={{ marginTop: '12px' }}>Chưa có hoạt động nào được ghi nhận.</p>
                 </div>
               ) : (
                 giaoDichMoi.map((gd, index) => {
@@ -292,20 +368,80 @@ const ThongKeGS = () => {
                                         isCho ? 'Chờ duyệt' : 'Từ chối';
 
                   const loaiColor = gd.loai === 'Đăng ký lịch' ? '#3b82f6' : '#8b5cf6';
-                  const loaiIcon = gd.loai === 'Đăng ký lịch' ? 'event_available' : 'handshake';
+                  const loaiIcon = gd.loai === 'Đăng ký lịch' ? 'event_note' : 'handshake';
+                  
+                  // Badge hiển thị mức độ mới: "Mới nhất", "Mới", hoặc không có
+                  const badgeNew = index === 0 ? (
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      color: '#fff',
+                      background: '#ef4444',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      marginLeft: '8px'
+                    }}>
+                      MỚI NHẤT
+                    </span>
+                  ) : index === 1 ? (
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      color: '#fff',
+                      background: '#f59e0b',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      marginLeft: '8px'
+                    }}>
+                      MỚI
+                    </span>
+                  ) : null;
 
                   return (
-                    <div key={index} className="top-list-item" style={{ alignItems: 'center' }}>
-                      <div className="top-rank" style={{ background: `${loaiColor}15`, color: loaiColor, border: 'none' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{loaiIcon}</span>
+                    <div 
+                      key={index} 
+                      className="top-list-item" 
+                      style={{ 
+                        alignItems: 'center',
+                        background: index === 0 ? '#fef3c7' : (index % 2 === 1 ? '#f8fafc' : '#ffffff'),
+                        padding: '16px',
+                        borderRadius: '8px',
+                        marginBottom: '8px',
+                        border: index === 0 ? '2px solid #f59e0b' : '1px solid #e2e8f0',
+                        position: 'relative'
+                      }}
+                    >
+                      <div className="top-rank" style={{ background: `${loaiColor}`, color: '#fff', border: 'none', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>{loaiIcon}</span>
                       </div>
-                      <div className="top-info">
-                        <div className="top-name">{gd.tenHocVien}</div>
-                        <div className="top-detail">
-                          <strong style={{ color: loaiColor }}>{gd.loai}</strong> • Mã GD: #{gd.id} • Học phí: {gd.hocphi ? `${gd.hocphi.toLocaleString()}đ` : 'Thỏa thuận'}
+                      <div className="top-info" style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className="top-name" style={{ fontWeight: '600', color: '#0f172a', fontSize: '15px' }}>
+                            👤 {gd.tenHocVien}
+                          </div>
+                          {badgeNew}
+                        </div>
+                        <div className="top-detail" style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+                          <span style={{ color: loaiColor, fontWeight: '600' }}>{gd.loai}</span>
+                          <span style={{ margin: '0 6px' }}>•</span>
+                          Mã: #{gd.id}
+                          <span style={{ margin: '0 6px' }}>•</span>
+                          💰 {gd.hocphi ? `${gd.hocphi.toLocaleString()}đ` : 'Thỏa thuận'}
+                          <span style={{ margin: '0 6px' }}>•</span>
+                          <span style={{ fontSize: '12px', color: '#94a3b8' }}>⏰ {gd.thoiGianText}</span>
                         </div>
                       </div>
-                      <div className="top-badge" style={{ color: trangThaiColor, background: 'transparent', padding: 0, fontWeight: 600 }}>
+                      <div 
+                        style={{ 
+                          color: trangThaiColor, 
+                          background: `${trangThaiColor}15`, 
+                          padding: '6px 12px',
+                          borderRadius: '16px',
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          border: `1px solid ${trangThaiColor}40`
+                        }}
+                      >
                         {trangThaiText}
                       </div>
                     </div>
@@ -316,7 +452,7 @@ const ThongKeGS = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

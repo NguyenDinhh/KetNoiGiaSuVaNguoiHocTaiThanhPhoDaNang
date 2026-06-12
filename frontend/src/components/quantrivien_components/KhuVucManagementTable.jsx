@@ -68,6 +68,28 @@ const KhuVucManagementTable = () => {
     }
   };
 
+  const xuLyKhoa = (khuVuc) => {
+    if (window.confirm(`Bạn có muốn KHÓA khu vực "${khuVuc.tenkhuvuc}" không? Khu vực sẽ không hiển thị với người dùng.`)) {
+      KhuVuc_Service.khoaKhuVuc(khuVuc.makhuvuc)
+        .then(() => {
+          alert("Khóa khu vực thành công!");
+          taiDanhSachKhuVuc();
+        })
+        .catch(loi => console.error("Lỗi khóa:", loi));
+    }
+  };
+
+  const xuLyMoKhoa = (khuVuc) => {
+    if (window.confirm(`Bạn có muốn MỞ KHÓA khu vực "${khuVuc.tenkhuvuc}" không?`)) {
+      KhuVuc_Service.moKhoaKhuVuc(khuVuc.makhuvuc)
+        .then(() => {
+          alert("Mở khóa khu vực thành công!");
+          taiDanhSachKhuVuc();
+        })
+        .catch(loi => console.error("Lỗi mở khóa:", loi));
+    }
+  };
+
   const xuLyNhapLieu = (suKien) => {
     const { name, value } = suKien.target;
     setFormDuLieu({ ...formDuLieu, [name]: value });
@@ -148,28 +170,52 @@ const KhuVucManagementTable = () => {
             <thead>
               <tr>
                 <th style={{ width: '15%', textAlign: 'center' }}>Mã khu vực</th>
-                <th style={{ width: '65%' }}>Tên khu vực</th>
+                <th style={{ width: '50%' }}>Tên khu vực</th>
+                <th style={{ width: '15%', textAlign: 'center' }}>Trạng thái</th>
                 <th style={{ width: '20%', textAlign: 'right' }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {dangTai ? (
-                <tr><td colSpan="3" style={{ textAlign: 'center', padding: '32px', color: 'var(--admin-text-variant)' }}>Đang tải danh mục...</td></tr>
+                <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px', color: 'var(--admin-text-variant)' }}>Đang tải danh mục...</td></tr>
               ) : danhSachDaLoc.length === 0 ? (
-                <tr><td colSpan="3" style={{ textAlign: 'center', padding: '32px', color: 'var(--admin-text-variant)' }}>Không có dữ liệu.</td></tr>
+                <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px', color: 'var(--admin-text-variant)' }}>Không có dữ liệu.</td></tr>
               ) : (
                 danhSachDaLoc.map((khuVuc) => (
                   <tr key={khuVuc.makhuvuc}>
                     <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>#{khuVuc.makhuvuc}</td>
                     <td><span style={{ fontWeight: 600, color: 'var(--admin-primary)' }}>{khuVuc.tenkhuvuc}</span></td>
+                    <td style={{ textAlign: 'center' }}>
+                      {khuVuc.trangthai === 1 ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: 'rgba(0, 107, 84, 0.1)', color: 'var(--admin-secondary)', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>check_circle</span>
+                          Hoạt động
+                        </span>
+                      ) : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>lock</span>
+                          Bị khóa
+                        </span>
+                      )}
+                    </td>
                     <td style={{ textAlign: 'right' }}>
 
                       <button type="button" className="btn-table-action-view" title="Chỉnh sửa" onClick={() => xuLyBamNutSua(khuVuc)}>
                         <span className="material-symbols-outlined">edit</span>
                       </button>
 
+                      {khuVuc.trangthai === 1 ? (
+                        <button type="button" className="btn-table-action-view" title="Khóa khu vực" style={{ color: '#f59e0b' }} onClick={() => xuLyKhoa(khuVuc)}>
+                          <span className="material-symbols-outlined">lock</span>
+                        </button>
+                      ) : (
+                        <button type="button" className="btn-table-action-view" title="Mở khóa khu vực" style={{ color: '#10b981' }} onClick={() => xuLyMoKhoa(khuVuc)}>
+                          <span className="material-symbols-outlined">lock_open</span>
+                        </button>
+                      )}
+
                       {/* NÚT XÓA (MÀU ĐỎ) */}
-                      <button type="button" className="btn-table-action-view" title="Xóa khu vực" style={{ color: 'var(--admin-error)' }} onClick={() => xuLyXoa(khuVuc)}>
+                      <button type="button" className="btn-table-action-view" title="Xóa vĩnh viễn" style={{ color: 'var(--admin-error)' }} onClick={() => xuLyXoa(khuVuc)}>
                         <span className="material-symbols-outlined">delete</span>
                       </button>
                     </td>

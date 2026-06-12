@@ -9,6 +9,8 @@ import ChiTietDangKyLich_Service from '../../services/ChiTietDangKyLich_Service'
 import DanhGia_Service from '../../services/DanhGia_Service';
 import MonHoc_Service from '../../services/MonHoc_Service';
 import NguoiDung_Service from '../../services/NguoiDung_Service';
+import GiaSu_UngTuyen_Service from '../../services/GiaSu_UngTuyen_Service';
+import YeuCauTimGiaSu_Service from '../../services/YeuCauTimGiaSu_Service';
 
 const TongQuanGS = ({ setTabHienTai }) => {
   const [loading, setLoading] = useState(true);
@@ -41,13 +43,15 @@ const TongQuanGS = ({ setTabHienTai }) => {
         const giasuData = await GiaSu_Service.layChiTietGiaSuvoimanguoidung(userLocal.manguoidung);
         if (!giasuData?.magiasu) { setLoading(false); return; }
 
-        const [ resLop, resDK, resChiTiet, resDanhGia, resMon, resND ] = await Promise.all([
+        const [ resLop, resDK, resChiTiet, resDanhGia, resMon, resND, resUngTuyen, resYeuCau ] = await Promise.all([
           GiaSu_MonHoc_Service.layDanhSachGiaSuMonHoc().catch(() => []),
           DangKyLich_Service.layDanhSachDangKyLich().catch(() => []),
           ChiTietDangKyLich_Service.layDanhSachChiTietDangKyLich().catch(() => []),
           DanhGia_Service.layDanhSachDanhGia().catch(() => []),
           MonHoc_Service.layDanhSachMonHoc().catch(() => []),
-          NguoiDung_Service.layDanhSachNguoiDung().catch(() => [])
+          NguoiDung_Service.layDanhSachNguoiDung().catch(() => []),
+          GiaSu_UngTuyen_Service.layDanhSachUngTuyen().catch(() => []),
+          YeuCauTimGiaSu_Service.layDanhSachYeuCau().catch(() => [])
         ]);
 
         if (!isMounted) return;
@@ -58,26 +62,59 @@ const TongQuanGS = ({ setTabHienTai }) => {
         const cacDanhGia = Array.isArray(resDanhGia) ? resDanhGia : (resDanhGia?.data || []);
         const cacMon = Array.isArray(resMon) ? resMon : (resMon?.data || []);
         const cacND = Array.isArray(resND) ? resND : (resND?.data || []);
+        const cacUngTuyen = Array.isArray(resUngTuyen) ? resUngTuyen : (resUngTuyen?.data || []);
+        const cacYeuCau = Array.isArray(resYeuCau) ? resYeuCau : (resYeuCau?.data || []);
 
         const lopCuaToi = cacLop.filter(l => Number(l.magiasu) === Number(giasuData.magiasu));
         const mangMaLop = lopCuaToi.map(l => Number(l.magiasu_monhoc));
         const dkCuaToi = cacDangKy.filter(dk => mangMaLop.includes(Number(dk.magiasu_monhoc)));
 
+        // 🟢 LẤY CÁC YÊU CẦU MÀ GIA SƯ NÀY ĐƯỢC DUYỆT (từ YEUCAUTIMGIASU qua GIASU_UNGTUYEN)
+        const ungTuyenCuaToi = cacUngTuyen.filter(ut => Number(ut.magiasu) === Number(giasuData.magiasu) && Number(ut.trangthai) === 1);
+        const mangMaYeuCau = ungTuyenCuaToi.map(ut => Number(ut.mayeucau));
+        const yeuCauCuaToi = cacYeuCau.filter(yc => mangMaYeuCau.includes(Number(yc.mayeucau)));
+
         const dangDay = dkCuaToi.filter(dk => Number(dk.trangthai) === 1);
         const choDuyet = dkCuaToi.filter(dk => Number(dk.trangthai) === 0);
-        const tongThuNhap = dangDay.reduce((sum, dk) => sum + (Number(dk.tonghocphi) || 0), 0);
+        
+        // 🟢 TÍNH TỔNG THU NHẬP: từ cả DangKyLich và YeuCauTimGiaSu
+        const thuNhapTuDangKy = dangDay.reduce((sum, dk) => sum + (Number(dk.tonghocphi) || 0), 0);
+        const yeuCauDangDay = yeuCauCuaToi.filter(yc => Number(yc.trangthai) === 1);
+        const thuNhapTuYeuCau = yeuCauDangDay.reduce((sum, yc) => sum + (Number(yc.tonghocphi) || 0), 0);
+        const tongThuNhap = thuNhapTuDangKy + thuNhapTuYeuCau;
 
+        // 🟢 LẤY ĐÁNH GIÁ TỪ CẢ 2 NGUỒN
         const mangMaDK = dkCuaToi.map(dk => Number(dk.madangky));
-        const danhGiaGoc = cacDanhGia.filter(dg => mangMaDK.includes(Number(dg.madangky)));
+        const danhGiaTuDangKy = cacDanhGia.filter(dg => dg.madangky && mangMaDK.includes(Number(dg.madangky)));
+        const danhGiaTuYeuCau = cacDanhGia.filter(dg => dg.mayeucau && mangMaYeuCau.includes(Number(dg.mayeucau)));
+        const danhGiaGoc = [...danhGiaTuDangKy, ...danhGiaTuYeuCau];
+        
         const luotDanhGia = danhGiaGoc.length;
         const danhGiaTB = luotDanhGia > 0 ? (danhGiaGoc.reduce((sum, dg) => sum + Number(dg.sodiem), 0) / luotDanhGia).toFixed(1) : 0;
 
         const danhGiaHoanChinh = danhGiaGoc.map(dg => {
-          const đơn = dkCuaToi.find(dk => Number(dk.madangky) === Number(dg.madangky));
-          const lớp = lopCuaToi.find(l => Number(l.magiasu_monhoc) === Number(đơn?.magiasu_monhoc));
-          const môn = cacMon.find(m => Number(m.mamonhoc) === Number(lớp?.mamonhoc));
-          const ngườiĐánhGiá = cacND.find(nd => Number(nd.id || nd.manguoidung) === Number(đơn?.manguoidung));
-          return { ...dg, tenMonHoc: môn ? môn.tenmonhoc : 'Môn học', tenNguoiDanhGia: ngườiĐánhGiá ? (ngườiĐánhGiá.hoten || ngườiĐánhGiá.name) : 'Học viên ẩn' };
+          let môn = null;
+          let ngườiĐánhGiá = null;
+          
+          // Nếu là đánh giá từ DANGKYLICH
+          if (dg.madangky) {
+            const đơn = dkCuaToi.find(dk => Number(dk.madangky) === Number(dg.madangky));
+            const lớp = lopCuaToi.find(l => Number(l.magiasu_monhoc) === Number(đơn?.magiasu_monhoc));
+            môn = cacMon.find(m => Number(m.mamonhoc) === Number(lớp?.mamonhoc));
+            ngườiĐánhGiá = cacND.find(nd => Number(nd.id || nd.manguoidung) === Number(đơn?.manguoidung));
+          } 
+          // Nếu là đánh giá từ YEUCAUTIMGIASU
+          else if (dg.mayeucau) {
+            const yêuCầu = yeuCauCuaToi.find(yc => Number(yc.mayeucau) === Number(dg.mayeucau));
+            môn = cacMon.find(m => Number(m.mamonhoc) === Number(yêuCầu?.mamonhoc));
+            ngườiĐánhGiá = cacND.find(nd => Number(nd.id || nd.manguoidung) === Number(yêuCầu?.manguoidung));
+          }
+          
+          return { 
+            ...dg, 
+            tenMonHoc: môn ? môn.tenmonhoc : 'Môn học', 
+            tenNguoiDanhGia: ngườiĐánhGiá ? (ngườiĐánhGiá.hoten || ngườiĐánhGiá.name) : 'Học viên ẩn' 
+          };
         });
 
         setDanhSachDanhGiaChiTiet(danhGiaHoanChinh.reverse());
@@ -187,12 +224,16 @@ const TongQuanGS = ({ setTabHienTai }) => {
                           </div>
                           <strong style={{ fontSize: '14px', color: '#0f172a' }}>{dg.sodiem} Sao</strong>
                         </div>
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>Mã đơn: #{dg.madangky}</span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          {dg.madangky ? `Mã đơn: #${dg.madangky}` : `Mã YC: #${dg.mayeucau}`}
+                        </span>
                       </div>
                       <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#475569', fontStyle: 'italic', lineHeight: '1.6' }}>"{dg.noidung || 'Không có nhận xét chi tiết.'}"</p>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px dashed #cbd5e1', fontSize: '13px', color: '#64748b' }}>
                         <span>👤 Phụ huynh: <strong>{dg.tenNguoiDanhGia}</strong></span>
                         <span>📚 Môn: <strong>{dg.tenMonHoc}</strong></span>
+                        {dg.madangky && <span style={{fontSize: '11px', color: '#94a3b8'}}>Đơn: #{dg.madangky}</span>}
+                        {dg.mayeucau && <span style={{fontSize: '11px', color: '#94a3b8'}}>YC: #{dg.mayeucau}</span>}
                       </div>
                     </div>
                   ))}

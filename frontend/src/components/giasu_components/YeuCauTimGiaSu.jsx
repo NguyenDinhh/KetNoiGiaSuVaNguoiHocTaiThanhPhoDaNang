@@ -28,6 +28,9 @@ const BaiDangTimGiaSu = () => {
   const [danhSachHeLop, setDanhSachHeLop] = useState([]);
   const [danhSachMonCoTheDay, setDanhSachMonCoTheDay] = useState([]);
   const [maGiaSuHienTai, setMaGiaSuHienTai] = useState(null);
+  
+  // State lưu lý do từ chối từ bảng GIASU_UNGTUYEN
+  const [lyDoTuChoiMap, setLyDoTuChoiMap] = useState({});
 
   // --- STATE BỘ LỌC ---
   const [boLocKhuVuc, setBoLocKhuVuc] = useState('');
@@ -44,7 +47,8 @@ const BaiDangTimGiaSu = () => {
   const [expanded, setExpanded] = useState({
     choDuyet: true,
     dangDay: true,
-    hoanThanh: false
+    hoanThanh: false,
+    tuChoi: false
   });
 
   // STATE PHỤC VỤ HIỂN THỊ MODAL XEM ĐÁNH GIÁ
@@ -111,11 +115,16 @@ const BaiDangTimGiaSu = () => {
                 .filter(bcmh => cacBangCapCuaGS.includes(bcmh.mabangcap))
                 .map(bcmh => bcmh.mamonhoc);
 
+              const mapLyDoTuChoi = {};
               listTatCaUngTuyen
                 .filter(ut => ut.magiasu === maGiaSu)
                 .forEach(ut => {
                   mapUngTuyen[ut.mayeucau] = ut.trangthai;
+                  if (ut.trangthai === 2 && ut.lydotuchoi) {
+                    mapLyDoTuChoi[ut.mayeucau] = ut.lydotuchoi;
+                  }
                 });
+              setLyDoTuChoiMap(mapLyDoTuChoi);
             }
           } catch (err) {
             console.warn("Chưa thể lấy thông tin chi tiết gia sư.", err);
@@ -311,60 +320,78 @@ const BaiDangTimGiaSu = () => {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {daUngTuyen ? (
-            trangThaiUT === 1 ? (
-              trangThaiYeuCau === 2 ? (
-                <>
-                  <button className="btn-ungtuyen" disabled style={{ flex: 1, backgroundColor: '#10b981', color: '#fff', cursor: 'default' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>task_alt</span>
-                    Đã Hoàn Thành
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {daUngTuyen ? (
+              trangThaiUT === 1 ? (
+                trangThaiYeuCau === 2 ? (
+                  <>
+                    <button className="btn-ungtuyen" disabled style={{ flex: 1, backgroundColor: '#10b981', color: '#fff', cursor: 'default' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>task_alt</span>
+                      Đã Hoàn Thành
+                    </button>
+                    <button className="btn-ungtuyen" onClick={() => handleXemDanhGia(baiDang)} style={{ flex: 1, backgroundColor: '#0284c7', color: '#fff' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>star</span>
+                      Xem Đánh Giá
+                    </button>
+                  </>
+                ) : (
+                  <button className="btn-ungtuyen approved" disabled style={{ flex: 1 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>check_circle</span>
+                    Đã Duyệt - Đang Dạy
                   </button>
-                  <button className="btn-ungtuyen" onClick={() => handleXemDanhGia(baiDang)} style={{ flex: 1, backgroundColor: '#0284c7', color: '#fff' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>star</span>
-                    Xem Đánh Giá
+                )
+              ) : trangThaiUT === 2 ? (
+                <button className="btn-ungtuyen rejected" disabled style={{ flex: 1 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>cancel</span>
+                  Đã Từ Chối
+                </button>
+              ) : (
+                <>
+                  <button className="btn-ungtuyen pending" disabled style={{ flex: 1 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
+                    Đang Chờ Duyệt
+                  </button>
+                  <button 
+                    className="btn-ungtuyen" 
+                    onClick={() => handleHuyUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)}
+                    style={{ flex: '0 0 auto', backgroundColor: '#ef4444', color: '#fff', border: 'none' }}
+                    title="Rút hồ sơ ứng tuyển"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
+                    Rút Đơn
                   </button>
                 </>
+              )
+            ) : (
+              !duDieuKien ? (
+                <button className="btn-ungtuyen disabled" disabled title="Bạn chưa cập nhật bằng cấp/chứng chỉ tương ứng cho môn này" style={{ flex: 1 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>block</span>
+                  Không Đủ Điều Kiện
+                </button>
               ) : (
-                <button className="btn-ungtuyen approved" disabled style={{ flex: 1 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>check_circle</span>
-                  Đã Duyệt - Đang Dạy
+                <button className="btn-ungtuyen" onClick={() => handleUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)} style={{ flex: 1 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>how_to_reg</span>
+                  Ứng Tuyển Ngay
                 </button>
               )
-            ) : trangThaiUT === 2 ? (
-              <button className="btn-ungtuyen rejected" disabled style={{ flex: 1 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>cancel</span>
-                Đã Từ Chối
-              </button>
-            ) : (
-              <>
-                <button className="btn-ungtuyen pending" disabled style={{ flex: 1 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
-                  Đang Chờ Duyệt
-                </button>
-                <button 
-                  className="btn-ungtuyen" 
-                  onClick={() => handleHuyUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)}
-                  style={{ flex: '0 0 auto', backgroundColor: '#ef4444', color: '#fff', border: 'none' }}
-                  title="Rút hồ sơ ứng tuyển"
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
-                  Rút Đơn
-                </button>
-              </>
-            )
-          ) : (
-            !duDieuKien ? (
-              <button className="btn-ungtuyen disabled" disabled title="Bạn chưa cập nhật bằng cấp/chứng chỉ tương ứng cho môn này" style={{ flex: 1 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>block</span>
-                Không Đủ Điều Kiện
-              </button>
-            ) : (
-              <button className="btn-ungtuyen" onClick={() => handleUngTuyen(baiDang.mayeucau, baiDang.tenmonhoc)} style={{ flex: 1 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>how_to_reg</span>
-                Ứng Tuyển Ngay
-              </button>
-            )
+            )}
+          </div>
+          
+          {/* HIỂN THỊ LÝ DO TỪ CHỐI (NẾU CÓ) */}
+          {trangThaiUT === 2 && lyDoTuChoiMap[baiDang.mayeucau] && (
+            <div style={{ 
+              padding: '12px', 
+              background: '#fef2f2', 
+              border: '1px solid #fca5a5', 
+              borderRadius: '8px', 
+              fontSize: '13px', 
+              color: '#dc2626',
+              fontWeight: '600'
+            }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '4px' }}>info</span>
+              Lý do từ chối: {lyDoTuChoiMap[baiDang.mayeucau]}
+            </div>
           )}
         </div>
       </div>
@@ -432,6 +459,7 @@ const BaiDangTimGiaSu = () => {
   const listChoDuyet = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 0);
   const listDangDay = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 1 && bai.trangthai !== 2);
   const listHoanThanh = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 1 && bai.trangthai === 2);
+  const listTuChoi = listDaUngTuyenRaw.filter(bai => danhSachDaUngTuyen[bai.mayeucau] === 2);
 
   return (
     <div className="baidang-container">
@@ -547,6 +575,7 @@ const BaiDangTimGiaSu = () => {
               {renderSection('Đang chờ Phụ huynh duyệt', listChoDuyet, 'choDuyet', '#d97706', 'hourglass_empty')}
               {renderSection('Lớp đang diễn ra', listDangDay, 'dangDay', '#0284c7', 'school')}
               {renderSection('Lớp đã hoàn thành', listHoanThanh, 'hoanThanh', '#10b981', 'task_alt')}
+              {renderSection('Yêu cầu bị từ chối', listTuChoi, 'tuChoi', '#ef4444', 'block')}
             </div>
           )}
         </>

@@ -15,6 +15,7 @@ import DangKyLich_Service from '../../services/DangKyLich_Service';
 import ChiTietDangKyLich_Service from '../../services/ChiTietDangKyLich_Service';
 import NguoiDung_Service from '../../services/NguoiDung_Service';
 import HocVien_Service from '../../services/HocVien_Service';
+import YeuCau_HocVien_Service from '../../services/YeuCau_HocVien_Service';
 import DanhGia_Service from '../../services/DanhGia_Service';
 
 const YeuCauDangKyLich = () => {
@@ -32,6 +33,11 @@ const YeuCauDangKyLich = () => {
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewHienTai, setReviewHienTai] = useState(null);
+  
+  // State cho modal từ chối
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [dangKyCanTuChoi, setDangKyCanTuChoi] = useState(null);
+  const [lyDoTuChoi, setLyDoTuChoi] = useState('');
 
   const [timKiemMon, setTimKiemMon] = useState('');
   const [heLopChon, setHeLopChon] = useState('');
@@ -96,7 +102,10 @@ const YeuCauDangKyLich = () => {
               .map(mapping => Number(mapping.mamonhoc));
 
             const maMonHocKhongTrungLap = [...new Set(mangMaMonHocChoPhep)];
-            const monHocChoUI = dsMonHoc.filter(m => maMonHocKhongTrungLap.includes(Number(m.mamonhoc)));
+            const monHocChoUI = dsMonHoc.filter(m => 
+              maMonHocKhongTrungLap.includes(Number(m.mamonhoc)) && 
+              m.trangthai === 1
+            );
 
             setMonHocDuocPhepDay(monHocChoUI);
           } catch (error) {
@@ -116,19 +125,21 @@ const YeuCauDangKyLich = () => {
     try {
       setLoadingDangKy(true);
 
-      const [cacLop, cacKhungGio, cacDangKy, cacChiTietDK, cacNguoiDung, cacHocVien, resMonHoc, resDanhGia] = await Promise.all([
+      const [cacLop, cacKhungGio, cacDangKy, cacChiTietDK, cacNguoiDung, cacHocVien, cacYeuCauHocVien, resMonHoc, resDanhGia] = await Promise.all([
         GiaSu_MonHoc_Service.layDanhSachGiaSuMonHoc().catch(() => []),
         KhungGio_GiaSu_MonHoc_Service.layDanhSachKhungGio().catch(() => []),
         DangKyLich_Service.layDanhSachDangKyLich().catch(() => []),
         ChiTietDangKyLich_Service.layDanhSachChiTietDangKyLich().catch(() => []),
         NguoiDung_Service.layDanhSachNguoiDung().catch(() => []),
         HocVien_Service.layDanhSachHocVien().catch(() => []),
+        YeuCau_HocVien_Service.layDanhSachYeuCauHocVien().catch(() => []),
         MonHoc_Service.layDanhSachMonHoc().catch(() => []),
         DanhGia_Service.layDanhSachDanhGia().catch(() => [])
       ]);
 
       const listMonHoc = Array.isArray(resMonHoc) ? resMonHoc : (resMonHoc?.data || []);
       const arrDanhGia = Array.isArray(resDanhGia) ? resDanhGia : (resDanhGia?.data || []);
+      const arrYeuCauHocVien = Array.isArray(cacYeuCauHocVien) ? cacYeuCauHocVien : (cacYeuCauHocVien?.data || []);
 
       const lopCuaToi = cacLop.filter(l => Number(l.magiasu) === Number(maGS));
       
@@ -146,7 +157,14 @@ const YeuCauDangKyLich = () => {
         const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(lopHoc.mamonhoc));
 
         const nguoiHoc = (cacNguoiDung || []).find(nd => Number(nd.id || nd.manguoidung) === Number(dk.manguoidung)) || {};
-        const hocVienLienQuan = (cacHocVien || []).filter(hv => Number(hv.manguoidung) === Number(dk.manguoidung));
+        
+        // Lọc học viên từ YEUCAU_HOCVIEN theo madangky, sau đó join với bảng HOCVIEN
+        const maHocVienDangKy = arrYeuCauHocVien
+          .filter(yc => Number(yc.madangky) === Number(dk.madangky))
+          .map(yc => Number(yc.mahocvien));
+        
+        const hocVienLienQuan = (cacHocVien || []).filter(hv => maHocVienDangKy.includes(Number(hv.mahocvien)));
+        
         const khungGioChon = (cacChiTietDK || []).filter(ct => Number(ct.madangky) === Number(dk.madangky));
         const danhGiaCuaDon = arrDanhGia.find(dg => Number(dg.madangky) === Number(dk.madangky));
 
@@ -180,7 +198,16 @@ const YeuCauDangKyLich = () => {
   };
 
   const handlePheDuyetDangKy = async (dk, trangThaiMoi) => {
-    const hanhDong = trangThaiMoi === 1 ? "ĐỒNG Ý" : "TỪ CHỐI";
+    // Nếu từ chối (trangThaiMoi = 2), mở modal nhập lý do
+    if (trangThaiMoi === 2) {
+      setDangKyCanTuChoi(dk);
+      setLyDoTuChoi('');
+      setIsRejectModalOpen(true);
+      return;
+    }
+    
+    // Nếu phê duyệt (trangThaiMoi = 1)
+    const hanhDong = "ĐỒNG Ý";
     if (!window.confirm(`Bạn có chắc chắn muốn ${hanhDong} yêu cầu đăng ký lịch học này không?`)) return;
 
     try {
@@ -197,7 +224,7 @@ const YeuCauDangKyLich = () => {
       await DangKyLich_Service.capNhatDangKyLich(dk.madangky, payload);
 
       if (dk.danhSachKhungGioChon && dk.danhSachKhungGioChon.length > 0) {
-        const trangThaiKhungGioMoi = trangThaiMoi === 1 ? 2 : 1;
+        const trangThaiKhungGioMoi = 2; // Đang dạy
         for (const ct of dk.danhSachKhungGioChon) {
           const kgGoc = danhSachKhungGio.find(k => Number(k.makhunggio) === Number(ct.makhunggio));
           if (kgGoc) {
@@ -217,6 +244,55 @@ const YeuCauDangKyLich = () => {
       fetchDanhSachLopVaKhungGio(maGiaSu);
     } catch (error) {
       alert("Đã xảy ra lỗi hệ thống, phê duyệt thất bại!");
+    }
+  };
+  
+  const handleXacNhanTuChoi = async () => {
+    if (!lyDoTuChoi.trim()) {
+      alert("Vui lòng nhập lý do từ chối!");
+      return;
+    }
+    
+    const dk = dangKyCanTuChoi;
+    
+    try {
+      const payload = {
+        madangky: dk.madangky,
+        manguoidung: dk.manguoidung,
+        magiasu_monhoc: dk.magiasu_monhoc,
+        ngaybatdauhoc: dk.ngaybatdauhoc,
+        tonghocphi: dk.tonghocphi,
+        ghichu: dk.ghichu || "",
+        trangthai: 2, // Từ chối
+        lydotuchoi: lyDoTuChoi
+      };
+
+      await DangKyLich_Service.capNhatDangKyLich(dk.madangky, payload);
+
+      // Mở lại khung giờ (chuyển về trạng thái 1 - Sẵn sàng)
+      if (dk.danhSachKhungGioChon && dk.danhSachKhungGioChon.length > 0) {
+        for (const ct of dk.danhSachKhungGioChon) {
+          const kgGoc = danhSachKhungGio.find(k => Number(k.makhunggio) === Number(ct.makhunggio));
+          if (kgGoc) {
+            const payloadKhungGio = {
+              magiasu_monhoc: kgGoc.magiasu_monhoc,
+              ngayday: kgGoc.ngayday,
+              thoigianbatdau: String(kgGoc.thoigianbatdau).slice(0, 5),
+              thoigianketthuc: String(kgGoc.thoigianketthuc).slice(0, 5),
+              trangthai: 1 // Mở lại
+            };
+            await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, payloadKhungGio);
+          }
+        }
+      }
+
+      alert("Đã từ chối yêu cầu đăng ký!");
+      setIsRejectModalOpen(false);
+      setDangKyCanTuChoi(null);
+      setLyDoTuChoi('');
+      fetchDanhSachLopVaKhungGio(maGiaSu);
+    } catch (error) {
+      alert("Đã xảy ra lỗi hệ thống, từ chối thất bại!");
     }
   };
 
@@ -298,17 +374,7 @@ const YeuCauDangKyLich = () => {
   const handleMoLaiLop = async (lop) => {
     if (window.confirm(`Bạn có chắc chắn muốn MỞ LẠI lớp học "${timTenMonHoc(lop.mamonhoc)}" không?`)) {
       try {
-        const payload = {
-          magiasu: maGiaSu,
-          mamonhoc: Number(lop.mamonhoc),
-          makhuvuc: Number(lop.makhuvuc),
-          hocphimoibuoi: Number(lop.hocphimoibuoi),
-          thoiluonghoc: Number(lop.thoiluonghoc),
-          sobuoihoc: Number(lop.sobuoihoc),
-          trangthai: 1 // Mở lại = trạng thái 1
-        };
-        
-        await GiaSu_MonHoc_Service.capNhatGiaSuMonHoc(lop.magiasu_monhoc, payload);
+        await GiaSu_MonHoc_Service.moKhoaGiaSuMonHoc(lop.magiasu_monhoc);
         alert("Đã mở lại lớp học thành công!");
         fetchDanhSachLopVaKhungGio(maGiaSu);
       } catch (error) {
@@ -436,6 +502,12 @@ const YeuCauDangKyLich = () => {
           <div>Khai giảng dự kiến: <strong style={{ color: '#0f172a' }}>{dk.ngaybatdauhoc ? new Date(dk.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa xếp'}</strong></div>
           <div style={{ marginTop: '4px' }}>Tổng học phí lớp học: <strong style={{ color: '#ef4444', fontSize: '15px' }}>{dk.tonghocphi?.toLocaleString()} VNĐ</strong></div>
           {dk.ghichu && <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>💬 Ghi chú: "{dk.ghichu}"</div>}
+          {Number(dk.trangthai) === 2 && dk.lydotuchoi && (
+            <div style={{ fontSize: '13px', color: '#dc2626', marginTop: '8px', fontWeight: '600', background: '#fef2f2', padding: '8px', borderRadius: '6px', border: '1px solid #fca5a5' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '4px' }}>info</span>
+              Lý do từ chối: {dk.lydotuchoi}
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -803,6 +875,77 @@ const YeuCauDangKyLich = () => {
         </div>
       )}
 
+      {/* 🟢 MODAL NHẬP LÝ DO TỪ CHỐI */}
+      {isRejectModalOpen && dangKyCanTuChoi && (
+        <div className="bc-modal-overlay">
+          <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
+            <div className="bc-modal-header">
+              <h3 style={{ margin: 0, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span className="material-symbols-outlined">block</span>
+                Từ chối yêu cầu đăng ký
+              </h3>
+              <button onClick={() => setIsRejectModalOpen(false)} className="bc-close-btn">&times;</button>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '16px', padding: '12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#991b1b', fontWeight: '600' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>info</span>
+                  Vui lòng nhập lý do từ chối để người học hiểu rõ tình huống.
+                </p>
+              </div>
+              <label style={{ display: 'block', fontWeight: '600', color: '#334155', marginBottom: '8px', fontSize: '14px' }}>
+                Lý do từ chối <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <textarea
+                value={lyDoTuChoi}
+                onChange={(e) => setLyDoTuChoi(e.target.value)}
+                placeholder="VD: Khung giờ không phù hợp, học viên quá xa khu vực dạy của tôi..."
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '12px',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  resize: 'vertical',
+                  fontFamily: 'inherit'
+                }}
+                maxLength={200}
+              />
+              <div style={{ textAlign: 'right', fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                {lyDoTuChoi.length}/200 ký tự
+              </div>
+            </div>
+            <div className="bc-modal-footer">
+              <button 
+                type="button" 
+                onClick={() => setIsRejectModalOpen(false)} 
+                className="btn-outline"
+                style={{ padding: '10px 20px' }}
+              >
+                Hủy
+              </button>
+              <button 
+                type="button" 
+                onClick={handleXacNhanTuChoi}
+                style={{
+                  padding: '10px 20px',
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+              >
+                Xác nhận từ chối
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL THÊM/SỬA LỚP */}
       {isModalLopOpen && (
         <div className="bc-modal-overlay">
@@ -819,7 +962,7 @@ const YeuCauDangKyLich = () => {
                   <input type="text" className="tcn-input" placeholder="🔍 Gõ tìm tên môn..." value={timKiemMon} onChange={e => setTimKiemMon(e.target.value)} style={{ flex: 1, padding: '8px' }} />
                   <select className="tcn-input" value={heLopChon} onChange={e => setHeLopChon(e.target.value)} style={{ flex: 1, padding: '8px' }}>
                     <option value="">-- Tất cả hệ lớp --</option>
-                    {danhSachHeLop.map(hl => <option key={hl.mahelop} value={hl.mahelop}>{hl.tenhelop}</option>)}
+                    {danhSachHeLop.filter(hl => hl.trangthai === 1).map(hl => <option key={hl.mahelop} value={hl.mahelop}>{hl.tenhelop}</option>)}
                   </select>
                 </div>
               </div>
@@ -836,7 +979,7 @@ const YeuCauDangKyLich = () => {
                   <label>Khu Vực Dạy</label>
                   <select className="tcn-input" value={formLop.makhuvuc} onChange={e => setFormLop({...formLop, makhuvuc: e.target.value})} required>
                     <option value="">-- Chọn khu vực --</option>
-                    {danhSachKhuVuc.map(kv => <option key={kv.makhuvuc} value={kv.makhuvuc}>{kv.tenkhuvuc}</option>)}
+                    {danhSachKhuVuc.filter(kv => kv.trangthai === 1).map(kv => <option key={kv.makhuvuc} value={kv.makhuvuc}>{kv.tenkhuvuc}</option>)}
                   </select>
                 </div>
               </div>

@@ -82,7 +82,8 @@ const TutorVerifyTable = () => {
   const handleDuyetHoSo = async (giaSu) => {
     if (window.confirm(`Xác nhận phê duyệt hồ sơ của gia sư: ${giaSu.hoten}?`)) {
       try {
-        await GiaSu_Service.suaGiaSu(giaSu.magiasu, { ...giaSu, trangthaiduyet: 1 });
+        // 🟢 Cập nhật duyệt = 1 và xóa lý do từ chối (nếu có)
+        await GiaSu_Service.suaGiaSu(giaSu.magiasu, { ...giaSu, trangthaiduyet: 1, lydotuchoi: null });
         alert("Đã duyệt hồ sơ gia sư thành công!");
         setChiTietGiaSu(null);
         loadTatCaDuLieuChoDuyet();
@@ -93,16 +94,25 @@ const TutorVerifyTable = () => {
   };
 
   const handleTuChoiHoSo = async (giaSu) => {
-    if (window.confirm(`Xác nhận TỪ CHỐI hồ sơ của gia sư: ${giaSu.hoten}?`)) {
-      try {
-        // CẬP NHẬT TRẠNG THÁI THÀNH 2 (TỪ CHỐI)
-        await GiaSu_Service.suaGiaSu(giaSu.magiasu, { ...giaSu, trangthaiduyet: 2 });
-        alert("Đã chuyển trạng thái hồ sơ sang 'Từ chối'!");
-        setChiTietGiaSu(null);
-        loadTatCaDuLieuChoDuyet();
-      } catch (error) {
-        alert("Có lỗi xảy ra trong quá trình cập nhật trạng thái!");
-      }
+    // 🟢 Dùng window.prompt để lấy lý do từ admin
+    const lyDo = window.prompt(`Nhập lý do TỪ CHỐI hồ sơ của gia sư: ${giaSu.hoten}?`, "");
+    
+    // Nếu admin bấm Cancel
+    if (lyDo === null) return; 
+
+    // Nếu admin để trống lý do
+    if (lyDo.trim() === "") {
+      return alert("Vui lòng nhập lý do từ chối để gia sư có thể khắc phục!");
+    }
+
+    try {
+      // 🟢 Gửi trạng thái 2 kèm theo lý do
+      await GiaSu_Service.suaGiaSu(giaSu.magiasu, { ...giaSu, trangthaiduyet: 2, lydotuchoi: lyDo.trim() });
+      alert("Đã chuyển trạng thái hồ sơ sang 'Từ chối'!");
+      setChiTietGiaSu(null);
+      loadTatCaDuLieuChoDuyet();
+    } catch (error) {
+      alert("Có lỗi xảy ra trong quá trình cập nhật trạng thái!");
     }
   };
 
@@ -110,7 +120,8 @@ const TutorVerifyTable = () => {
   const handleDuyetBangCap = async (bangCap) => {
     if (window.confirm(`Xác nhận phê duyệt chứng chỉ: ${bangCap.chuyennganh}?`)) {
       try {
-        await GiaSu_BangCap_Service.capNhatGiaSuBangCap(bangCap.mabangcapgiasu, { ...bangCap, trangthaiduyet: 1 });
+        // 🟢 Cập nhật duyệt = 1 và xóa lý do từ chối (nếu có)
+        await GiaSu_BangCap_Service.capNhatGiaSuBangCap(bangCap.mabangcapgiasu, { ...bangCap, trangthaiduyet: 1, lydotuchoi: null });
         alert("Đã duyệt bằng cấp thành công!");
         setChiTietBangCap(null);
         loadTatCaDuLieuChoDuyet();
@@ -121,16 +132,23 @@ const TutorVerifyTable = () => {
   };
 
   const handleTuChoiBangCap = async (bangCap) => {
-    if (window.confirm(`Từ chối bằng cấp này của gia sư: ${bangCap.tenGiaSu}?`)) {
-      try {
-        // CẬP NHẬT TRẠNG THÁI THÀNH 2 (TỪ CHỐI)
-        await GiaSu_BangCap_Service.capNhatGiaSuBangCap(bangCap.mabangcapgiasu, { ...bangCap, trangthaiduyet: 2 });
-        alert("Đã chuyển trạng thái bằng cấp sang 'Từ chối'!");
-        setChiTietBangCap(null);
-        loadTatCaDuLieuChoDuyet();
-      } catch (error) {
-        alert("Lỗi khi cập nhật trạng thái bằng cấp!");
-      }
+    // 🟢 Dùng window.prompt để lấy lý do từ chối
+    const lyDo = window.prompt(`Nhập lý do TỪ CHỐI bằng cấp này của gia sư: ${bangCap.tenGiaSu}?`, "");
+    
+    if (lyDo === null) return;
+
+    if (lyDo.trim() === "") {
+      return alert("Vui lòng nhập lý do từ chối để gia sư tải lại ảnh hợp lệ!");
+    }
+
+    try {
+      // 🟢 Gửi trạng thái 2 kèm theo lý do
+      await GiaSu_BangCap_Service.capNhatGiaSuBangCap(bangCap.mabangcapgiasu, { ...bangCap, trangthaiduyet: 2, lydotuchoi: lyDo.trim() });
+      alert("Đã chuyển trạng thái bằng cấp sang 'Từ chối'!");
+      setChiTietBangCap(null);
+      loadTatCaDuLieuChoDuyet();
+    } catch (error) {
+      alert("Lỗi khi cập nhật trạng thái bằng cấp!");
     }
   };
 

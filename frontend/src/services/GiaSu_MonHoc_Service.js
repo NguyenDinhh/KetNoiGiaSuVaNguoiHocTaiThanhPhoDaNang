@@ -56,6 +56,19 @@ const GiaSu_MonHoc_Service = {
         }
     },
 
+    moKhoaGiaSuMonHoc: async (maGiaSuMonHoc) => {
+        try {
+            const phanHoi = await fetch(`${DIA_CHI_API}/mokhoagiasumonhoc/${maGiaSuMonHoc}`, {
+                method: 'PUT'
+            });
+            if (!phanHoi.ok) throw new Error("Không thể mở khóa môn học gia sư!");
+            return await phanHoi.json();
+        } catch (loi) {
+            console.error("Lỗi tại GiaSu_MonHoc_Service.moKhoaGiaSuMonHoc:", loi);
+            throw loi;
+        }
+    },
+
     // ================== BỔ SUNG API TÍNH HỌC PHÍ ==================
     tinhHocPhi: async (hocphimotbuoi, sobuoi) => {
         try {

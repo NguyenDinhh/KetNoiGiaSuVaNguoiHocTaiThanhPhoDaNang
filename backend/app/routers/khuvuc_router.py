@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.schemas.base_schema import DataResponse
 from app.db.base import get_db
 from app.models.khuvuc_model import KhuVuc
-from app.schemas.khuvuc_schema import KhuVuc_Schema, Create_KhuVuc_Schema
+from app.schemas.khuvuc_schema import KhuVuc_Schema, Create_KhuVuc_Schema, Update_KhuVuc_Schema
 from typing import List
 khuvuc_router = APIRouter()
 
@@ -31,13 +31,33 @@ async def create_khuvuc(data: Create_KhuVuc_Schema, db: Session = Depends(get_db
         return DataResponse.custom_response(code="400",message="Lỗi", data=None)
 
 @khuvuc_router.put("/suakhuvuc/{id}", tags=["khuvuc"], description="Sửa tên khu vực", response_model= DataResponse[KhuVuc_Schema])
-async def update_khuvuc(id: int, data: Create_KhuVuc_Schema, db: Session = Depends(get_db)):
+async def update_khuvuc(id: int, data: Update_KhuVuc_Schema, db: Session = Depends(get_db)):
     khuvuc = db.query(KhuVuc).filter(KhuVuc.makhuvuc == id).first()
     if not khuvuc:
         return DataResponse.custom_response(code="404",message="Không tìm thấy khu vực", data= None)
     update_data = data.model_dump(exclude_unset= True)
     for key, value in update_data.items():
         setattr(khuvuc,key,value)
+    db.commit()
+    db.refresh(khuvuc)
+    return DataResponse.success_response(khuvuc)
+
+@khuvuc_router.put("/khoakhuvuc/{id}", tags=["khuvuc"], description="Khóa khu vực (trangthai = 0)", response_model=DataResponse[KhuVuc_Schema])
+async def lock_khuvuc(id: int, db: Session = Depends(get_db)):
+    khuvuc = db.query(KhuVuc).filter(KhuVuc.makhuvuc == id).first()
+    if not khuvuc:
+        return DataResponse.custom_response(code="404", message="Không tìm thấy khu vực", data=None)
+    khuvuc.trangthai = 0
+    db.commit()
+    db.refresh(khuvuc)
+    return DataResponse.success_response(khuvuc)
+
+@khuvuc_router.put("/mokhoakhuvuc/{id}", tags=["khuvuc"], description="Mở khóa khu vực (trangthai = 1)", response_model=DataResponse[KhuVuc_Schema])
+async def unlock_khuvuc(id: int, db: Session = Depends(get_db)):
+    khuvuc = db.query(KhuVuc).filter(KhuVuc.makhuvuc == id).first()
+    if not khuvuc:
+        return DataResponse.custom_response(code="404", message="Không tìm thấy khu vực", data=None)
+    khuvuc.trangthai = 1
     db.commit()
     db.refresh(khuvuc)
     return DataResponse.success_response(khuvuc)

@@ -66,6 +66,38 @@ const HocVien_Service = {
             console.error("Lỗi tại HocVien_Service.xoaHocVien:", loi);
             throw loi;
         }
+    },
+
+    khoaHocVien: async (maHocVien) => {
+        try {
+            const phanHoi = await fetch(`${DIA_CHI_API}/khoahocvien/${maHocVien}`, {
+                method: 'PUT'
+            });
+            if (!phanHoi.ok) {
+                const error = await phanHoi.json();
+                throw new Error(error.message || "Không thể khóa học viên!");
+            }
+            return await phanHoi.json();
+        } catch (loi) {
+            console.error("Lỗi tại HocVien_Service.khoaHocVien:", loi);
+            throw loi;
+        }
+    },
+
+    moKhoaHocVien: async (maHocVien) => {
+        try {
+            const phanHoi = await fetch(`${DIA_CHI_API}/mokhoahocvien/${maHocVien}`, {
+                method: 'PUT'
+            });
+            if (!phanHoi.ok) {
+                const error = await phanHoi.json();
+                throw new Error(error.message || "Không thể mở khóa học viên!");
+            }
+            return await phanHoi.json();
+        } catch (loi) {
+            console.error("Lỗi tại HocVien_Service.moKhoaHocVien:", loi);
+            throw loi;
+        }
     }
 };
 

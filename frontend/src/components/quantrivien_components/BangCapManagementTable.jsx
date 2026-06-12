@@ -77,6 +77,18 @@ const BangCapManagementTable = () => {
     }
   };
 
+  const xuLyKhoa = (bangCap) => {
+    if (window.confirm(`Bạn có muốn KHÓA bằng cấp "${bangCap.tenbangcap}" không? Bằng cấp sẽ không hiển thị với người dùng.`)) {
+      BangCap_Service.khoaBangCap(bangCap.mabangcap).then(() => taiDuLieuTongHop());
+    }
+  };
+
+  const xuLyMoKhoa = (bangCap) => {
+    if (window.confirm(`Bạn có muốn MỞ KHÓA bằng cấp "${bangCap.tenbangcap}" không?`)) {
+      BangCap_Service.moKhoaBangCap(bangCap.mabangcap).then(() => taiDuLieuTongHop());
+    }
+  };
+
   const xuLyGuiFormBangCap = (suKien) => {
     suKien.preventDefault();
     const payload = { tenbangcap: formDuLieuBangCap.tenbangcap };
@@ -199,25 +211,48 @@ const BangCapManagementTable = () => {
                 <thead>
                   <tr>
                     <th style={{ width: '15%', textAlign: 'center' }}>Mã bằng cấp</th>
-                    <th style={{ width: '65%' }}>Tên bằng cấp</th>
+                    <th style={{ width: '50%' }}>Tên bằng cấp</th>
+                    <th style={{ width: '15%', textAlign: 'center' }}>Trạng thái</th>
                     <th style={{ width: '20%', textAlign: 'right' }}>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dangTai ? (
-                    <tr><td colSpan="3" style={{ textAlign: 'center', padding: '32px' }}>Đang tải danh mục...</td></tr>
+                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px' }}>Đang tải danh mục...</td></tr>
                   ) : danhSachDaLoc.length === 0 ? (
-                    <tr><td colSpan="3" style={{ textAlign: 'center', padding: '32px' }}>Không có dữ liệu.</td></tr>
+                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px' }}>Không có dữ liệu.</td></tr>
                   ) : (
                     danhSachDaLoc.map((bangCap) => (
                       <tr key={bangCap.mabangcap}>
                         <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>#{bangCap.mabangcap}</td>
                         <td><span style={{ fontWeight: 600, color: 'var(--admin-primary)' }}>{bangCap.tenbangcap}</span></td>
+                        <td style={{ textAlign: 'center' }}>
+                          {bangCap.trangthai === 1 ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: 'rgba(0, 107, 84, 0.1)', color: 'var(--admin-secondary)', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>check_circle</span>
+                              Hoạt động
+                            </span>
+                          ) : (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>lock</span>
+                              Bị khóa
+                            </span>
+                          )}
+                        </td>
                         <td style={{ textAlign: 'right' }}>
                           <button type="button" className="btn-table-action-view" title="Chỉnh sửa" onClick={() => xuLyBamNutSua(bangCap)}>
                             <span className="material-symbols-outlined">edit</span>
                           </button>
-                          <button type="button" className="btn-table-action-view" title="Xóa" style={{ color: 'var(--admin-error)' }} onClick={() => xuLyXoa(bangCap)}>
+                          {bangCap.trangthai === 1 ? (
+                            <button type="button" className="btn-table-action-view" title="Khóa bằng cấp" style={{ color: '#f59e0b' }} onClick={() => xuLyKhoa(bangCap)}>
+                              <span className="material-symbols-outlined">lock</span>
+                            </button>
+                          ) : (
+                            <button type="button" className="btn-table-action-view" title="Mở khóa bằng cấp" style={{ color: '#10b981' }} onClick={() => xuLyMoKhoa(bangCap)}>
+                              <span className="material-symbols-outlined">lock_open</span>
+                            </button>
+                          )}
+                          <button type="button" className="btn-table-action-view" title="Xóa vĩnh viễn" style={{ color: 'var(--admin-error)' }} onClick={() => xuLyXoa(bangCap)}>
                             <span className="material-symbols-outlined">delete</span>
                           </button>
                         </td>

@@ -65,7 +65,34 @@ const BangCap_Service = {
       console.error("Lỗi tại BangCap_Service.xoaBangCap:", loi);
       throw loi;
     }
+  },
+
+  khoaBangCap: async (maBangCap) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/khoabangcap/${maBangCap}`, {
+        method: 'PUT'
+      });
+      if (!phanHoi.ok) throw new Error("Không thể khóa bằng cấp!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại BangCap_Service.khoaBangCap:", loi);
+      throw loi;
+    }
+  },
+
+  moKhoaBangCap: async (maBangCap) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/mokhoabangcap/${maBangCap}`, {
+        method: 'PUT'
+      });
+      if (!phanHoi.ok) throw new Error("Không thể mở khóa bằng cấp!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại BangCap_Service.moKhoaBangCap:", loi);
+      throw loi;
+    }
   }
+  
 };
 
 export default BangCap_Service;

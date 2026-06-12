@@ -8,6 +8,7 @@ const MonHocManagementTable = () => {
   const [dangTai, setDangTai] = useState(true);
   const [thongKe, setThongKe] = useState({ tongSo: 0, dangHoatDong: 0, dangTamNgung: 0 });
   const [tuKhoaTimKiem, setTuKhoaTimKiem] = useState("");
+  const [heLopDangLoc, setHeLopDangLoc] = useState("ALL"); // State lọc theo hệ lớp
 
   const [hienThiForm, setHienThiForm] = useState(false);
   const [formDuLieu, setFormDuLieu] = useState({ mahelop: "", tenmonhoc: "", mota: "", trangthai: 1 });
@@ -139,8 +140,9 @@ const MonHocManagementTable = () => {
 
   const danhSachDaLoc = danhSachMonHoc.filter((monHoc) => {
     const tuKhoaChuan = tuKhoaTimKiem.trim().toLowerCase();
-    if (tuKhoaChuan === "") return true;
-    return monHoc.tenmonhoc.toLowerCase().includes(tuKhoaChuan);
+    const khopTimKiem = tuKhoaChuan === "" || monHoc.tenmonhoc.toLowerCase().includes(tuKhoaChuan);
+    const khopHeLop = heLopDangLoc === "ALL" || monHoc.mahelop === heLopDangLoc;
+    return khopTimKiem && khopHeLop;
   });
 
   return (
@@ -176,7 +178,28 @@ const MonHocManagementTable = () => {
               <span className="material-symbols-outlined">search</span>
               <input type="text" placeholder="Tìm kiếm tên môn học..." value={tuKhoaTimKiem} onChange={(e) => setTuKhoaTimKiem(e.target.value)} />
             </div>
-            <button type="button" className="btn-admin-filter"><span className="material-symbols-outlined">filter_list</span>Lọc</button>
+            
+            {/* Dropdown lọc theo Hệ lớp */}
+            <select 
+              value={heLopDangLoc} 
+              onChange={(e) => setHeLopDangLoc(e.target.value === "ALL" ? "ALL" : parseInt(e.target.value))}
+              style={{ 
+                padding: '8px 12px', 
+                borderRadius: '6px', 
+                border: '1px solid #cbd5e1', 
+                backgroundColor: 'white',
+                fontSize: '14px',
+                cursor: 'pointer',
+                minWidth: '150px'
+              }}
+            >
+              <option value="ALL">Tất cả hệ lớp</option>
+              {danhSachHeLop.map((heLop) => (
+                <option key={heLop.mahelop} value={heLop.mahelop}>
+                  {heLop.tenhelop}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

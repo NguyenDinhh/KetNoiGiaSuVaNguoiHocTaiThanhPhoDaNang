@@ -16,16 +16,23 @@ const TrangCaNhan = () => {
   const [saving, setSaving] = useState(false);
 
   const fileInputRef = useRef(null);
+  const cccdMatTruocRef = useRef(null);
+  const cccdMatSauRef = useRef(null);
 
   // STATE: THÔNG TIN GIA SƯ & NGƯỜI DÙNG
   const [fileAnh, setFileAnh] = useState(null);
   const [anhPreview, setAnhPreview] = useState(null);
+  const [fileCCCDMatTruoc, setFileCCCDMatTruoc] = useState(null);
+  const [cccdMatTruocPreview, setCccdMatTruocPreview] = useState(null);
+  const [fileCCCDMatSau, setFileCCCDMatSau] = useState(null);
+  const [cccdMatSauPreview, setCccdMatSauPreview] = useState(null);
   const [formData, setFormData] = useState({
     manguoidung: null,
     magiasu: null,
     hoten: '', email: '', sodienthoai: '', anhdaidien: '',
     namsinh: '', gioitinh: 0, gioithieubanthan: '',
-    cccdmattruoc: '', cccdmatsau: '', trangthaiduyet: 0
+    cccdmattruoc: '', cccdmatsau: '', trangthaiduyet: 0,
+    lydotuchoi: ''
   });
   const [originalData, setOriginalData] = useState({});
 
@@ -98,7 +105,8 @@ const TrangCaNhan = () => {
             gioithieubanthan: giasuData?.gioithieubanthan || '',
             cccdmattruoc: giasuData?.cccdmattruoc || '',
             cccdmatsau: giasuData?.cccdmatsau || '',
-            trangthaiduyet: giasuData?.trangthaiduyet ?? 0
+            trangthaiduyet: giasuData?.trangthaiduyet ?? 0,
+            lydotuchoi: giasuData?.lydotuchoi || ''
           };
 
           setFormData(mergedData);
@@ -158,6 +166,22 @@ const TrangCaNhan = () => {
     }
   };
 
+  const xuLyChonCCCDMatTruoc = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileCCCDMatTruoc(file);
+      setCccdMatTruocPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const xuLyChonCCCDMatSau = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileCCCDMatSau(file);
+      setCccdMatSauPreview(URL.createObjectURL(file));
+    }
+  };
+
   const uploadAnhLenCloudinary = async (file) => {
     const formCloudData = new FormData();
     formCloudData.append("file", file);
@@ -178,13 +202,36 @@ const TrangCaNhan = () => {
     setSaving(true);
     try {
       let finalAvatarUrl = formData.anhdaidien;
+      let finalCCCDMatTruoc = formData.cccdmattruoc;
+      let finalCCCDMatSau = formData.cccdmatsau;
 
+      // Upload ảnh đại diện nếu có
       if (fileAnh) {
         const uploadedUrl = await uploadAnhLenCloudinary(fileAnh);
         if (uploadedUrl) {
           finalAvatarUrl = uploadedUrl;
         } else {
-          throw new Error("Tải ảnh lên Cloudinary thất bại!");
+          throw new Error("Tải ảnh đại diện lên Cloudinary thất bại!");
+        }
+      }
+
+      // Upload CCCD mặt trước nếu có
+      if (fileCCCDMatTruoc) {
+        const uploadedUrl = await uploadAnhLenCloudinary(fileCCCDMatTruoc);
+        if (uploadedUrl) {
+          finalCCCDMatTruoc = uploadedUrl;
+        } else {
+          throw new Error("Tải CCCD mặt trước lên Cloudinary thất bại!");
+        }
+      }
+
+      // Upload CCCD mặt sau nếu có
+      if (fileCCCDMatSau) {
+        const uploadedUrl = await uploadAnhLenCloudinary(fileCCCDMatSau);
+        if (uploadedUrl) {
+          finalCCCDMatSau = uploadedUrl;
+        } else {
+          throw new Error("Tải CCCD mặt sau lên Cloudinary thất bại!");
         }
       }
 
@@ -196,7 +243,9 @@ const TrangCaNhan = () => {
       const isGiaSuChanged =
         formData.namsinh !== originalData.namsinh ||
         formData.gioitinh !== originalData.gioitinh ||
-        formData.gioithieubanthan !== originalData.gioithieubanthan;
+        formData.gioithieubanthan !== originalData.gioithieubanthan ||
+        finalCCCDMatTruoc !== originalData.cccdmattruoc ||
+        finalCCCDMatSau !== originalData.cccdmatsau;
 
       if (!isNguoiDungChanged && !isGiaSuChanged) {
         alert("Bạn chưa thay đổi bất kỳ thông tin nào!");
@@ -222,8 +271,8 @@ const TrangCaNhan = () => {
       if (isGiaSuChanged) {
         const payloadGiaSu = {
           manguoidung: Number(formData.manguoidung),
-          cccdmattruoc: formData.cccdmattruoc || "string",
-          cccdmatsau: formData.cccdmatsau || "string",
+          cccdmattruoc: finalCCCDMatTruoc || "string",
+          cccdmatsau: finalCCCDMatSau || "string",
           namsinh: Number(formData.namsinh),
           gioitinh: Number(formData.gioitinh),
           gioithieubanthan: formData.gioithieubanthan || "",
@@ -247,6 +296,28 @@ const TrangCaNhan = () => {
       alert(error.message || "Xảy ra lỗi trong quá trình thực hiện lưu hồ sơ!");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // ================= YÊU CẦU DUYỆT LẠI =================
+  const handleYeuCauDuyetLai = async () => {
+    if (!formData.magiasu) {
+      alert("Không tìm thấy thông tin gia sư!");
+      return;
+    }
+
+    if (window.confirm("Bạn có muốn gửi lại yêu cầu duyệt hồ sơ không?")) {
+      try {
+        const payloadDuyetLai = {
+          trangthaiduyet: 0,  // Đặt lại trạng thái chờ duyệt
+          lydotuchoi: null    // Xóa lý do từ chối
+        };
+        await GiaSu_Service.suaGiaSu(formData.magiasu, payloadDuyetLai);
+        alert("Đã gửi yêu cầu duyệt lại thành công! Vui lòng chờ quản trị viên xem xét.");
+        window.location.reload();
+      } catch (error) {
+        alert("Lỗi khi gửi yêu cầu duyệt lại: " + error.message);
+      }
     }
   };
 
@@ -351,6 +422,51 @@ const TrangCaNhan = () => {
       {/* ================= TAB 1: THÔNG TIN GIA SƯ ================= */}
       {tabHienTai === 'thong_tin' && (
         <form onSubmit={handleSaveProfile} className="tcn-form">
+          {/* HIỂN THỊ TRẠNG THÁI DUYỆT */}
+          <div style={{ marginBottom: '20px', padding: '16px', borderRadius: '8px', backgroundColor: formData.trangthaiduyet === 1 ? '#d1fae5' : formData.trangthaiduyet === 2 ? '#fee2e2' : '#fef3c7' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {formData.trangthaiduyet === 1 ? (
+                <>
+                  <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#059669' }}>check_circle</span>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#059669', fontSize: '18px' }}>✓ Hồ sơ đã được duyệt</h3>
+                    <p style={{ margin: '4px 0 0 0', color: '#047857', fontSize: '14px' }}>Bạn có thể nhận lớp và giảng dạy</p>
+                  </div>
+                </>
+              ) : formData.trangthaiduyet === 2 ? (
+                <>
+                  <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#dc2626' }}>cancel</span>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ margin: 0, color: '#dc2626', fontSize: '18px' }}>✕ Hồ sơ bị từ chối</h3>
+                    {formData.lydotuchoi && (
+                      <p style={{ margin: '4px 0 0 0', color: '#991b1b', fontSize: '14px', fontWeight: 600 }}>
+                        Lý do: {formData.lydotuchoi}
+                      </p>
+                    )}
+                    <p style={{ margin: '8px 0 0 0', color: '#7f1d1d', fontSize: '13px' }}>
+                      Vui lòng cập nhật lại CCCD hoặc thông tin và gửi yêu cầu duyệt lại
+                    </p>
+                    <button 
+                      type="button" 
+                      onClick={handleYeuCauDuyetLai}
+                      style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      Gửi yêu cầu duyệt lại
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#d97706' }}>schedule</span>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#d97706', fontSize: '18px' }}>⏳ Đang chờ duyệt</h3>
+                    <p style={{ margin: '4px 0 0 0', color: '#92400e', fontSize: '14px' }}>Hồ sơ của bạn đang được quản trị viên xem xét</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
           <div className="tcn-top-section">
             <div className="tcn-avatar-col">
               {anhHienThi && anhHienThi.trim() !== '' && anhHienThi !== 'null' && anhHienThi !== 'string' ? (
@@ -405,6 +521,53 @@ const TrangCaNhan = () => {
                   name="gioithieubanthan" value={formData.gioithieubanthan} onChange={handleInputChange}
                   rows="5" className="tcn-input" placeholder="Giới thiệu đôi nét về bản thân và phương pháp giảng dạy..." required
                 ></textarea>
+              </div>
+
+              {/* PHẦN CẬP NHẬT CCCD */}
+              <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 16px 0', color: '#0f172a', fontSize: '16px' }}>📝 Căn cước công dân (CCCD)</h4>
+                
+                <div className="tcn-row" style={{ gap: '16px' }}>
+                  {/* CCCD Mặt Trước */}
+                  <div className="tcn-form-group" style={{ flex: 1 }}>
+                    <label>CCCD Mặt trước</label>
+                    <div style={{ position: 'relative', border: '2px dashed #cbd5e1', borderRadius: '8px', padding: '16px', textAlign: 'center', cursor: 'pointer', backgroundColor: 'white' }} onClick={() => cccdMatTruocRef.current.click()}>
+                      {(cccdMatTruocPreview || formData.cccdmattruoc) && (cccdMatTruocPreview || formData.cccdmattruoc) !== 'string' ? (
+                        <img 
+                          src={cccdMatTruocPreview || formData.cccdmattruoc} 
+                          alt="CCCD mặt trước" 
+                          style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }}
+                        />
+                      ) : (
+                        <div style={{ padding: '20px' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#94a3b8' }}>badge</span>
+                          <p style={{ margin: '8px 0 0 0', color: '#64748b', fontSize: '14px' }}>Nhấn để tải CCCD mặt trước</p>
+                        </div>
+                      )}
+                    </div>
+                    <input type="file" accept="image/*" ref={cccdMatTruocRef} style={{ display: 'none' }} onChange={xuLyChonCCCDMatTruoc} />
+                  </div>
+
+                  {/* CCCD Mặt Sau */}
+                  <div className="tcn-form-group" style={{ flex: 1 }}>
+                    <label>CCCD Mặt sau</label>
+                    <div style={{ position: 'relative', border: '2px dashed #cbd5e1', borderRadius: '8px', padding: '16px', textAlign: 'center', cursor: 'pointer', backgroundColor: 'white' }} onClick={() => cccdMatSauRef.current.click()}>
+                      {(cccdMatSauPreview || formData.cccdmatsau) && (cccdMatSauPreview || formData.cccdmatsau) !== 'string' ? (
+                        <img 
+                          src={cccdMatSauPreview || formData.cccdmatsau} 
+                          alt="CCCD mặt sau" 
+                          style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }}
+                        />
+                      ) : (
+                        <div style={{ padding: '20px' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#94a3b8' }}>badge</span>
+                          <p style={{ margin: '8px 0 0 0', color: '#64748b', fontSize: '14px' }}>Nhấn để tải CCCD mặt sau</p>
+                        </div>
+                      )}
+                    </div>
+                    <input type="file" accept="image/*" ref={cccdMatSauRef} style={{ display: 'none' }} onChange={xuLyChonCCCDMatSau} />
+                  </div>
+                </div>
               </div>
 
               <button type="submit" className="btn-submit" disabled={saving}>

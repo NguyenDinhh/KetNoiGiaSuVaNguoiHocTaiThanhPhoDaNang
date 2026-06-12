@@ -65,8 +65,14 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
 
   const toggleHocVien = (id) => {
     if (hocVienDaChon.includes(id)) {
+      // Cho phép bỏ chọn
       setHocVienDaChon(hocVienDaChon.filter(x => x !== id));
     } else {
+      // Kiểm tra giới hạn 3 học viên
+      if (hocVienDaChon.length >= 3) {
+        alert("Chỉ được chọn tối đa 3 học viên cho một đơn đăng ký!");
+        return;
+      }
       setHocVienDaChon([...hocVienDaChon, id]);
     }
   };
@@ -177,8 +183,13 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
         <div>
           <label className="dkmh-label">
             <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '6px', color: '#0284c7' }}>groups</span>
-            Bước 1: Tích chọn học viên tham gia học ({hocVienDaChon.length})
+            Bước 1: Tích chọn học viên tham gia học ({hocVienDaChon.length}/3)
           </label>
+          {hocVienDaChon.length === 3 && (
+            <p style={{ color: '#f59e0b', fontSize: '13px', fontWeight: 'bold', margin: '4px 0 8px 0', background: '#fffbeb', padding: '8px', borderRadius: '4px', border: '1px solid #fcd34d' }}>
+              ⚠️ Đã đạt giới hạn 3 học viên. Bỏ chọn học viên hiện tại nếu muốn thay đổi.
+            </p>
+          )}
           {danhSachHocVien.length === 0 ? (
             <p style={{ color: '#ef4444', fontSize: '13px', fontStyle: 'italic', margin: '4px 0 0 0' }}>
               * Tài khoản của bạn chưa đăng ký hồ sơ học viên nào. Vui lòng vào mục "Quản lý Học viên" thiết lập trước!
@@ -187,13 +198,24 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
             <div className="dkmh-checkbox-grid">
               {danhSachHocVien.map(hv => {
                 const isSelected = hocVienDaChon.includes(hv.mahocvien);
+                const isDisabled = !isSelected && hocVienDaChon.length >= 3;
                 return (
                   <div
                     key={hv.mahocvien}
-                    className={`dkmh-checkbox-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => toggleHocVien(hv.mahocvien)}
+                    className={`dkmh-checkbox-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                    onClick={() => !isDisabled && toggleHocVien(hv.mahocvien)}
+                    style={{ 
+                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                      opacity: isDisabled ? 0.5 : 1
+                    }}
                   >
-                    <input type="checkbox" checked={isSelected} readOnly style={{ cursor: 'pointer' }} />
+                    <input 
+                      type="checkbox" 
+                      checked={isSelected} 
+                      readOnly 
+                      disabled={isDisabled}
+                      style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }} 
+                    />
                     <div>
                       <div style={{ fontWeight: '700', fontSize: '14px', color: '#1e293b' }}>{hv.tenhocvien}</div>
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Năm sinh: {hv.namsinh} | Học lực: {hv.hocluc}</div>

@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends
 from app.db.base import get_db
 from sqlalchemy.orm import Session
 from app.models.bangcap_model import BangCap
-from app.schemas.bangcap_schema import BangCap_Schema, Create_BangCap_Schema
+from app.schemas.bangcap_schema import BangCap_Schema, Create_BangCap_Schema, Update_BangCap_Schema
 from app.schemas.base_schema import DataResponse
 from typing import List
 
@@ -29,7 +29,7 @@ async def create_bancap(data: Create_BangCap_Schema,db: Session = Depends(get_db
     return DataResponse.success_response(bangcap)
 
 @bangcap_router.put("/suabangcap/{id}", tags=["bangcap"], description= "Sửa bằng cấp", response_model=DataResponse[BangCap_Schema])
-async def update_bangcap(id: int,  data: Create_BangCap_Schema,db: Session = Depends(get_db)):
+async def update_bangcap(id: int,  data: Update_BangCap_Schema,db: Session = Depends(get_db)):
     bangcap = db.query(BangCap).filter(BangCap.mabangcap == id).first()
     if not bangcap:
         return DataResponse.custom_response(code="404", message="Lỗi", data= None)
@@ -40,8 +40,28 @@ async def update_bangcap(id: int,  data: Create_BangCap_Schema,db: Session = Dep
     db.refresh(bangcap)
     return DataResponse.success_response(bangcap)
 
+@bangcap_router.put("/khoabangcap/{id}", tags=["bangcap"], description="Khóa bằng cấp (trangthai = 0)", response_model=DataResponse[BangCap_Schema])
+async def lock_bangcap(id: int, db: Session = Depends(get_db)):
+    bangcap = db.query(BangCap).filter(BangCap.mabangcap == id).first()
+    if not bangcap:
+        return DataResponse.custom_response(code="404", message="Không tìm thấy bằng cấp", data=None)
+    bangcap.trangthai = 0
+    db.commit()
+    db.refresh(bangcap)
+    return DataResponse.success_response(bangcap)
+
+@bangcap_router.put("/mokhoabangcap/{id}", tags=["bangcap"], description="Mở khóa bằng cấp (trangthai = 1)", response_model=DataResponse[BangCap_Schema])
+async def unlock_bangcap(id: int, db: Session = Depends(get_db)):
+    bangcap = db.query(BangCap).filter(BangCap.mabangcap == id).first()
+    if not bangcap:
+        return DataResponse.custom_response(code="404", message="Không tìm thấy bằng cấp", data=None)
+    bangcap.trangthai = 1
+    db.commit()
+    db.refresh(bangcap)
+    return DataResponse.success_response(bangcap)
+
 @bangcap_router.delete("/xoabangcap/{id}", tags=["bangcap"], description= "Xóa bằng cấp", response_model=DataResponse[BangCap_Schema])
-async def update_bangcap(id: int,db: Session = Depends(get_db)):
+async def delete_bangcap(id: int,db: Session = Depends(get_db)):
     bangcap = db.query(BangCap).filter(BangCap.mabangcap == id).first()
     if not bangcap:
         return DataResponse.custom_response(code="404", message="Lỗi", data= None)

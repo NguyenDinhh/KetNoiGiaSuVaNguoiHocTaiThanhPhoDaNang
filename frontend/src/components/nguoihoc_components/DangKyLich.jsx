@@ -12,6 +12,7 @@ import NguoiDung_Service from '../../services/NguoiDung_Service';
 import HocVien_Service from '../../services/HocVien_Service';
 import YeuCau_HocVien_Service from '../../services/YeuCau_HocVien_Service';
 import DanhGia_Service from '../../services/DanhGia_Service';
+import GiaSu_UngTuyen_Service from '../../services/GiaSu_UngTuyen_Service';
 
 const DangKyLich = () => {
   // STATE QUẢN LÝ TAB CHÍNH CỦA TRANG
@@ -60,7 +61,7 @@ const DangKyLich = () => {
       const [
         resDangKy, resChiTiet, resGiaSuMon, resMonHoc,
         resGiaSu, resNguoiDung, resYeuCauHV, resHocVien, resDanhGia,
-        resYeuCauTimGiaSu, resChiTietYeuCau
+        resYeuCauTimGiaSu, resChiTietYeuCau, resGiaSuUngTuyen
       ] = await Promise.all([
         DangKyLich_Service.layDanhSachDangKyLich().catch(() => []),
         ChiTietDangKyLich_Service.layDanhSachChiTietDangKyLich().catch(() => []),
@@ -72,7 +73,8 @@ const DangKyLich = () => {
         HocVien_Service.layDanhSachHocVien().catch(() => []),
         DanhGia_Service.layDanhSachDanhGia().catch(() => []),
         YeuCauTimGiaSu_Service.layDanhSachYeuCau().catch(() => []),
-        ChiTietYeuCau_Service.layDanhSachChiTietYeuCau().catch(() => [])
+        ChiTietYeuCau_Service.layDanhSachChiTietYeuCau().catch(() => []),
+        GiaSu_UngTuyen_Service.layDanhSachUngTuyen().catch(() => [])
       ]);
 
       const listMonHoc = Array.isArray(resMonHoc) ? resMonHoc : (resMonHoc?.data || []);
@@ -124,13 +126,25 @@ const DangKyLich = () => {
       // 🟢 XỬ LÝ DATA TỪ YEU CẦU TÌM GIA SƯ (người học tạo yêu cầu, gia sư ứng tuyển)
       const arrYeuCau = Array.isArray(resYeuCauTimGiaSu) ? resYeuCauTimGiaSu : (resYeuCauTimGiaSu?.data || []);
       const arrChiTietYC = Array.isArray(resChiTietYeuCau) ? resChiTietYeuCau : (resChiTietYeuCau?.data || []);
+      const arrGiaSuUngTuyen = Array.isArray(resGiaSuUngTuyen) ? resGiaSuUngTuyen : (resGiaSuUngTuyen?.data || []);
 
       const yeuCauCuaToi = arrYeuCau.filter(yc => Number(yc.manguoidung) === Number(maND));
 
       const dataYeuCau = yeuCauCuaToi.map(yc => {
         const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc));
-        const giaSu = arrGiaSu.find(gs => Number(gs.magiasu) === Number(yc.magiasu)) || {};
-        const thongTinGS = arrNguoiDung.find(nd => Number(nd.manguoidung || nd.id) === Number(giaSu.manguoidung)) || {};
+        
+        // 🔥 TÌM GIA SƯ TỪ BẢNG GIASU_UNGTUYEN (người được duyệt - trangthai = 1)
+        const ungTuyenDuocDuyet = arrGiaSuUngTuyen.find(ut => 
+          Number(ut.mayeucau) === Number(yc.mayeucau) && Number(ut.trangthai) === 1
+        );
+        
+        let giaSu = {};
+        let thongTinGS = {};
+        
+        if (ungTuyenDuocDuyet) {
+          giaSu = arrGiaSu.find(gs => Number(gs.magiasu) === Number(ungTuyenDuocDuyet.magiasu)) || {};
+          thongTinGS = arrNguoiDung.find(nd => Number(nd.manguoidung || nd.id) === Number(giaSu.manguoidung)) || {};
+        }
 
         const khungGioYC = arrChiTietYC.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau));
 
@@ -147,8 +161,9 @@ const DangKyLich = () => {
           giasu_email: thongTinGS.email || 'Chưa cập nhật',
           danhSachKhungGioChon: khungGioYC,
           danhSachHocVien: danhSachHocVienYC,
-          tonghocphi: yc.hocphi,
-          ghichu: yc.ghichu
+          tonghocphi: yc.tonghocphi,
+          ghichu: yc.ghichu,
+          ngaybatdauhoc: yc.ngaybatdauhoc
         };
       });
 
@@ -429,6 +444,21 @@ const DangKyLich = () => {
                   <div className="dkl-footer-info">
                     <div>Khai giảng dự kiến: <strong>{dk.ngaybatdauhoc ? new Date(dk.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></div>
                     {dk.ghichu && <div className="dkl-footer-note">💬 Ghi chú: "{dk.ghichu}"</div>}
+                    {Number(dk.trangthai) === 2 && dk.lydotuchoi && (
+                      <div style={{ 
+                        marginTop: '12px', 
+                        padding: '12px', 
+                        background: '#fef2f2', 
+                        border: '1px solid #fca5a5', 
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        color: '#dc2626',
+                        fontWeight: '600'
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '4px' }}>info</span>
+                        Lý do từ chối: {dk.lydotuchoi}
+                      </div>
+                    )}
                   </div>
 
                   <div className="dkl-footer-actions">

@@ -56,6 +56,11 @@ const QuanLyYeuCau = () => {
   const [formData, setFormData] = useState({ makhuvuc: '', mamonhoc: '', ngaybatdauhoc: '', sobuoihoc: '', tonghocphi: '' });
   const [khungGioList, setKhungGioList] = useState([{ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' }]);
   const [selectedStudents, setSelectedStudents] = useState([]);
+  
+  // State cho modal từ chối gia sư
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [ungTuyenCanTuChoi, setUngTuyenCanTuChoi] = useState(null);
+  const [lyDoTuChoi, setLyDoTuChoi] = useState('');
 
   // ================= FETCH DỮ LIỆU TỔNG (CHẠY 1 LẦN) =================
   useEffect(() => {
@@ -215,13 +220,38 @@ const QuanLyYeuCau = () => {
     } catch (error) { alert("Đã xảy ra lỗi khi duyệt gia sư!"); }
   };
 
-  const handleTuChoiGiaSu = async (ungTuyenCanTuChoi) => {
-    if (!window.confirm("Bạn muốn từ chối Gia sư này?")) return;
+  const handleTuChoiGiaSu = async (ungTuyen) => {
+    setUngTuyenCanTuChoi(ungTuyen);
+    setLyDoTuChoi('');
+    setIsRejectModalOpen(true);
+  };
+  
+  const handleXacNhanTuChoiGiaSu = async () => {
+    if (!lyDoTuChoi.trim()) {
+      alert("Vui lòng nhập lý do từ chối!");
+      return;
+    }
+    
     try {
-      await GiaSu_UngTuyen_Service.capNhatTrangThaiUngTuyen(ungTuyenCanTuChoi.magiasu_ungtuyen || ungTuyenCanTuChoi.id, { ...ungTuyenCanTuChoi, trangthai: 2 });
+      const payload = {
+        ...ungTuyenCanTuChoi,
+        trangthai: 2,
+        lydotuchoi: lyDoTuChoi
+      };
+      
+      await GiaSu_UngTuyen_Service.capNhatTrangThaiUngTuyen(
+        ungTuyenCanTuChoi.magiasu_ungtuyen || ungTuyenCanTuChoi.id, 
+        payload
+      );
+      
       alert("Đã từ chối Gia sư.");
+      setIsRejectModalOpen(false);
+      setUngTuyenCanTuChoi(null);
+      setLyDoTuChoi('');
       window.location.reload();
-    } catch (error) { alert("Đã xảy ra lỗi!"); }
+    } catch (error) { 
+      alert("Đã xảy ra lỗi!"); 
+    }
   };
 
   const handleLuuSua = async (e) => {
@@ -343,7 +373,23 @@ const QuanLyYeuCau = () => {
     } catch (error) { alert("Quá trình lưu dữ liệu gặp lỗi."); }
   };
 
-  const monHocDropdown = boLocHeLop ? danhSachMonHoc.filter(m => Number(m.mahelop) === Number(boLocHeLop)) : danhSachMonHoc;
+  // Lọc môn học theo:
+  // 1. Hệ lớp được chọn (nếu có)
+  // 2. Môn học có trangthai = 1
+  // 3. Hệ lớp của môn học có trangthai = 1
+  const monHocDropdown = danhSachMonHoc.filter(m => {
+    // Kiểm tra môn học có hoạt động không
+    if (m.trangthai !== 1) return false;
+    
+    // Kiểm tra hệ lớp của môn học có hoạt động không
+    const heLop = danhSachHeLop.find(hl => hl.mahelop === Number(m.mahelop));
+    if (!heLop || heLop.trangthai !== 1) return false;
+    
+    // Nếu có bộ lọc hệ lớp, chỉ lấy môn học thuộc hệ lớp đó
+    if (boLocHeLop && Number(m.mahelop) !== Number(boLocHeLop)) return false;
+    
+    return true;
+  });
 
   // ====================================================================
   // 🟢 PHÂN LOẠI DANH SÁCH THEO MÃ TRẠNG THÁI (0, 1, 2, 3)
@@ -583,6 +629,77 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
+          {/* MODAL TỪ CHỐI GIA SƯ */}
+          {isRejectModalOpen && ungTuyenCanTuChoi && (
+            <div className="bc-modal-overlay">
+              <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
+                <div className="bc-modal-header">
+                  <h3 style={{ margin: 0, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="material-symbols-outlined">block</span>
+                    Từ chối Gia sư ứng tuyển
+                  </h3>
+                  <button onClick={() => setIsRejectModalOpen(false)} className="bc-close-btn">&times;</button>
+                </div>
+                <div style={{ padding: '20px' }}>
+                  <div style={{ marginBottom: '16px', padding: '12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#991b1b', fontWeight: '600' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>info</span>
+                      Vui lòng nhập lý do từ chối để Gia sư hiểu rõ tình huống.
+                    </p>
+                  </div>
+                  <label style={{ display: 'block', fontWeight: '600', color: '#334155', marginBottom: '8px', fontSize: '14px' }}>
+                    Lý do từ chối <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <textarea
+                    value={lyDoTuChoi}
+                    onChange={(e) => setLyDoTuChoi(e.target.value)}
+                    placeholder="VD: Không phù hợp với lịch của học viên, học phí quá cao..."
+                    style={{
+                      width: '100%',
+                      minHeight: '100px',
+                      padding: '12px',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      resize: 'vertical',
+                      fontFamily: 'inherit'
+                    }}
+                    maxLength={200}
+                  />
+                  <div style={{ textAlign: 'right', fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                    {lyDoTuChoi.length}/200 ký tự
+                  </div>
+                </div>
+                <div className="bc-modal-footer">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsRejectModalOpen(false)} 
+                    className="btn-outline"
+                    style={{ padding: '10px 20px' }}
+                  >
+                    Hủy
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={handleXacNhanTuChoiGiaSu}
+                    style={{
+                      padding: '10px 20px',
+                      background: '#ef4444',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Xác nhận từ chối
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* BỔ SUNG: Modal Xem chi tiết (Hiển thị mảng khung giờ) */}
           {isDetailOpen && detailData && (
             <div className="bc-modal-overlay">
@@ -763,8 +880,8 @@ const QuanLyYeuCau = () => {
               <div>
                 <h3 style={{ marginBottom: '20px' }}>Thông tin lớp học cơ bản</h3>
                 <div className="yctg-row">
-                  <div className="yctg-form-group"><label className="yctg-form-label">Khu vực *</label><select className="yctg-form-control" name="makhuvuc" value={formData.makhuvuc} onChange={e => setFormData({...formData, makhuvuc: e.target.value})}><option value="">-- Chọn khu vực học --</option>{danhSachKhuVuc.map(k => <option key={k.makhuvuc} value={k.makhuvuc}>{k.tenkhuvuc}</option>)}</select></div>
-                  <div className="yctg-form-group"><label className="yctg-form-label">Cấp học (Tùy chọn lọc)</label><select className="yctg-form-control" value={boLocHeLop} onChange={e => { setBoLocHeLop(e.target.value); setFormData({...formData, mamonhoc: ''}); }}><option value="">-- Tất cả hệ lớp --</option>{danhSachHeLop.map(hl => <option key={hl.mahelop} value={hl.mahelop}>{hl.tenhelop}</option>)}</select></div>
+                  <div className="yctg-form-group"><label className="yctg-form-label">Khu vực *</label><select className="yctg-form-control" name="makhuvuc" value={formData.makhuvuc} onChange={e => setFormData({...formData, makhuvuc: e.target.value})}><option value="">-- Chọn khu vực học --</option>{danhSachKhuVuc.filter(k => k.trangthai === 1).map(k => <option key={k.makhuvuc} value={k.makhuvuc}>{k.tenkhuvuc}</option>)}</select></div>
+                  <div className="yctg-form-group"><label className="yctg-form-label">Cấp học (Tùy chọn lọc)</label><select className="yctg-form-control" value={boLocHeLop} onChange={e => { setBoLocHeLop(e.target.value); setFormData({...formData, mamonhoc: ''}); }}><option value="">-- Tất cả hệ lớp --</option>{danhSachHeLop.filter(hl => hl.trangthai === 1).map(hl => <option key={hl.mahelop} value={hl.mahelop}>{hl.tenhelop}</option>)}</select></div>
                 </div>
                 <div className="yctg-row">
                   <div className="yctg-form-group"><label className="yctg-form-label">Môn học *</label><select className="yctg-form-control" name="mamonhoc" value={formData.mamonhoc} onChange={e => setFormData({...formData, mamonhoc: e.target.value})}><option value="">-- Chọn môn học --</option>{monHocDropdown.map(m => <option key={m.mamonhoc} value={m.mamonhoc}>{m.tenmonhoc}</option>)}</select></div>
@@ -798,16 +915,55 @@ const QuanLyYeuCau = () => {
 
             {step === 3 && (
               <div>
-                <h3 style={{ marginBottom: '10px' }}>Chọn học viên tham gia</h3>
+                <h3 style={{ marginBottom: '10px' }}>Chọn học viên tham gia ({selectedStudents.length}/3)</h3>
+                {selectedStudents.length === 3 && (
+                  <div style={{ 
+                    background: '#fffbeb', 
+                    padding: '12px 16px', 
+                    borderRadius: '8px', 
+                    color: '#b45309',
+                    marginBottom: '16px',
+                    border: '1px solid #fcd34d',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}>
+                    ⚠️ Đã đạt giới hạn 3 học viên. Bỏ chọn học viên hiện tại nếu muốn thay đổi.
+                  </div>
+                )}
                 {danhSachHocVienCuaToi.length === 0 ? (
                   <div style={{ background: '#fffbeb', padding: '20px', borderRadius: '8px', color: '#b45309' }}>Bạn chưa có hồ sơ học viên. Vui lòng quay lại tab Học viên để tạo hồ sơ trước.</div>
                 ) : (
                   <div className="yctg-student-grid">
                     {danhSachHocVienCuaToi.map(hv => {
                       const isSelected = selectedStudents.includes(hv.mahocvien);
+                      const isDisabled = !isSelected && selectedStudents.length >= 3;
                       return (
-                        <div key={hv.mahocvien} className={`yctg-student-card ${isSelected ? 'selected' : ''}`} onClick={() => setSelectedStudents(prev => prev.includes(hv.mahocvien) ? prev.filter(id => id !== hv.mahocvien) : [...prev, hv.mahocvien])}>
-                          <input type="checkbox" className="yctg-student-checkbox" checked={isSelected} readOnly />
+                        <div 
+                          key={hv.mahocvien} 
+                          className={`yctg-student-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`} 
+                          onClick={() => {
+                            if (isDisabled) {
+                              alert("Chỉ được chọn tối đa 3 học viên cho một yêu cầu!");
+                              return;
+                            }
+                            setSelectedStudents(prev => 
+                              prev.includes(hv.mahocvien) 
+                                ? prev.filter(id => id !== hv.mahocvien) 
+                                : [...prev, hv.mahocvien]
+                            );
+                          }}
+                          style={{ 
+                            cursor: isDisabled ? 'not-allowed' : 'pointer',
+                            opacity: isDisabled ? 0.5 : 1
+                          }}
+                        >
+                          <input 
+                            type="checkbox" 
+                            className="yctg-student-checkbox" 
+                            checked={isSelected} 
+                            disabled={isDisabled}
+                            readOnly 
+                          />
                           <div className="yctg-student-info"><h4>{hv.tenhocvien}</h4><p>SN: {hv.namsinh} - Lực học: {hv.hocluc}</p></div>
                         </div>
                       );

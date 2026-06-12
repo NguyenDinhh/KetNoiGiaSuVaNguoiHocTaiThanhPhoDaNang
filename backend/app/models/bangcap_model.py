@@ -6,3 +6,4 @@ class BangCap(Base):
 
     mabangcap = Column(Integer, primary_key=True, autoincrement=True)
     tenbangcap = Column(String(255), nullable=False, unique=True)
+    trangthai = Column(Integer)

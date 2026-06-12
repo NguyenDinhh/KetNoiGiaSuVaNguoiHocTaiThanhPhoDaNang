@@ -26,7 +26,7 @@ const HocVien = () => {
     taiDanhSachHocVienActive();
   }, []);
 
-  // Hàm tải dữ liệu và lọc điều kiện hiển thị học viên chưa bị khóa
+  // Hàm tải dữ liệu và lọc học viên theo manguoidung (hiển thị cả bị khóa và đang hoạt động)
   const taiDanhSachHocVienActive = async () => {
     try {
       setLoading(true);
@@ -34,14 +34,13 @@ const HocVien = () => {
       const tatCaHocVien = Array.isArray(data) ? data : [];
 
       // LỌC CHỈ LẤY:
-      // 1. Học viên thuộc về tài khoản này (manguoidung)
-      // 2. Học viên KHÔNG BỊ KHÓA (trangthai !== 0)
-      const activeStudents = tatCaHocVien.filter(hv =>
-        Number(hv.manguoidung) === Number(currentUserId) &&
-        hv.trangthai !== 0
+      // Học viên thuộc về tài khoản này (manguoidung)
+      // Hiển thị cả học viên hoạt động và bị khóa
+      const hocVienCuaToi = tatCaHocVien.filter(hv =>
+        Number(hv.manguoidung) === Number(currentUserId)
       );
 
-      setDanhSachHocVien(activeStudents);
+      setDanhSachHocVien(hocVienCuaToi);
     } catch (error) {
       console.error("Lỗi đồng bộ dữ liệu danh sách học viên:", error);
     } finally {
@@ -58,8 +57,11 @@ const HocVien = () => {
   };
 
   const handleOpenModalThemMoi = () => {
-    if (danhSachHocVien.length >= 3) {
-      alert("Mỗi tài khoản chỉ được phép quản lý tối đa 3 học viên hoạt động cùng lúc!");
+    // Đếm số học viên đang hoạt động (trangthai = 1)
+    const soHocVienDangHoatDong = danhSachHocVien.filter(hv => hv.trangthai === 1).length;
+    
+    if (soHocVienDangHoatDong >= 10) {
+      alert("Mỗi tài khoản chỉ được phép quản lý tối đa 10 học viên hoạt động cùng lúc!");
       return;
     }
     setEditingHocVien(null);
@@ -100,8 +102,10 @@ const HocVien = () => {
         alert("Cập nhật thông tin học viên thành công!");
       } else {
         // LUỒNG THÊM MỚI (Kiểm tra chốt chặn số lượng hoạt động một lần nữa trước khi gửi)
-        if (danhSachHocVien.length >= 3) {
-          throw new Error("Không thể thêm! Giới hạn tối đa 3 học viên đang hoạt động.");
+        const soHocVienDangHoatDong = danhSachHocVien.filter(hv => hv.trangthai === 1).length;
+        
+        if (soHocVienDangHoatDong >= 10) {
+          throw new Error("Không thể thêm! Giới hạn tối đa 10 học viên đang hoạt động.");
         }
 
         const payloadThem = {
@@ -124,15 +128,28 @@ const HocVien = () => {
     }
   };
 
-  // Luồng xử lý Khóa học viên (Xóa mềm - thay đổi trạng thái hoạt động)
+  // Luồng xử lý Khóa học viên
   const handleLockHocVien = async (id, name) => {
     if (window.confirm(`Bạn có chắc chắn muốn khóa học viên [ ${name} ] không?\nHọc viên bị khóa sẽ không thể sử dụng để đăng ký tìm gia sư.`)) {
       try {
-        await HocVien_Service.xoaHocVien(id);
-        alert("Đã khóa trạng thái hồ sơ học viên thành công!");
+        await HocVien_Service.khoaHocVien(id);
+        alert("Đã khóa học viên thành công!");
         taiDanhSachHocVienActive();
       } catch (error) {
-        alert("Khóa hồ sơ học viên thất bại!");
+        alert(error.message || "Khóa học viên thất bại!");
+      }
+    }
+  };
+
+  // Luồng xử lý Mở khóa học viên
+  const handleUnlockHocVien = async (id, name) => {
+    if (window.confirm(`Bạn có chắc chắn muốn mở khóa học viên [ ${name} ] không?`)) {
+      try {
+        await HocVien_Service.moKhoaHocVien(id);
+        alert("Đã mở khóa học viên thành công!");
+        taiDanhSachHocVienActive();
+      } catch (error) {
+        alert(error.message || "Mở khóa học viên thất bại!");
       }
     }
   };
@@ -141,14 +158,16 @@ const HocVien = () => {
     return <div className="dkl-loading-message">Đang tải danh sách học viên...</div>;
   }
 
-  const datGioiHanBaNguoi = danhSachHocVien.length >= 3;
+  // Đếm số học viên đang hoạt động
+  const soHocVienDangHoatDong = danhSachHocVien.filter(hv => hv.trangthai === 1).length;
+  const datGioiHanBaNguoi = soHocVienDangHoatDong >= 10;
 
   return (
     <div className="nh-hv-card">
       <div className="nh-hv-header">
         <div className="nh-hv-title-group">
           <h2>Quản lý Học viên</h2>
-          <p>Danh sách các học viên liên kết quản lý bởi tài khoản của bạn (Tối đa 3 học viên hoạt động).</p>
+          <p>Danh sách các học viên liên kết quản lý bởi tài khoản của bạn (Tối đa 10 học viên hoạt động).</p>
         </div>
 
         {/* Nút thêm mới tự động ẩn/khóa thuộc tính khi đạt giới hạn 3 người */}
@@ -162,10 +181,10 @@ const HocVien = () => {
         </button>
       </div>
 
-      {/* Hiển thị cảnh báo trực quan khi chạm ngưỡng giới hạn 3 người */}
+      {/* Hiển thị cảnh báo trực quan khi chạm ngưỡng giới hạn 10 người */}
       {datGioiHanBaNguoi && (
         <div className="nh-hv-limit-warning">
-          ⚠️ <strong>Thông báo:</strong> Bạn đã cấu hình đủ số lượng tối đa 3 học viên đang hoạt động. Để thêm học viên mới, vui lòng tiến hành "Khóa" bớt hồ sơ không còn nhu cầu học tập phía bên dưới hệ thống.
+          ⚠️ <strong>Thông báo:</strong> Bạn đã cấu hình đủ số lượng tối đa 10 học viên đang hoạt động. Để thêm học viên mới, vui lòng tiến hành "Khóa" bớt hồ sơ không còn nhu cầu học tập phía bên dưới hệ thống.
         </div>
       )}
 
@@ -184,6 +203,7 @@ const HocVien = () => {
                 <th>Học lực</th>
                 <th>Địa chỉ cư trú</th>
                 <th>Ghi chú đặc điểm</th>
+                <th>Trạng thái</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -196,6 +216,13 @@ const HocVien = () => {
                   <td className="hv-address-cell">{hv.diachi}</td>
                   <td className="hv-note-cell">{hv.ghichu || '---'}</td>
                   <td>
+                    {hv.trangthai === 1 ? (
+                      <span className="nh-badge-status-active">Hoạt động</span>
+                    ) : (
+                      <span className="nh-badge-status-locked">Bị khóa</span>
+                    )}
+                  </td>
+                  <td>
                     <div className="nh-hv-actions">
                       <button
                         type="button"
@@ -205,14 +232,25 @@ const HocVien = () => {
                       >
                         <span className="material-symbols-outlined">edit</span>
                       </button>
-                      <button
-                        type="button"
-                        className="btn-hv-action-lock"
-                        onClick={() => handleLockHocVien(hv.mahocvien, hv.tenhocvien)}
-                        title="Khóa học viên"
-                      >
-                        <span className="material-symbols-outlined">block</span>
-                      </button>
+                      {hv.trangthai === 1 ? (
+                        <button
+                          type="button"
+                          className="btn-hv-action-lock"
+                          onClick={() => handleLockHocVien(hv.mahocvien, hv.tenhocvien)}
+                          title="Khóa học viên"
+                        >
+                          <span className="material-symbols-outlined">lock</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn-hv-action-unlock"
+                          onClick={() => handleUnlockHocVien(hv.mahocvien, hv.tenhocvien)}
+                          title="Mở khóa học viên"
+                        >
+                          <span className="material-symbols-outlined">lock_open</span>
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

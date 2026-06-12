@@ -66,3 +66,15 @@ async def lock_giasumonhoc(id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(giasu_monhoc)
     return DataResponse.custom_response(code="200", message="Khóa lớp học thành công", data=giasu_monhoc)
+
+# API MỞ KHÓA LỚP HỌC (PUT)
+@giasu_monhoc_router.put("/mokhoagiasumonhoc/{id}", tags=["giasu_monhoc"], response_model=DataResponse[GiaSuMonHoc_Schema])
+async def unlock_giasumonhoc(id: int, db: Session = Depends(get_db)):
+    giasu_monhoc = db.query(GiaSuMonHoc).filter(GiaSuMonHoc.magiasu_monhoc == id).first()
+    if not giasu_monhoc:
+        return DataResponse.custom_response(code="404", message="Không tìm thấy lớp học", data=None)
+
+    giasu_monhoc.trangthai = 1  # Chuyển trạng thái thành hoạt động (Mở khóa)
+    db.commit()
+    db.refresh(giasu_monhoc)
+    return DataResponse.custom_response(code="200", message="Mở khóa lớp học thành công", data=giasu_monhoc)

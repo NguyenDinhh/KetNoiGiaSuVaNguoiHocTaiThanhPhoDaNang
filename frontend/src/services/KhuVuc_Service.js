@@ -65,6 +65,32 @@ const KhuVuc_Service = {
       console.error("Lỗi tại KhuVuc_Service.xoaKhuVuc:", loi);
       throw loi;
     }
+  },
+
+  khoaKhuVuc: async (maKhuVuc) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/khoakhuvuc/${maKhuVuc}`, {
+        method: 'PUT'
+      });
+      if (!phanHoi.ok) throw new Error("Không thể khóa khu vực!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại KhuVuc_Service.khoaKhuVuc:", loi);
+      throw loi;
+    }
+  },
+
+  moKhoaKhuVuc: async (maKhuVuc) => {
+    try {
+      const phanHoi = await fetch(`${DIA_CHI_API}/mokhoakhuvuc/${maKhuVuc}`, {
+        method: 'PUT'
+      });
+      if (!phanHoi.ok) throw new Error("Không thể mở khóa khu vực!");
+      return await phanHoi.json();
+    } catch (loi) {
+      console.error("Lỗi tại KhuVuc_Service.moKhoaKhuVuc:", loi);
+      throw loi;
+    }
   }
 };
 
