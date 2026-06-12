@@ -8,6 +8,7 @@ class GiaSuUngTuyen_Schema(BaseModel):
     magiasu: int
     thoigian_ungtuyen: datetime
     trangthai: int  # 0: Đang chờ, 1: Chấp nhận, 2: Từ chối
+    lydotuchoi: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -21,3 +22,4 @@ class Update_GiaSuUngTuyen_Schema(BaseModel):
     magiasu: Optional[int] = None
     thoigian_ungtuyen: Optional[datetime] = None
     trangthai: Optional[int] = None
+    lydotuchoi: Optional[str] = None

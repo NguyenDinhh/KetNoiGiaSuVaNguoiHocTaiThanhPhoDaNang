@@ -14,3 +14,4 @@ class GiaSu(Base):
     gioithieubanthan = Column(String(1000))
     ngaydangki = Column(DateTime, server_default=func.now())
     trangthaiduyet = Column(Integer, default=0) # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    lydotuchoi = Column(String(100))

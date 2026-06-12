@@ -11,3 +11,4 @@ class HocVien(Base):
     hocluc = Column(String(50))
     diachi = Column(String(255))
     ghichu = Column(String(1000))
+    trangthai = Column(Integer)

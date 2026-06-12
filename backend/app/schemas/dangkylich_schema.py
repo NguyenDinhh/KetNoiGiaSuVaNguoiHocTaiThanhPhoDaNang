@@ -11,6 +11,7 @@ class DangKyLich_Schema(BaseModel):
     tonghocphi: int
     ghichu: Optional[str] = None # Cho phép null đề phòng ghi chú trống
     trangthai: int
+    lydotuchoi: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -30,3 +31,4 @@ class Update_DangKyLich_Schema(BaseModel):
     tonghocphi: Optional[int] = None
     ghichu: Optional[str] = None
     trangthai: Optional[int] = None
+    lydotuchoi: Optional[str] = None

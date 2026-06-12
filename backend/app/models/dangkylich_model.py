@@ -13,3 +13,4 @@ class DangKyLich(Base):
     tonghocphi = Column(Integer, CheckConstraint('tonghocphi >= 0'))
     ghichu = Column(String(1000))
     trangthai = Column(Integer, default=0)
+    lydotuchoi = Column(String(100))

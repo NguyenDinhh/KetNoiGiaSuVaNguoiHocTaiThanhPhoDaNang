@@ -4,7 +4,7 @@ from typing import List
 from app.schemas.base_schema import DataResponse
 from app.db.base import get_db
 from app.models.hocvien_model import HocVien
-from app.schemas.hocvien_schema import HocVien_Schema, Create_HocVien_Schema
+from app.schemas.hocvien_schema import HocVien_Schema, Create_HocVien_Schema, Update_HocVien_Schema
 
 hocvien_router = APIRouter()
 
@@ -32,7 +32,7 @@ async def create_hocvien(data: Create_HocVien_Schema, db: Session = Depends(get_
         return DataResponse.custom_response(code="400", message="Lỗi", data=None)
 
 @hocvien_router.put("/suahocvien/{id}", tags=["hocvien"], description="Sửa thông tin học viên", response_model=DataResponse[HocVien_Schema])
-async def update_hocvien(id: int, data: Create_HocVien_Schema, db: Session = Depends(get_db)):
+async def update_hocvien(id: int, data: Update_HocVien_Schema, db: Session = Depends(get_db)):
     hocvien = db.query(HocVien).filter(HocVien.mahocvien == id).first()
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)

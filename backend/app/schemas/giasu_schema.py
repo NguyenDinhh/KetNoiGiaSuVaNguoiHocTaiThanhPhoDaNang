@@ -12,6 +12,7 @@ class GiaSu_Schema(BaseModel):
     gioithieubanthan: Optional[str] = None
     ngaydangki: Optional[datetime] = None
     trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    lydotuchoi: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -24,3 +25,13 @@ class Create_GiaSu_Schema(BaseModel):
     gioitinh: int  # 0: Nam, 1: Nữ
     gioithieubanthan: str
     trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+
+class Update_GiaSu_Schema(BaseModel):
+    manguoidung: Optional[int] = None
+    cccdmattruoc: Optional[str] = None
+    cccdmatsau: Optional[str] = None
+    namsinh: Optional[int] = None
+    gioitinh: Optional[int] = None
+    gioithieubanthan: Optional[str] = None
+    trangthaiduyet: Optional[int] = None
+    lydotuchoi: Optional[str] = None

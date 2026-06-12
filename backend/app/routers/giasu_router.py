@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.base import get_db
 from app.schemas.base_schema import DataResponse
 from app.models.giasu_model import GiaSu
-from app.schemas.giasu_schema import GiaSu_Schema,Create_GiaSu_Schema
+from app.schemas.giasu_schema import GiaSu_Schema, Create_GiaSu_Schema, Update_GiaSu_Schema
 giasu_router = APIRouter()
 
 @giasu_router.get("/danhsachgiasu", tags=["giasu"], description="Danh sách gia sư", response_model= DataResponse[List[GiaSu_Schema]])
@@ -36,7 +36,7 @@ async def create_giasu(data: Create_GiaSu_Schema, db: Session = Depends(get_db))
         return DataResponse.custom_response(code="400", message="Lỗi", data=None)
 
 @giasu_router.put("/suagiasu/{id}",tags=["giasu"],description="Sửa thông tin gia sư", response_model=DataResponse[GiaSu_Schema])
-async def update_giasu(id: int, data: Create_GiaSu_Schema, db:Session = Depends(get_db)):
+async def update_giasu(id: int, data: Update_GiaSu_Schema, db:Session = Depends(get_db)):
     giasu = db.query(GiaSu).filter(GiaSu.magiasu == id).first()
     if not giasu:
         return DataResponse.custom_response(code="404",message="Không tìm thấy", data=None)
