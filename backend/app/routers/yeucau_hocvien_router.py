@@ -18,7 +18,7 @@ async def get_danhsachyeucauhocvien(db: Session = Depends(get_db)):
     return DataResponse.success_response(yeucau_hocviens)
 
 @yeucau_hocvien_router.get("/yeucauhocvien/{id}", tags=["yeucau_hocvien"], description="Lấy 1 yêu cầu học viên", response_model=DataResponse[YeuCauHocVien_Schema])
-async def get_yeucauhocvien(id: int, db: Session = Depends(get_db)):
+async def get_yeucauhocvien(id: str, db: Session = Depends(get_db)):
     yeucau_hocvien = db.query(YeuCauHocVien).filter(YeuCauHocVien.mayeucau_hocvien == id).first()
     if not yeucau_hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)
@@ -29,36 +29,71 @@ async def get_yeucauhocvien(id: int, db: Session = Depends(get_db)):
 # ----------------------------------------------------------------------
 @yeucau_hocvien_router.post("/themyeucauhocvien", tags=["yeucau_hocvien"], description="Thêm yêu cầu học viên (Bằng Mã Yêu Cầu)", response_model=DataResponse[YeuCauHocVien_Schema])
 async def create_yeucauhocvien_mayeucau(data: Create_YeuCauHocVienVoiMaYeuCau_Schema, db: Session = Depends(get_db)):
-    # Data chỉ có mahocvien và mayeucau, khi dump ra DB sẽ tự để madangky là rỗng
-    yeucau_hocvien = YeuCauHocVien(**data.model_dump())
     try:
+        print(f"DEBUG: Thêm yêu cầu học viên - mayeucau: {data.mayeucau}, mahocvien: {data.mahocvien}")
+        
+        yeucau_hocvien = YeuCauHocVien(
+            mayeucau_hocvien="",
+            mahocvien=data.mahocvien,
+            mayeucau=data.mayeucau,
+            madangky=None
+        )
         db.add(yeucau_hocvien)
         db.commit()
-        db.refresh(yeucau_hocvien)
-        return DataResponse.success_response(yeucau_hocvien)
+        
+        yc_hv_da_tao = db.query(YeuCauHocVien).filter(
+            YeuCauHocVien.mayeucau == data.mayeucau,
+            YeuCauHocVien.mahocvien == data.mahocvien
+        ).order_by(YeuCauHocVien.mayeucau_hocvien.desc()).first()
+        
+        if not yc_hv_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất!", data=None)
+        
+        print(f"DEBUG: Thêm YC-HV thành công: {yc_hv_da_tao.mayeucau_hocvien}")
+        return DataResponse.success_response(yc_hv_da_tao)
     except Exception as e:
         db.rollback()
-        print(f"❌ LỖI NỐI HỌC VIÊN (MÃ YÊU CẦU): {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Lỗi Database: {str(e)}")
+        print(f"LỖI thêm yêu cầu học viên: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        raise HTTPException(status_code=400, detail=f"Lỗi: {str(e)}")
 
 # ----------------------------------------------------------------------
 # 2. API THÊM THEO MÃ ĐĂNG KÝ (Đường dẫn mới)
 # ----------------------------------------------------------------------
 @yeucau_hocvien_router.post("/themyeucauhocvien_theomadangky", tags=["yeucau_hocvien"], description="Thêm yêu cầu học viên (Bằng Mã Đăng Ký)", response_model=DataResponse[YeuCauHocVien_Schema])
 async def create_yeucauhocvien_madangky(data: Create_YeuCauHocVienVoiMaDangKy_Schema, db: Session = Depends(get_db)):
-    yeucau_hocvien = YeuCauHocVien(**data.model_dump())
     try:
+        print(f"DEBUG: Thêm yêu cầu học viên theo đăng ký - madangky: {data.madangky}, mahocvien: {data.mahocvien}")
+        
+        yeucau_hocvien = YeuCauHocVien(
+            mayeucau_hocvien="",
+            mahocvien=data.mahocvien,
+            mayeucau=None,
+            madangky=data.madangky
+        )
         db.add(yeucau_hocvien)
         db.commit()
-        db.refresh(yeucau_hocvien)
-        return DataResponse.success_response(yeucau_hocvien)
+        
+        yc_hv_da_tao = db.query(YeuCauHocVien).filter(
+            YeuCauHocVien.madangky == data.madangky,
+            YeuCauHocVien.mahocvien == data.mahocvien
+        ).order_by(YeuCauHocVien.mayeucau_hocvien.desc()).first()
+        
+        if not yc_hv_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất!", data=None)
+        
+        print(f"DEBUG: Thêm YC-HV theo DK thành công: {yc_hv_da_tao.mayeucau_hocvien}")
+        return DataResponse.success_response(yc_hv_da_tao)
     except Exception as e:
         db.rollback()
-        print(f"❌ LỖI NỐI HỌC VIÊN (MÃ ĐĂNG KÝ): {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Lỗi Database: {str(e)}")
+        print(f"LỖI thêm yêu cầu học viên theo đăng ký: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        raise HTTPException(status_code=400, detail=f"Lỗi: {str(e)}")
 
 @yeucau_hocvien_router.delete("/xoayeucauhocvien/{id}", tags=["yeucau_hocvien"], description="Xóa yêu cầu học viên", response_model=DataResponse[YeuCauHocVien_Schema])
-async def delete_yeucauhocvien(id: int, db: Session = Depends(get_db)):
+async def delete_yeucauhocvien(id: str, db: Session = Depends(get_db)):
     yeucau_hocvien = db.query(YeuCauHocVien).filter(YeuCauHocVien.mayeucau_hocvien == id).first()
     if not yeucau_hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)

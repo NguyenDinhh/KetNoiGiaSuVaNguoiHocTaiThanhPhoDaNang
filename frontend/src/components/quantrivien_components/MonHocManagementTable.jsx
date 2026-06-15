@@ -106,8 +106,13 @@ const MonHocManagementTable = () => {
   const xuLyGuiForm = (suKien) => {
     suKien.preventDefault();
 
+    if (!formDuLieu.mahelop || formDuLieu.mahelop === "") {
+      alert("Vui lòng chọn hệ lớp!");
+      return;
+    }
+
     const duLieuChuanHoa = {
-      mahelop: parseInt(formDuLieu.mahelop),
+      mahelop: formDuLieu.mahelop,
       tenmonhoc: formDuLieu.tenmonhoc,
       mota: formDuLieu.mota,
       trangthai: parseInt(formDuLieu.trangthai) || 1
@@ -141,7 +146,7 @@ const MonHocManagementTable = () => {
   const danhSachDaLoc = danhSachMonHoc.filter((monHoc) => {
     const tuKhoaChuan = tuKhoaTimKiem.trim().toLowerCase();
     const khopTimKiem = tuKhoaChuan === "" || monHoc.tenmonhoc.toLowerCase().includes(tuKhoaChuan);
-    const khopHeLop = heLopDangLoc === "ALL" || monHoc.mahelop === heLopDangLoc;
+    const khopHeLop = heLopDangLoc === "ALL" || String(monHoc.mahelop) === String(heLopDangLoc);
     return khopTimKiem && khopHeLop;
   });
 
@@ -182,7 +187,7 @@ const MonHocManagementTable = () => {
             {/* Dropdown lọc theo Hệ lớp */}
             <select 
               value={heLopDangLoc} 
-              onChange={(e) => setHeLopDangLoc(e.target.value === "ALL" ? "ALL" : parseInt(e.target.value))}
+              onChange={(e) => setHeLopDangLoc(e.target.value)}
               style={{ 
                 padding: '8px 12px', 
                 borderRadius: '6px', 

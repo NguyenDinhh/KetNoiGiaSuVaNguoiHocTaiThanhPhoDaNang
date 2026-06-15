@@ -67,9 +67,9 @@ const BaiDangTimGiaSu = () => {
         const yeuCauDangMo = listYeuCau.filter(yc => Number(yc.trangthai) === 0);
 
         const duLieuHoanChinh = yeuCauDangMo.map(yc => {
-          const monHoc = listMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc));
-          const khuVuc = listKhuVuc.find(k => Number(k.makhuvuc) === Number(yc.makhuvuc));
-          const chiTietCuaYeuCau = listChiTiet.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau));
+          const monHoc = listMonHoc.find(m => String(m.mamonhoc) === String(yc.mamonhoc));
+          const khuVuc = listKhuVuc.find(k => String(k.makhuvuc) === String(yc.makhuvuc));
+          const chiTietCuaYeuCau = listChiTiet.filter(ct => String(ct.mayeucau) === String(yc.mayeucau));
 
           const chuoiLichHoc = chiTietCuaYeuCau.map(ct => {
             const gioBatDau = ct.thoigianbatdau ? ct.thoigianbatdau.substring(0, 5) : '';
@@ -77,11 +77,11 @@ const BaiDangTimGiaSu = () => {
             return `${ct.ngayhoc} (${gioBatDau}-${gioKetThuc})`;
           }).join(', ');
 
-          const nhungNguoiThamGia = listYCHV.filter(y => Number(y.mayeucau) === Number(yc.mayeucau));
-          const thongTinHocVien = nhungNguoiThamGia.map(y => listHV.find(h => Number(h.mahocvien) === Number(y.mahocvien))).filter(Boolean);
+          const nhungNguoiThamGia = listYCHV.filter(y => String(y.mayeucau) === String(yc.mayeucau));
+          const thongTinHocVien = nhungNguoiThamGia.map(y => listHV.find(h => String(h.mahocvien) === String(y.mahocvien))).filter(Boolean);
 
           // 🟢 ĐẾM SỐ LƯỢNG GIA SƯ ĐÃ NỘP ĐƠN ỨNG TUYỂN VÀO YÊU CẦU NÀY
-          const soLuongUngTuyen = listUngTuyen.filter(ut => Number(ut.mayeucau) === Number(yc.mayeucau)).length;
+          const soLuongUngTuyen = listUngTuyen.filter(ut => String(ut.mayeucau) === String(yc.mayeucau)).length;
 
           return {
             ...yc,
@@ -115,13 +115,13 @@ const BaiDangTimGiaSu = () => {
   };
 
   const monHocDropdown = boLocHeLop
-    ? danhSachMonHoc.filter(m => Number(m.mahelop) === Number(boLocHeLop))
+    ? danhSachMonHoc.filter(m => String(m.mahelop) === String(boLocHeLop))
     : danhSachMonHoc;
 
   const danhSachHienThi = danhSachBaiDang.filter(bai => {
-    if (boLocKhuVuc && Number(bai.makhuvuc) !== Number(boLocKhuVuc)) return false;
-    if (boLocHeLop && Number(bai.mahelop) !== Number(boLocHeLop)) return false;
-    if (boLocMonHoc && Number(bai.mamonhoc) !== Number(boLocMonHoc)) return false;
+    if (boLocKhuVuc && String(bai.makhuvuc) !== Number(boLocKhuVuc)) return false;
+    if (boLocHeLop && String(bai.mahelop) !== Number(boLocHeLop)) return false;
+    if (boLocMonHoc && String(bai.mamonhoc) !== Number(boLocMonHoc)) return false;
     return true;
   });
 

@@ -16,20 +16,28 @@ async def get_danhsachkhunggio(db: Session = Depends(get_db)):
 
 @khunggio_giasu_monhoc_router.post("/themkhunggiogiasumonhoc", tags=["khunggio_giasu_monhoc"], response_model=DataResponse[KhungGioGiaSuMonHoc_Schema])
 async def create_khunggio(data: Create_KhungGioGiaSuMonHoc_Schema, db: Session = Depends(get_db)):
-    khunggio = KhungGioGiaSuMonHoc(**data.model_dump())
-    khunggio.trangthai = 1  # Mặc định thêm mới là Hoạt động
     try:
+        khunggio = KhungGioGiaSuMonHoc(makhunggio="", **data.model_dump())
+        khunggio.trangthai = 1
         db.add(khunggio)
         db.commit()
-        db.refresh(khunggio)
-        return DataResponse.success_response(khunggio)
+        
+        khunggio_da_tao = db.query(KhungGioGiaSuMonHoc).filter(
+            KhungGioGiaSuMonHoc.magiasu_monhoc == data.magiasu_monhoc
+        ).order_by(KhungGioGiaSuMonHoc.makhunggio.desc()).first()
+        
+        if not khunggio_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất!", data=None)
+        
+        return DataResponse.success_response(khunggio_da_tao)
     except Exception as e:
         db.rollback()
-        return DataResponse.custom_response(code="400", message=str(e), data=None)
+        print(f"LỖI thêm khung giờ: {str(e)}")
+        return DataResponse.custom_response(code="500", message=f"Lỗi: {str(e)}", data=None)
 
 # 🟢 API SỬA KHUNG GIỜ LỊCH HỌC (PUT) - Đã dùng Update_Schema và thuật toán linh hoạt
 @khunggio_giasu_monhoc_router.put("/suakhunggiogiasumonhoc/{id}", tags=["khunggio_giasu_monhoc"], response_model=DataResponse[KhungGioGiaSuMonHoc_Schema])
-async def update_khunggio(id: int, data: Update_KhungGioGiaSuMonHoc_Schema, db: Session = Depends(get_db)):
+async def update_khunggio(id: str, data: Update_KhungGioGiaSuMonHoc_Schema, db: Session = Depends(get_db)):
     try:
         khunggio = db.query(KhungGioGiaSuMonHoc).filter(KhungGioGiaSuMonHoc.makhunggio == id).first()
 
@@ -42,7 +50,6 @@ async def update_khunggio(id: int, data: Update_KhungGioGiaSuMonHoc_Schema, db: 
             setattr(khunggio, key, value)
 
         db.commit()
-        db.refresh(khunggio)
         return DataResponse.success_response(khunggio)
     except Exception as e:
         db.rollback()
@@ -51,12 +58,11 @@ async def update_khunggio(id: int, data: Update_KhungGioGiaSuMonHoc_Schema, db: 
 
 # ĐỔI THÀNH API KHÓA KHUNG GIỜ LỊCH HỌC (PUT)
 @khunggio_giasu_monhoc_router.put("/khoakhunggiogiasumonhoc/{id}", tags=["khunggio_giasu_monhoc"], response_model=DataResponse[KhungGioGiaSuMonHoc_Schema])
-async def lock_khunggio(id: int, db: Session = Depends(get_db)):
+async def lock_khunggio(id: str, db: Session = Depends(get_db)):
     khunggio = db.query(KhungGioGiaSuMonHoc).filter(KhungGioGiaSuMonHoc.makhunggio == id).first()
     if not khunggio:
         return DataResponse.custom_response(code="404", message="Không tìm thấy lịch học", data=None)
 
     khunggio.trangthai = 0  # Chuyển trạng thái thành không hoạt động (Khóa)
     db.commit()
-    db.refresh(khunggio)
     return DataResponse.custom_response(code="200", message="Khóa lịch học thành công", data=khunggio)

@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint, text
 from app.models.base_model import Base
 
 class MonHoc(Base):
     __tablename__ = "MONHOC"
 
-    mamonhoc = Column(Integer, primary_key=True, autoincrement=True)
-    mahelop = Column(Integer, ForeignKey("HELOP.mahelop"), nullable=False)
+    mamonhoc = Column(String(10), primary_key=True, server_default=text("''"))
+    mahelop = Column(String(10), ForeignKey("HELOP.mahelop"), nullable=False)
     tenmonhoc = Column(String(255), nullable=False)
     mota = Column(String(1000))
     trangthai = Column(Integer, default=1)  # 1: Hoạt động, 0: Ngưng áp dụng

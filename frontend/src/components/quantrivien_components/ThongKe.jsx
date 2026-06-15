@@ -102,7 +102,7 @@ const ThongKe = () => {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(([manguoidung, soYeuCau]) => {
-          const nguoiDung = nguoiHocList.find(nd => Number(nd.id || nd.manguoidung) === parseInt(manguoidung));
+          const nguoiDung = nguoiHocList.find(nd => String(nd.id || nd.manguoidung) === manguoidung);
           return {
             ten: nguoiDung?.name || nguoiDung?.hoten || 'Không xác định',
             soLuong: soYeuCau,
@@ -147,19 +147,19 @@ const ThongKe = () => {
 
       const giaSuVoiDanhGia = dsGiaSu.map(gs => {
         // Tìm các mã liên kết
-        const lopCuaGS = dsGSMH.filter(l => Number(l.magiasu) === Number(gs.magiasu));
-        const mangMaLop = lopCuaGS.map(l => Number(l.magiasu_monhoc));
+        const lopCuaGS = dsGSMH.filter(l => String(l.magiasu) === String(gs.magiasu));
+        const mangMaLop = lopCuaGS.map(l => String(l.magiasu_monhoc));
 
-        const dkCuaGS = dsDangKyLich.filter(dk => mangMaLop.includes(Number(dk.magiasu_monhoc)));
-        const utCuaGS = dsUT.filter(ut => Number(ut.magiasu) === Number(gs.magiasu) && Number(ut.trangthai) === 1);
+        const dkCuaGS = dsDangKyLich.filter(dk => mangMaLop.includes(String(dk.magiasu_monhoc)));
+        const utCuaGS = dsUT.filter(ut => String(ut.magiasu) === String(gs.magiasu) && Number(ut.trangthai) === 1);
 
-        const mangMaDK = dkCuaGS.map(dk => Number(dk.madangky));
-        const mangMaYC = utCuaGS.map(ut => Number(ut.mayeucau));
+        const mangMaDK = dkCuaGS.map(dk => String(dk.madangky));
+        const mangMaYC = utCuaGS.map(ut => String(ut.mayeucau));
 
         // Lọc đánh giá của riêng gia sư này
         const danhGiaCuaGS = dsDanhGia.filter(dg =>
-          (dg.madangky && mangMaDK.includes(Number(dg.madangky))) ||
-          (dg.mayeucau && mangMaYC.includes(Number(dg.mayeucau)))
+          (dg.madangky && mangMaDK.includes(String(dg.madangky))) ||
+          (dg.mayeucau && mangMaYC.includes(String(dg.mayeucau)))
         );
 
         const luotDG = danhGiaCuaGS.length;
@@ -200,7 +200,7 @@ const ThongKe = () => {
         .slice(0, 5)
         .map(gs => {
           // Tìm tên từ bảng người dùng
-          const nd = dsNguoiDung.find(n => Number(n.id || n.manguoidung) === Number(gs.manguoidung));
+          const nd = dsNguoiDung.find(n => String(n.id || n.manguoidung) === String(gs.manguoidung));
           return {
             ten: nd?.name || nd?.hoten || gs.hoten || 'Không xác định',
             soLuong: gs.diemTrungBinh.toFixed(1),

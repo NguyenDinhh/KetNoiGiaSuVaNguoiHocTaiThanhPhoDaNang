@@ -1,10 +1,10 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Time, Float, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, String, Date, DateTime, Time, Float, ForeignKey, CheckConstraint, text
 from app.models.base_model import Base
 
 class NguoiDung(Base):
     __tablename__ = "NGUOIDUNG"
 
-    manguoidung = Column(Integer, primary_key=True)
+    manguoidung = Column(String(10), primary_key=True, server_default=text("''"))
     email = Column(String(100), unique=True, nullable=False)
     matkhau = Column(String(255), nullable=False)
     hoten = Column(String(100), nullable=False)

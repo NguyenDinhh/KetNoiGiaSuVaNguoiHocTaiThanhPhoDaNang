@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
 class BangCapMonHoc_Schema(BaseModel):
-    mabangcap_monhoc: int
-    mabangcap: int
-    mamonhoc: int
+    mabangcap_monhoc: str
+    mabangcap: str
+    mamonhoc: str
 
     class Config:
         from_attributes = True
 
 class Create_BangCapMonHoc_Schema(BaseModel):
-    mabangcap: int
-    mamonhoc: int
+    mabangcap: str
+    mamonhoc: str

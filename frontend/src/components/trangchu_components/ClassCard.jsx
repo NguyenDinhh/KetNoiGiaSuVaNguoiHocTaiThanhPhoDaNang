@@ -40,11 +40,11 @@ const ClassCard = () => {
         let top3LopMoiNhat = danhSachDaLoc.slice(0, 3);
 
         const lopHienThi = top3LopMoiNhat.map(yc => {
-          const mon = tatCaMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc)) || {};
-          const kv = tatCaKhuVuc.find(k => Number(k.makhuvuc) === Number(yc.makhuvuc)) || {};
-          const hl = tatCaHeLop.find(h => Number(h.mahelop) === Number(yc.mahelop || mon.mahelop)) || {};
+          const mon = tatCaMonHoc.find(m => String(m.mamonhoc) === String(yc.mamonhoc)) || {};
+          const kv = tatCaKhuVuc.find(k => String(k.makhuvuc) === String(yc.makhuvuc)) || {};
+          const hl = tatCaHeLop.find(h => String(h.mahelop) === String(yc.mahelop || mon.mahelop)) || {};
 
-          const soLuongUngTuyen = tatCaUngTuyen.filter(ut => Number(ut.mayeucau) === Number(yc.mayeucau)).length;
+          const soLuongUngTuyen = tatCaUngTuyen.filter(ut => String(ut.mayeucau) === String(yc.mayeucau)).length;
 
           return {
             ...yc,

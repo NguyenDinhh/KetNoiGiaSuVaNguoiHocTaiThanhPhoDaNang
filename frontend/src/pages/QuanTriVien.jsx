@@ -43,9 +43,9 @@ const Admin = () => {
     { id: 'verify', icon: 'fact_check', label: 'Xác nhận hồ sơ', component: <TutorVerifyTable /> },
     { id: 'users', icon: 'group', label: 'Quản lý người dùng', component: <UserManagementTable /> },
     { id: 'degrees', icon: 'school', label: 'Danh mục bằng cấp', component: <BangCapManagementTable /> },
-    { id: 'classes', icon: 'layers', label: 'Hệ lớp', component: <HeLopManagementTable /> },
-    { id: 'subjects', icon: 'book', label: 'Môn học', component: <MonHocManagementTable /> },
-    { id: 'areas', icon: 'location_on', label: 'Khu vực', component: <KhuVucManagementTable /> },
+    { id: 'classes', icon: 'layers', label: 'Danh mục hệ lớp', component: <HeLopManagementTable /> },
+    { id: 'subjects', icon: 'book', label: 'Danh mục môn học', component: <MonHocManagementTable /> },
+    { id: 'areas', icon: 'location_on', label: 'Danh mục khu vực', component: <KhuVucManagementTable /> },
     { id: 'stats', icon: 'analytics', label: 'Thống kê', component: <ThongKe/> }
   ];
 

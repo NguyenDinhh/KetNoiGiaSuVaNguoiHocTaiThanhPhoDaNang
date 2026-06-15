@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class BangCap_Schema(BaseModel):
-    mabangcap: int
+    mabangcap: str
     tenbangcap: str
     trangthai: Optional[int] = None
 

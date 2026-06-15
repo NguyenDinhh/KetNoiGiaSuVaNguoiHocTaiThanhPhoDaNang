@@ -85,8 +85,8 @@ const NguoiHoc = () => {
 
   // 🟢 DANH SÁCH MENU ĐÃ ĐỒNG BỘ ID CHUẨN
   const danhSachMenu = [
-    { id: 'HoSoCaNhan', icon: 'person', label: 'Hồ sơ cá nhân', component: <TrangCaNhanNH /> },
-    { id: 'QuanLyHocVien', icon: 'school', label: 'Quản lý Học viên', component: <HocVien /> },
+    { id: 'HoSoCaNhan', icon: 'person', label: 'Thông tin cá nhân', component: <TrangCaNhanNH /> },
+    { id: 'QuanLyHocVien', icon: 'school', label: 'Hồ sơ học viên', component: <HocVien /> },
     { id: 'QuanLyYeuCau', icon: 'menu_book', label: 'Quản lý yêu cầu', component: <QuanLyYeuCau /> },
     { id: 'DangKyLich', icon: 'calendar_month', label: 'Đăng ký lịch', component: <DangKyLich /> }
   ];

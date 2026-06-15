@@ -84,24 +84,24 @@ const DangKyLich = () => {
       const arrHocVien = Array.isArray(resHocVien) ? resHocVien : (resHocVien?.data || []);
       const arrDanhGia = Array.isArray(resDanhGia) ? resDanhGia : (resDanhGia?.data || []);
 
-      const hocVienCuaToi = arrHocVien.filter(hv => Number(hv.manguoidung) === Number(maND));
+      const hocVienCuaToi = arrHocVien.filter(hv => String(hv.manguoidung) === String(maND));
       setDanhSachHocVienCuaToi(hocVienCuaToi);
 
-      const donCuaToi = (resDangKy || []).filter(dk => Number(dk.manguoidung) === Number(maND));
+      const donCuaToi = (resDangKy || []).filter(dk => String(dk.manguoidung) === String(maND));
 
       const dataHoanChinh = donCuaToi.map(dk => {
-        const lopHoc = (resGiaSuMon || []).find(l => Number(l.magiasu_monhoc) === Number(dk.magiasu_monhoc)) || {};
-        const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(lopHoc.mamonhoc));
+        const lopHoc = (resGiaSuMon || []).find(l => String(l.magiasu_monhoc) === String(dk.magiasu_monhoc)) || {};
+        const mon = listMonHoc.find(m => String(m.mamonhoc) === String(lopHoc.mamonhoc));
 
-        const giaSu = arrGiaSu.find(gs => Number(gs.magiasu) === Number(lopHoc.magiasu)) || {};
-        const thongTinGS = arrNguoiDung.find(nd => Number(nd.manguoidung || nd.id) === Number(giaSu.manguoidung)) || {};
+        const giaSu = arrGiaSu.find(gs => String(gs.magiasu) === String(lopHoc.magiasu)) || {};
+        const thongTinGS = arrNguoiDung.find(nd => String(nd.manguoidung || nd.id) === String(giaSu.manguoidung)) || {};
 
-        const khungGioChon = (resChiTiet || []).filter(ct => Number(ct.madangky) === Number(dk.madangky));
+        const khungGioChon = (resChiTiet || []).filter(ct => String(ct.madangky) === String(dk.madangky));
 
-        const cacYeuCau = arrYeuCauHV.filter(yc => Number(yc.madangky) === Number(dk.madangky));
-        const danhSachHocVienChon = cacYeuCau.map(yc => arrHocVien.find(hv => Number(hv.mahocvien) === Number(yc.mahocvien))).filter(Boolean);
+        const cacYeuCau = arrYeuCauHV.filter(yc => String(yc.madangky) === String(dk.madangky));
+        const danhSachHocVienChon = cacYeuCau.map(yc => arrHocVien.find(hv => String(hv.mahocvien) === String(yc.mahocvien))).filter(Boolean);
 
-        const đánhGiáĐãCó = arrDanhGia.find(dg => Number(dg.madangky) === Number(dk.madangky));
+        const đánhGiáĐãCó = arrDanhGia.find(dg => String(dg.madangky) === String(dk.madangky));
 
         return {
           ...dk,
@@ -120,7 +120,7 @@ const DangKyLich = () => {
         if (Number(a.trangthai) !== Number(b.trangthai)) {
           return Number(a.trangthai) - Number(b.trangthai);
         }
-        return Number(b.madangky) - Number(a.madangky);
+        return String(b.madangky) - String(a.madangky);
       }));
 
       // 🟢 XỬ LÝ DATA TỪ YEU CẦU TÌM GIA SƯ (người học tạo yêu cầu, gia sư ứng tuyển)
@@ -128,28 +128,28 @@ const DangKyLich = () => {
       const arrChiTietYC = Array.isArray(resChiTietYeuCau) ? resChiTietYeuCau : (resChiTietYeuCau?.data || []);
       const arrGiaSuUngTuyen = Array.isArray(resGiaSuUngTuyen) ? resGiaSuUngTuyen : (resGiaSuUngTuyen?.data || []);
 
-      const yeuCauCuaToi = arrYeuCau.filter(yc => Number(yc.manguoidung) === Number(maND));
+      const yeuCauCuaToi = arrYeuCau.filter(yc => String(yc.manguoidung) === String(maND));
 
       const dataYeuCau = yeuCauCuaToi.map(yc => {
-        const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc));
+        const mon = listMonHoc.find(m => String(m.mamonhoc) === String(yc.mamonhoc));
         
         // 🔥 TÌM GIA SƯ TỪ BẢNG GIASU_UNGTUYEN (người được duyệt - trangthai = 1)
         const ungTuyenDuocDuyet = arrGiaSuUngTuyen.find(ut => 
-          Number(ut.mayeucau) === Number(yc.mayeucau) && Number(ut.trangthai) === 1
+          String(ut.mayeucau) === String(yc.mayeucau) && Number(ut.trangthai) === 1
         );
         
         let giaSu = {};
         let thongTinGS = {};
         
         if (ungTuyenDuocDuyet) {
-          giaSu = arrGiaSu.find(gs => Number(gs.magiasu) === Number(ungTuyenDuocDuyet.magiasu)) || {};
-          thongTinGS = arrNguoiDung.find(nd => Number(nd.manguoidung || nd.id) === Number(giaSu.manguoidung)) || {};
+          giaSu = arrGiaSu.find(gs => String(gs.magiasu) === String(ungTuyenDuocDuyet.magiasu)) || {};
+          thongTinGS = arrNguoiDung.find(nd => String(nd.manguoidung || nd.id) === String(giaSu.manguoidung)) || {};
         }
 
-        const khungGioYC = arrChiTietYC.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau));
+        const khungGioYC = arrChiTietYC.filter(ct => String(ct.mayeucau) === String(yc.mayeucau));
 
-        const cacYeuCauHV = arrYeuCauHV.filter(ychv => Number(ychv.mayeucau) === Number(yc.mayeucau));
-        const danhSachHocVienYC = cacYeuCauHV.map(ychv => arrHocVien.find(hv => Number(hv.mahocvien) === Number(ychv.mahocvien))).filter(Boolean);
+        const cacYeuCauHV = arrYeuCauHV.filter(ychv => String(ychv.mayeucau) === String(yc.mayeucau));
+        const danhSachHocVienYC = cacYeuCauHV.map(ychv => arrHocVien.find(hv => String(hv.mahocvien) === String(ychv.mahocvien))).filter(Boolean);
 
         return {
           mayeucau: yc.mayeucau,
@@ -171,7 +171,7 @@ const DangKyLich = () => {
         if (Number(a.trangthai) !== Number(b.trangthai)) {
           return Number(a.trangthai) - Number(b.trangthai);
         }
-        return Number(b.mayeucau) - Number(a.mayeucau);
+        return String(b.mayeucau) - String(a.mayeucau);
       }));
       
     } catch (error) {
@@ -199,7 +199,7 @@ const DangKyLich = () => {
 
       const resYCHV = await YeuCau_HocVien_Service.layDanhSachYeuCauHocVien();
       const arrYCHV = Array.isArray(resYCHV) ? resYCHV : (resYCHV?.data || []);
-      const cacYCHVCanXoa = arrYCHV.filter(yc => Number(yc.madangky) === Number(dk.madangky));
+      const cacYCHVCanXoa = arrYCHV.filter(yc => String(yc.madangky) === String(dk.madangky));
       
       for (const yc of cacYCHVCanXoa) {
         await YeuCau_HocVien_Service.xoaYeuCauHocVien(yc.mayeucau_hocvien);
@@ -252,24 +252,36 @@ const DangKyLich = () => {
     try {
       const payloadDanhGia = {
         mayeucau: null,
-        madangky: Number(reviewData.madangky),
+        madangky: String(reviewData.madangky),
         sodiem: parseFloat(reviewData.sosao),
         noidung: String(reviewData.nhanxet)
       };
 
+      console.log("DEBUG: Gửi đánh giá đăng ký lịch với payload:", payloadDanhGia);
+
       if (reviewData.madanhgia) {
-        await DanhGia_Service.capNhatDanhGia(reviewData.madanhgia, payloadDanhGia);
+        const result = await DanhGia_Service.capNhatDanhGia(reviewData.madanhgia, payloadDanhGia);
+        console.log("DEBUG: Kết quả cập nhật đánh giá:", result);
+        
+        if (donDangChon) {
+          const resultCapNhat = await DangKyLich_Service.capNhatDangKyLich(donDangChon.madangky, { ...donDangChon, trangthai: 3 });
+          console.log("DEBUG: Đảm bảo trạng thái đăng ký lịch = 3:", resultCapNhat);
+        }
+        
         alert("🎉 Đã cập nhật đánh giá thành công!");
       } else {
-        await DanhGia_Service.themDanhGiaMoi(payloadDanhGia);
+        const resultDanhGia = await DanhGia_Service.themDanhGiaMoi(payloadDanhGia);
+        console.log("DEBUG: Kết quả thêm đánh giá:", resultDanhGia);
 
         if (donDangChon) {
-          await DangKyLich_Service.capNhatDangKyLich(donDangChon.madangky, { ...donDangChon, trangthai: 3 });
+          const resultCapNhat = await DangKyLich_Service.capNhatDangKyLich(donDangChon.madangky, { ...donDangChon, trangthai: 3 });
+          console.log("DEBUG: Cập nhật trạng thái đăng ký lịch = 3:", resultCapNhat);
 
           if (donDangChon.danhSachKhungGioChon && donDangChon.danhSachKhungGioChon.length > 0) {
             for (const ct of donDangChon.danhSachKhungGioChon) {
               await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, { trangthai: 1 });
             }
+            console.log("DEBUG: Đã mở lại khung giờ (trangthai = 1)");
           }
         }
         alert("🎉 Đã hoàn thành khóa học và ghi nhận đánh giá Gia sư thành công!");
@@ -277,6 +289,7 @@ const DangKyLich = () => {
       setIsReviewOpen(false);
       fetchLichDaDangKy();
     } catch (error) {
+      console.error("LỖI khi xử lý đánh giá đăng ký lịch:", error);
       alert(`Đã xảy ra lỗi: ${error.message || "Không thể thực hiện đánh giá"}`);
     }
   };
@@ -295,7 +308,7 @@ const DangKyLich = () => {
     cacLopDangHocTuDangKy.forEach(dk => {
       const coHocVienDuocChon = tabHocVien === 'Tất cả'
         ? true
-        : dk.danhSachHocVien.some(hv => Number(hv.mahocvien) === Number(tabHocVien));
+        : dk.danhSachHocVien.some(hv => String(hv.mahocvien) === String(tabHocVien));
 
       if (coHocVienDuocChon) {
         dk.danhSachKhungGioChon?.forEach(ct => {
@@ -318,7 +331,7 @@ const DangKyLich = () => {
     cacLopDangHocTuYeuCau.forEach(yc => {
       const coHocVienDuocChon = tabHocVien === 'Tất cả'
         ? true
-        : yc.danhSachHocVien.some(hv => Number(hv.mahocvien) === Number(tabHocVien));
+        : yc.danhSachHocVien.some(hv => String(hv.mahocvien) === String(tabHocVien));
 
       if (coHocVienDuocChon) {
         yc.danhSachKhungGioChon?.forEach(ct => {

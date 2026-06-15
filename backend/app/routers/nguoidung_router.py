@@ -23,7 +23,7 @@ async def get_danhsachnguoidung(db: Session = Depends(get_db)):
     return DataResponse.success_response(data)
 
 @nguoidung_router.get("/nguoidung/{id}", tags=["nguoidung"])
-async def get_nguoidung(id: int, db: Session = Depends(get_db)):
+async def get_nguoidung(id: str, db: Session = Depends(get_db)):
     nguoidung = db.query(NguoiDung).filter(
         NguoiDung.manguoidung == id
     ).first()
@@ -39,8 +39,18 @@ async def get_nguoidung(id: int, db: Session = Depends(get_db)):
 
 @nguoidung_router.post("/dangky", tags=["nguoidung"])
 async def register(data: Register_NguoiDung_Schema, db: Session = Depends(get_db)):
+    email_exists = db.query(NguoiDung).filter(NguoiDung.email == data.email).first()
+    if email_exists:
+        return DataResponse.custom_response(code="400", message="Email đã được đăng ký!", data=None)
+    
+    if data.sodienthoai:
+        sdt_exists = db.query(NguoiDung).filter(NguoiDung.sodienthoai == data.sodienthoai).first()
+        if sdt_exists:
+            return DataResponse.custom_response(code="400", message="Số điện thoại đã được đăng ký!", data=None)
+    
     try:
-        nguoidung = NguoiDung(
+        nguoidung_moi = NguoiDung(
+            manguoidung="",
             email=data.email,
             matkhau=hash_password(data.matkhau),
             hoten=data.hoten,
@@ -49,21 +59,22 @@ async def register(data: Register_NguoiDung_Schema, db: Session = Depends(get_db
             vaitro=data.vaitro,
             trangthai=1
         )
-        db.add(nguoidung)
+        db.add(nguoidung_moi)
         db.commit()
-        db.refresh(nguoidung)
+        
+        nguoidung_da_tao = db.query(NguoiDung).filter(NguoiDung.email == data.email).first()
+        if not nguoidung_da_tao:
+            return DataResponse.custom_response(code="500", message="Đăng ký thành công nhưng lỗi truy xuất dữ liệu!", data=None)
+        
         return DataResponse.custom_response(
             code="200",
             message="Đăng ký thành công",
-            data=NguoiDung_Schema.model_validate(nguoidung).model_dump()
+            data=NguoiDung_Schema.model_validate(nguoidung_da_tao).model_dump()
         )
-    except Exception:
+    except Exception as e:
         db.rollback()
-        return DataResponse.custom_response(
-            code="400",
-            message="Email hoặc SĐT đã tồn tại!",
-            data=None
-        )
+        print(f"Lỗi đăng ký: {str(e)}")
+        return DataResponse.custom_response(code="500", message="Đã xảy ra lỗi hệ thống trong quá trình đăng ký.", data=None)
 
 @nguoidung_router.post("/dangnhap", tags=["nguoidung"])
 async def login(data: Login_Schema, db: Session = Depends(get_db)):
@@ -93,7 +104,7 @@ async def login(data: Login_Schema, db: Session = Depends(get_db)):
     )
 
 @nguoidung_router.put("/suanguoidung/{id}", tags=["nguoidung"])
-async def update_nguoidung(id: int, data: Update_NguoiDung_Schema, db: Session = Depends(get_db)):
+async def update_nguoidung(id: str, data: Update_NguoiDung_Schema, db: Session = Depends(get_db)):
     nguoidung = db.query(NguoiDung).filter(
         NguoiDung.manguoidung == id
     ).first()
@@ -119,7 +130,7 @@ async def update_nguoidung(id: int, data: Update_NguoiDung_Schema, db: Session =
     )
 
 @nguoidung_router.patch("/khoanguoidung/{id}", tags=["nguoidung"])
-async def toggle_trangthai_nguoidung(id: int, db: Session = Depends(get_db)):
+async def toggle_trangthai_nguoidung(id: str, db: Session = Depends(get_db)):
     nguoidung = db.query(NguoiDung).filter(
         NguoiDung.manguoidung == id
     ).first()
@@ -138,7 +149,7 @@ async def toggle_trangthai_nguoidung(id: int, db: Session = Depends(get_db)):
     )
 
 @nguoidung_router.delete("/xoanguoidung/{id}", tags=["NguoiDung"])
-async def delete_nguoidung(id: int, db: Session = Depends(get_db)):
+async def delete_nguoidung(id: str, db: Session = Depends(get_db)):
     nguoi_dung = db.query(NguoiDung).filter(
         NguoiDung.manguoidung == id
     ).first()

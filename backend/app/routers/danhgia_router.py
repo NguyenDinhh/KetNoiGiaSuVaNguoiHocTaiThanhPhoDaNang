@@ -25,7 +25,7 @@ async def get_danhsachdanhgia(db: Session = Depends(get_db)):
     description="Lấy 1 đánh giá",
     response_model=DataResponse[DanhGia_Schema]
 )
-async def get_danhgia(id: int, db: Session = Depends(get_db)):
+async def get_danhgia(id: str, db: Session = Depends(get_db)):
     danhgia = db.query(DanhGia).filter(DanhGia.madanhgia == id).first()
     if not danhgia:
         return DataResponse.custom_response(
@@ -49,19 +49,34 @@ async def create_danhgia(data: Create_DanhGia_Schema, db: Session = Depends(get_
             data=None
         )
 
-    danhgia = DanhGia(**data.model_dump())
     try:
+        print(f"DEBUG: Thêm đánh giá - mayeucau: {data.mayeucau}, madangky: {data.madangky}")
+        
+        danhgia = DanhGia(madanhgia="", **data.model_dump())
         db.add(danhgia)
         db.commit()
-        db.refresh(danhgia)
-        return DataResponse.success_response(danhgia)
+        
+        # Query lại dựa vào mayeucau hoặc madangky
+        if data.mayeucau:
+            danhgia_da_tao = db.query(DanhGia).filter(
+                DanhGia.mayeucau == data.mayeucau
+            ).order_by(DanhGia.madanhgia.desc()).first()
+        else:
+            danhgia_da_tao = db.query(DanhGia).filter(
+                DanhGia.madangky == data.madangky
+            ).order_by(DanhGia.madanhgia.desc()).first()
+        
+        if not danhgia_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất!", data=None)
+        
+        print(f"DEBUG: Đánh giá thành công: {danhgia_da_tao.madanhgia}")
+        return DataResponse.success_response(danhgia_da_tao)
     except Exception as e:
         db.rollback()
-        return DataResponse.custom_response(
-            code="400",
-            message=f"Lỗi hệ thống: {str(e)}",
-            data=None
-        )
+        print(f"LỖI thêm đánh giá: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        return DataResponse.custom_response(code="500", message=f"Lỗi: {str(e)}", data=None)
 
 @danhgia_router.put(
     "/suadanhgia/{id}",
@@ -69,7 +84,7 @@ async def create_danhgia(data: Create_DanhGia_Schema, db: Session = Depends(get_
     description="Sửa đánh giá",
     response_model=DataResponse[DanhGia_Schema]
 )
-async def update_danhgia(id: int, data: Create_DanhGia_Schema, db: Session = Depends(get_db)):
+async def update_danhgia(id: str, data: Create_DanhGia_Schema, db: Session = Depends(get_db)):
     danhgia = db.query(DanhGia).filter(DanhGia.madanhgia == id).first()
     if not danhgia:
         return DataResponse.custom_response(
@@ -84,7 +99,6 @@ async def update_danhgia(id: int, data: Create_DanhGia_Schema, db: Session = Dep
 
     try:
         db.commit()
-        db.refresh(danhgia)
         return DataResponse.success_response(danhgia)
     except Exception as e:
         db.rollback()
@@ -100,7 +114,7 @@ async def update_danhgia(id: int, data: Create_DanhGia_Schema, db: Session = Dep
     description="Xóa đánh giá",
     response_model=DataResponse[DanhGia_Schema]
 )
-async def delete_danhgia(id: int, db: Session = Depends(get_db)):
+async def delete_danhgia(id: str, db: Session = Depends(get_db)):
     danhgia = db.query(DanhGia).filter(DanhGia.madanhgia == id).first()
     if not danhgia:
         return DataResponse.custom_response(

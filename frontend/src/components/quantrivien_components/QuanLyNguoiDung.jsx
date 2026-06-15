@@ -369,7 +369,6 @@ const UserManagementTable = () => {
                 <label style={{ fontSize: '14px', fontWeight: 500 }}>Vai trò hệ thống</label>
                 <select name="vaitro" style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc' }} value={formDuLieu.vaitro} onChange={xuLyNhapLieu}>
                   <option value={0}>Quản trị viên</option>
-                  <option value={1}>Gia sư</option>
                   <option value={2}>Người học</option>
                 </select>
               </div>

@@ -3,8 +3,8 @@ from datetime import datetime, time
 from typing import Optional
 
 class KhungGioGiaSuMonHoc_Schema(BaseModel):
-    makhunggio: int
-    magiasu_monhoc: int
+    makhunggio: str
+    magiasu_monhoc: str
     ngaytao: datetime
     ngayday: str
     thoigianbatdau: time
@@ -15,14 +15,14 @@ class KhungGioGiaSuMonHoc_Schema(BaseModel):
         from_attributes = True
 
 class Create_KhungGioGiaSuMonHoc_Schema(BaseModel):
-    magiasu_monhoc: int
+    magiasu_monhoc: str
     ngayday: str
     thoigianbatdau: time
     thoigianketthuc: time
 
 # 🟢 THÊM SCHEMA NÀY DÀNH RIÊNG CHO LÚC CẬP NHẬT (PUT)
 class Update_KhungGioGiaSuMonHoc_Schema(BaseModel):
-    magiasu_monhoc: Optional[int] = None
+    magiasu_monhoc: Optional[str] = None
     ngayday: Optional[str] = None
     thoigianbatdau: Optional[time] = None
     thoigianketthuc: Optional[time] = None

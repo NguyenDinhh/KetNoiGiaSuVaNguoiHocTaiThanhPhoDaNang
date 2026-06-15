@@ -32,7 +32,7 @@ const ThongKeGS = () => {
 
       const giasuData = await GiaSu_Service.layChiTietGiaSuvoimanguoidung(userLocal.manguoidung);
       if (!giasuData?.magiasu) return;
-      const maGS = Number(giasuData.magiasu);
+      const maGS = giasuData.magiasu;
 
       const [resLopHoc, resDangKy, resUngTuyen, resYeuCau, resNguoiDung] = await Promise.all([
         GiaSu_MonHoc_Service.layDanhSachGiaSuMonHoc().catch(() => []),
@@ -53,11 +53,11 @@ const ThongKeGS = () => {
       // Mã gốc: 0 (Chờ), 1 (Duyệt/Đang dạy), 2 (Từ chối), 3 (Hoàn thành)
       // Khớp 100% với mã Chuẩn hóa của chúng ta.
       // ==========================================
-      const lopCuaToi = cacLop.filter(l => Number(l.magiasu) === maGS);
-      const mangMaLop = lopCuaToi.map(l => Number(l.magiasu_monhoc));
+      const lopCuaToi = cacLop.filter(l => String(l.magiasu) === maGS);
+      const mangMaLop = lopCuaToi.map(l => String(l.magiasu_monhoc));
 
       const luongDangKy = cacDangKy
-        .filter(dk => mangMaLop.includes(Number(dk.magiasu_monhoc)))
+        .filter(dk => mangMaLop.includes(String(dk.magiasu_monhoc)))
         .map(dk => ({
           loai: 'Đăng ký lịch',
           id: dk.madangky,
@@ -72,9 +72,9 @@ const ThongKeGS = () => {
       // Mã gốc Yêu Cầu: 0 (Chờ), 1 (Đang dạy), 2 (Hoàn thành)
       // ==========================================
       const luongUngTuyen = cacUngTuyen
-        .filter(ut => Number(ut.magiasu) === maGS)
+        .filter(ut => String(ut.magiasu) === maGS)
         .map(ut => {
-          const yeuCauGoc = cacYeuCau.find(yc => Number(yc.mayeucau) === Number(ut.mayeucau)) || {};
+          const yeuCauGoc = cacYeuCau.find(yc => String(yc.mayeucau) === String(ut.mayeucau)) || {};
           const utTrangThai = Number(ut.trangthai);
           const ycTrangThai = Number(yeuCauGoc.trangthai);
 
@@ -130,7 +130,7 @@ const ThongKeGS = () => {
         .sort((a, b) => b.ngaytao - a.ngaytao) // Sắp xếp mới nhất lên đầu
         .slice(0, 5)
         .map((gd, index) => {
-          const userHocVien = cacNguoiDung.find(nd => Number(nd.id || nd.manguoidung) === Number(gd.manguoidung));
+          const userHocVien = cacNguoiDung.find(nd => String(nd.id || nd.manguoidung) === String(gd.manguoidung));
           
           // Tính thời gian tương đối
           const now = new Date();

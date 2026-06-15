@@ -130,13 +130,11 @@ const TrangCaNhan = () => {
   // ================= LUỒNG TRA CỨU ĐỘNG CÁC MÔN HỌC ĐƯỢC PHÉP DẠY =================
   const layDanhSachMonHocChoMaBC = (maBC) => {
     if (!maBC) return [];
-    // Tìm các bản ghi mapping trong bảng trung gian BangCap_MonHoc
-    const mapping = danhSachBangCapMonHoc.filter(item => Number(item.mabangcap) === Number(maBC));
-    // Ánh xạ sang bảng MonHoc để nhặt ra tên môn học chính xác
+    const mapping = danhSachBangCapMonHoc.filter(item => String(item.mabangcap) === String(maBC));
     return mapping.map(mapItem => {
-      const mon = danhSachMonHoc.find(mh => Number(mh.mamonhoc) === Number(mapItem.mamonhoc));
+      const mon = danhSachMonHoc.find(mh => String(mh.mamonhoc) === String(mapItem.mamonhoc));
       return mon ? mon.tenmonhoc : null;
-    }).filter(Boolean); // Lọc bỏ các phần tử rỗng hoặc null nếu có lỗi data
+    }).filter(Boolean);
   };
 
   // Tự động cập nhật môn học gợi ý khi Gia sư đổi ô select ở Modal thêm mới
@@ -270,7 +268,7 @@ const TrangCaNhan = () => {
 
       if (isGiaSuChanged) {
         const payloadGiaSu = {
-          manguoidung: Number(formData.manguoidung),
+          manguoidung: formData.manguoidung,
           cccdmattruoc: finalCCCDMatTruoc || "string",
           cccdmatsau: finalCCCDMatSau || "string",
           namsinh: Number(formData.namsinh),
@@ -325,7 +323,7 @@ const TrangCaNhan = () => {
     if (!maGiaSu) return;
     try {
       const tatCaBangCap = await GiaSu_BangCap_Service.layDanhSachGiaSuBangCap();
-      const bangCapCuaToi = tatCaBangCap.filter(bc => bc.magiasu === maGiaSu);
+      const bangCapCuaToi = tatCaBangCap.filter(bc => String(bc.magiasu) === String(maGiaSu));
       setDanhSachBangCap(bangCapCuaToi);
     } catch (error) {
       console.error("Lỗi tải bằng cấp gia sư:", error);
@@ -333,7 +331,7 @@ const TrangCaNhan = () => {
   };
 
   const timTenBangCapGoc = (maBC) => {
-    const timThay = danhSachDanhMucBangCap.find(b => b.mabangcap === Number(maBC));
+    const timThay = danhSachDanhMucBangCap.find(b => String(b.mabangcap) === String(maBC));
     return timThay ? timThay.tenbangcap : "Bằng cấp / Chứng chỉ";
   };
 
@@ -365,26 +363,32 @@ const TrangCaNhan = () => {
 
     setIsUploadingBangCap(true);
     try {
+      console.log("DEBUG Frontend: Bắt đầu upload ảnh bằng cấp...");
       const uploadedUrl = await uploadAnhLenCloudinary(fileAnhBangCap);
+      console.log("DEBUG Frontend: Upload ảnh thành công:", uploadedUrl);
+      
       if (!uploadedUrl) throw new Error("Lỗi khi tải ảnh lên Cloud!");
 
       const payloadThem = {
         magiasu: formData.magiasu,
-        mabangcap: Number(formBangCap.mabangcap),
+        mabangcap: formBangCap.mabangcap,
         chuyennganh: formBangCap.chuyennganh,
         namtotnghiep: Number(formBangCap.namtotnghiep),
         cosodaotao: formBangCap.cosodaotao,
         anhbangcap: uploadedUrl,
         trangthaiduyet: 0
       };
+      console.log("DEBUG Frontend: Payload gửi đi:", payloadThem);
 
-      await GiaSu_BangCap_Service.themGiaSuBangCapMoi(payloadThem);
+      const response = await GiaSu_BangCap_Service.themGiaSuBangCapMoi(payloadThem);
+      console.log("DEBUG Frontend: Response nhận về:", response);
 
       alert("Đã thêm bằng cấp thành công! Vui lòng chờ Admin duyệt.");
       setIsModalBangCapOpen(false);
       fetchDanhSachBangCap(formData.magiasu);
 
     } catch (error) {
+      console.error("LỖI Frontend:", error);
       alert("Thêm bằng cấp thất bại: " + error.message);
     } finally {
       setIsUploadingBangCap(false);
@@ -415,7 +419,7 @@ const TrangCaNhan = () => {
         <h2>Hồ sơ Gia Sư</h2>
         <div className="tcn-tabs">
           <button type="button" onClick={() => setTabHienTai('thong_tin')} className={`tcn-tab-btn ${tabHienTai === 'thong_tin' ? 'active' : ''}`}>Thông tin Gia sư</button>
-          <button type="button" onClick={() => setTabHienTai('bang_cap')} className={`tcn-tab-btn ${tabHienTai === 'bang_cap' ? 'active' : ''}`}>Cập nhật bằng cấp</button>
+          <button type="button" onClick={() => setTabHienTai('bang_cap')} className={`tcn-tab-btn ${tabHienTai === 'bang_cap' ? 'active' : ''}`}>Thông tin bằng cấp</button>
         </div>
       </div>
 

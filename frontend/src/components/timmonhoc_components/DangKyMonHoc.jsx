@@ -37,12 +37,12 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
         const mangKhungGio = Array.isArray(resKhungGio) ? resKhungGio : [];
         // Lọc lấy các khung giờ đang sẵn sàng (trạng thái 1)
         const khungGioHopLe = mangKhungGio.filter(
-          kg => Number(kg.magiasu_monhoc) === Number(item.magiasu_monhoc) && Number(kg.trangthai) === 1
+          kg => String(kg.magiasu_monhoc) === String(item.magiasu_monhoc) && Number(kg.trangthai) === 1
         );
         setDanhSachKhungGio(khungGioHopLe);
 
         const mangHocVien = Array.isArray(resHocVien) ? resHocVien : (resHocVien?.data || []);
-        const hocVienCuaToi = mangHocVien.filter(hv => Number(hv.manguoidung) === Number(maND));
+        const hocVienCuaToi = mangHocVien.filter(hv => String(hv.manguoidung) === String(maND));
         setDanhSachHocVien(hocVienCuaToi);
 
       } catch (error) {
@@ -56,8 +56,8 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
   }, [item, onClose]);
 
   const toggleKhungGio = (kg) => {
-    if (khungGioDaChon.some(x => Number(x.makhunggio) === Number(kg.makhunggio))) {
-      setKhungGioDaChon(khungGioDaChon.filter(x => Number(x.makhunggio) !== Number(kg.makhunggio)));
+    if (khungGioDaChon.some(x => String(x.makhunggio) === String(kg.makhunggio))) {
+      setKhungGioDaChon(khungGioDaChon.filter(x => String(x.makhunggio) !== String(kg.makhunggio)));
     } else {
       setKhungGioDaChon([...khungGioDaChon, kg]);
     }
@@ -92,12 +92,12 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
     try {
       setIsSubmitting(true);
       const userLocal = JSON.parse(localStorage.getItem("thongTinUser"));
-      const maND = Number(userLocal?.manguoidung || userLocal?.id);
+      const maND = String(userLocal?.manguoidung || userLocal?.id);
 
       // --- 🟢 BƯỚC 1: LƯU BẢNG MASTER (DANG KY LICH) ---
       const formMaster = {
         manguoidung: maND,
-        magiasu_monhoc: Number(item.magiasu_monhoc),
+        magiasu_monhoc: item.magiasu_monhoc,
         ngaybatdauhoc: String(ngayBatDauHoc),
         tonghocphi: Number(tongHocPhiTinhToan),
         ghichu: ghiChu || ""
@@ -124,8 +124,8 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
       console.log(`👉 [BƯỚC 2] Đang lưu dữ liệu khung giờ học và chuyển trạng thái Chờ duyệt (3)...`);
       for (const kg of khungGioDaChon) {
         const formDetail = {
-          makhunggio: Number(kg.makhunggio),
-          madangky: Number(maDangKyMoi),
+          makhunggio: kg.makhunggio,
+          madangky: maDangKyMoi,
           ngayhoc: kg.ngayday,
           thoigianbatdau: kg.thoigianbatdau,
           thoigianketthuc: kg.thoigianketthuc,
@@ -143,8 +143,8 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
       console.log(`👉 [BƯỚC 3] Đang ánh xạ học viên tham gia với mã đăng ký...`);
       for (const maHV of hocVienDaChon) {
         const formHV = {
-          mahocvien: Number(maHV),
-          madangky: Number(maDangKyMoi)
+          mahocvien: maHV,
+          madangky: maDangKyMoi
         };
         await YeuCau_HocVien_Service.themYeuCauHocVienTheoMaDangKy(formHV);
       }
@@ -238,7 +238,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
           ) : (
             <div className="dkmh-checkbox-grid">
               {danhSachKhungGio.map(kg => {
-                const isSelected = khungGioDaChon.some(x => Number(x.makhunggio) === Number(kg.makhunggio));
+                const isSelected = khungGioDaChon.some(x => String(x.makhunggio) === String(kg.makhunggio));
                 return (
                   <div
                     key={kg.makhunggio}

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from pydantic import field_validator
 
 class NguoiDung_Schema(BaseModel):
-    manguoidung: int
+    manguoidung: str
     email: str
     # matkhau: str
     hoten:str

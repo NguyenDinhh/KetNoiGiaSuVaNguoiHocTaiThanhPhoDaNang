@@ -65,14 +65,14 @@ const TongQuanGS = ({ setTabHienTai }) => {
         const cacUngTuyen = Array.isArray(resUngTuyen) ? resUngTuyen : (resUngTuyen?.data || []);
         const cacYeuCau = Array.isArray(resYeuCau) ? resYeuCau : (resYeuCau?.data || []);
 
-        const lopCuaToi = cacLop.filter(l => Number(l.magiasu) === Number(giasuData.magiasu));
-        const mangMaLop = lopCuaToi.map(l => Number(l.magiasu_monhoc));
-        const dkCuaToi = cacDangKy.filter(dk => mangMaLop.includes(Number(dk.magiasu_monhoc)));
+        const lopCuaToi = cacLop.filter(l => String(l.magiasu) === String(giasuData.magiasu));
+        const mangMaLop = lopCuaToi.map(l => String(l.magiasu_monhoc));
+        const dkCuaToi = cacDangKy.filter(dk => mangMaLop.includes(String(dk.magiasu_monhoc)));
 
         // 🟢 LẤY CÁC YÊU CẦU MÀ GIA SƯ NÀY ĐƯỢC DUYỆT (từ YEUCAUTIMGIASU qua GIASU_UNGTUYEN)
-        const ungTuyenCuaToi = cacUngTuyen.filter(ut => Number(ut.magiasu) === Number(giasuData.magiasu) && Number(ut.trangthai) === 1);
-        const mangMaYeuCau = ungTuyenCuaToi.map(ut => Number(ut.mayeucau));
-        const yeuCauCuaToi = cacYeuCau.filter(yc => mangMaYeuCau.includes(Number(yc.mayeucau)));
+        const ungTuyenCuaToi = cacUngTuyen.filter(ut => String(ut.magiasu) === String(giasuData.magiasu) && Number(ut.trangthai) === 1);
+        const mangMaYeuCau = ungTuyenCuaToi.map(ut => String(ut.mayeucau));
+        const yeuCauCuaToi = cacYeuCau.filter(yc => mangMaYeuCau.includes(String(yc.mayeucau)));
 
         const dangDay = dkCuaToi.filter(dk => Number(dk.trangthai) === 1);
         const choDuyet = dkCuaToi.filter(dk => Number(dk.trangthai) === 0);
@@ -84,9 +84,9 @@ const TongQuanGS = ({ setTabHienTai }) => {
         const tongThuNhap = thuNhapTuDangKy + thuNhapTuYeuCau;
 
         // 🟢 LẤY ĐÁNH GIÁ TỪ CẢ 2 NGUỒN
-        const mangMaDK = dkCuaToi.map(dk => Number(dk.madangky));
-        const danhGiaTuDangKy = cacDanhGia.filter(dg => dg.madangky && mangMaDK.includes(Number(dg.madangky)));
-        const danhGiaTuYeuCau = cacDanhGia.filter(dg => dg.mayeucau && mangMaYeuCau.includes(Number(dg.mayeucau)));
+        const mangMaDK = dkCuaToi.map(dk => String(dk.madangky));
+        const danhGiaTuDangKy = cacDanhGia.filter(dg => dg.madangky && mangMaDK.includes(String(dg.madangky)));
+        const danhGiaTuYeuCau = cacDanhGia.filter(dg => dg.mayeucau && mangMaYeuCau.includes(String(dg.mayeucau)));
         const danhGiaGoc = [...danhGiaTuDangKy, ...danhGiaTuYeuCau];
         
         const luotDanhGia = danhGiaGoc.length;
@@ -98,16 +98,16 @@ const TongQuanGS = ({ setTabHienTai }) => {
           
           // Nếu là đánh giá từ DANGKYLICH
           if (dg.madangky) {
-            const đơn = dkCuaToi.find(dk => Number(dk.madangky) === Number(dg.madangky));
-            const lớp = lopCuaToi.find(l => Number(l.magiasu_monhoc) === Number(đơn?.magiasu_monhoc));
-            môn = cacMon.find(m => Number(m.mamonhoc) === Number(lớp?.mamonhoc));
-            ngườiĐánhGiá = cacND.find(nd => Number(nd.id || nd.manguoidung) === Number(đơn?.manguoidung));
+            const đơn = dkCuaToi.find(dk => String(dk.madangky) === String(dg.madangky));
+            const lớp = lopCuaToi.find(l => String(l.magiasu_monhoc) === String(đơn?.magiasu_monhoc));
+            môn = cacMon.find(m => String(m.mamonhoc) === String(lớp?.mamonhoc));
+            ngườiĐánhGiá = cacND.find(nd => String(nd.id || nd.manguoidung) === String(đơn?.manguoidung));
           } 
           // Nếu là đánh giá từ YEUCAUTIMGIASU
           else if (dg.mayeucau) {
-            const yêuCầu = yeuCauCuaToi.find(yc => Number(yc.mayeucau) === Number(dg.mayeucau));
-            môn = cacMon.find(m => Number(m.mamonhoc) === Number(yêuCầu?.mamonhoc));
-            ngườiĐánhGiá = cacND.find(nd => Number(nd.id || nd.manguoidung) === Number(yêuCầu?.manguoidung));
+            const yêuCầu = yeuCauCuaToi.find(yc => String(yc.mayeucau) === String(dg.mayeucau));
+            môn = cacMon.find(m => String(m.mamonhoc) === String(yêuCầu?.mamonhoc));
+            ngườiĐánhGiá = cacND.find(nd => String(nd.id || nd.manguoidung) === String(yêuCầu?.manguoidung));
           }
           
           return { 
@@ -122,11 +122,11 @@ const TongQuanGS = ({ setTabHienTai }) => {
 
         const lichHnayRaw = [];
         dangDay.forEach(dk => {
-          const chiTietHomNay = cacChiTiet.filter(ct => Number(ct.madangky) === Number(dk.madangky) && ct.ngayhoc === thuHomNay );
+          const chiTietHomNay = cacChiTiet.filter(ct => String(ct.madangky) === String(dk.madangky) && ct.ngayhoc === thuHomNay );
           if (chiTietHomNay.length > 0) {
-            const lop = lopCuaToi.find(l => Number(l.magiasu_monhoc) === Number(dk.magiasu_monhoc));
-            const mon = cacMon.find(m => Number(m.mamonhoc) === Number(lop?.mamonhoc));
-            const phuHuynh = cacND.find(nd => Number(nd.id || nd.manguoidung) === Number(dk.manguoidung));
+            const lop = lopCuaToi.find(l => String(l.magiasu_monhoc) === String(dk.magiasu_monhoc));
+            const mon = cacMon.find(m => String(m.mamonhoc) === String(lop?.mamonhoc));
+            const phuHuynh = cacND.find(nd => String(nd.id || nd.manguoidung) === String(dk.manguoidung));
             chiTietHomNay.forEach(ct => {
               lichHnayRaw.push({ id: ct.machitietdangky, gio: `${String(ct.thoigianbatdau).slice(0, 5)} - ${String(ct.thoigianketthuc).slice(0, 5)}`, mon: mon ? mon.tenmonhoc : 'Môn học ẩn', hocVien: phuHuynh ? (phuHuynh.name || phuHuynh.hoten) : 'Chưa rõ' });
             });

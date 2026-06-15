@@ -29,7 +29,7 @@ async def get_danhsachgiasuungtuyen(db: Session = Depends(get_db)):
     description="Lấy 1 ứng tuyển gia sư",
     response_model=DataResponse[GiaSuUngTuyen_Schema]
 )
-async def get_giasuungtuyen(id: int, db: Session = Depends(get_db)):
+async def get_giasuungtuyen(id: str, db: Session = Depends(get_db)):
     giasu_ungtuyen = db.query(GiaSuUngTuyen).filter(
         GiaSuUngTuyen.magiasu_ungtuyen == id
     ).first()
@@ -48,18 +48,29 @@ async def get_giasuungtuyen(id: int, db: Session = Depends(get_db)):
     response_model=DataResponse[GiaSuUngTuyen_Schema]
 )
 async def create_giasuungtuyen(data: Create_GiaSuUngTuyen_Schema, db: Session = Depends(get_db)):
-    giasu_ungtuyen = GiaSuUngTuyen(**data.model_dump())
     try:
+        print(f"DEBUG: Thêm ứng tuyển - magiasu: {data.magiasu}, mayeucau: {data.mayeucau}")
+        
+        giasu_ungtuyen = GiaSuUngTuyen(magiasu_ungtuyen="", **data.model_dump())
         db.add(giasu_ungtuyen)
         db.commit()
-        db.refresh(giasu_ungtuyen)
-        return DataResponse.success_response(giasu_ungtuyen)
-    except:
-        return DataResponse.custom_response(
-            code="400",
-            message="Lỗi",
-            data=None
-        )
+        
+        ungtuyen_da_tao = db.query(GiaSuUngTuyen).filter(
+            GiaSuUngTuyen.magiasu == data.magiasu,
+            GiaSuUngTuyen.mayeucau == data.mayeucau
+        ).order_by(GiaSuUngTuyen.magiasu_ungtuyen.desc()).first()
+        
+        if not ungtuyen_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất!", data=None)
+        
+        print(f"DEBUG: Ứng tuyển thành công: {ungtuyen_da_tao.magiasu_ungtuyen}")
+        return DataResponse.success_response(ungtuyen_da_tao)
+    except Exception as e:
+        db.rollback()
+        print(f"LỖI thêm ứng tuyển: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        return DataResponse.custom_response(code="500", message=f"Lỗi: {str(e)}", data=None)
 
 @giasu_ungtuyen_router.put(
     "/suagiasuungtuyen/{id}",
@@ -67,7 +78,7 @@ async def create_giasuungtuyen(data: Create_GiaSuUngTuyen_Schema, db: Session = 
     description="Sửa trạng thái ứng tuyển",
     response_model=DataResponse[GiaSuUngTuyen_Schema]
 )
-async def update_giasuungtuyen(id: int, data: Update_GiaSuUngTuyen_Schema, db: Session = Depends(get_db)):
+async def update_giasuungtuyen(id: str, data: Update_GiaSuUngTuyen_Schema, db: Session = Depends(get_db)):
     giasu_ungtuyen = db.query(GiaSuUngTuyen).filter(
         GiaSuUngTuyen.magiasu_ungtuyen == id
     ).first()
@@ -83,7 +94,6 @@ async def update_giasuungtuyen(id: int, data: Update_GiaSuUngTuyen_Schema, db: S
         setattr(giasu_ungtuyen, key, value)
 
     db.commit()
-    db.refresh(giasu_ungtuyen)
     return DataResponse.success_response(giasu_ungtuyen)
 
 @giasu_ungtuyen_router.delete(
@@ -92,7 +102,7 @@ async def update_giasuungtuyen(id: int, data: Update_GiaSuUngTuyen_Schema, db: S
     description="Xóa ứng tuyển gia sư",
     response_model=DataResponse[GiaSuUngTuyen_Schema]
 )
-async def delete_giasuungtuyen(id: int, db: Session = Depends(get_db)):
+async def delete_giasuungtuyen(id: str, db: Session = Depends(get_db)):
     giasu_ungtuyen = db.query(GiaSuUngTuyen).filter(
         GiaSuUngTuyen.magiasu_ungtuyen == id
     ).first()

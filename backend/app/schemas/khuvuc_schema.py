@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class KhuVuc_Schema(BaseModel):
-    makhuvuc: int
+    makhuvuc: str
     tenkhuvuc: str
     trangthai: Optional[int] = None
 

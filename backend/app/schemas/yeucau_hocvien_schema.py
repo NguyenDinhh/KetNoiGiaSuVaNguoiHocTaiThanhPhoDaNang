@@ -2,18 +2,18 @@ from pydantic import BaseModel
 from typing import Optional
 
 class YeuCauHocVien_Schema(BaseModel):
-    mayeucau_hocvien: int
-    mahocvien: int
-    mayeucau: Optional[int] = None
-    madangky: Optional[int] = None
+    mayeucau_hocvien: str
+    mahocvien: str
+    mayeucau: Optional[str] = None
+    madangky: Optional[str] = None
 
     class Config:
         from_attributes = True
 
 class Create_YeuCauHocVienVoiMaYeuCau_Schema(BaseModel):
-    mahocvien: int
-    mayeucau: int
+    mahocvien: str
+    mayeucau: str
 
 class Create_YeuCauHocVienVoiMaDangKy_Schema(BaseModel):
-    mahocvien: int
-    madangky: int
+    mahocvien: str
+    madangky: str

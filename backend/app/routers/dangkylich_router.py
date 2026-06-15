@@ -15,7 +15,7 @@ async def get_danhsachdangkylich(db: Session = Depends(get_db)):
     return DataResponse.success_response(dangkylichs)
 
 @dangkylich_router.get("/dangkylich/{id}", tags=["dangkylich"], description="Lấy 1 đăng ký lịch", response_model=DataResponse[DangKyLich_Schema])
-async def get_dangkylich(id: int, db: Session = Depends(get_db)):
+async def get_dangkylich(id: str, db: Session = Depends(get_db)):
     dangkylich = db.query(DangKyLich).filter(DangKyLich.madangky == id).first()
     if not dangkylich:
         return DataResponse.custom_response(code="404", message="Không tìm thấy đăng ký lịch", data=None)
@@ -24,19 +24,28 @@ async def get_dangkylich(id: int, db: Session = Depends(get_db)):
 @dangkylich_router.post("/themdangkylich", tags=["dangkylich"], description="Thêm đăng ký lịch", response_model=DataResponse[DangKyLich_Schema])
 async def create_dangkylich(data: Create_DangKyLich_Schema, db: Session = Depends(get_db)):
     try:
-        dangkylich = DangKyLich(**data.model_dump())
+        dangkylich = DangKyLich(madangky="", **data.model_dump())
         db.add(dangkylich)
         db.commit()
-        db.refresh(dangkylich)
-        return DataResponse.success_response(dangkylich)
+        
+        dangkylich_da_tao = db.query(DangKyLich).filter(
+            DangKyLich.magiasu_monhoc == data.magiasu_monhoc
+        ).order_by(DangKyLich.madangky.desc()).first()
+        
+        if not dangkylich_da_tao:
+            return DataResponse.custom_response(code="500", message="Không tìm thấy đăng ký lịch vừa tạo", data=None)
+        
+        return DataResponse.success_response(dangkylich_da_tao)
     except Exception as e:
-        db.rollback() # Bắt buộc phải rollback để Database không bị kẹt
-        print("❌ LỖI DATABASE KHI THÊM:", e) # In ra Terminal đen để ông biết bị sao
+        db.rollback()
+        print(f"LỖI: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
         return DataResponse.custom_response(code="400", message=str(e), data=None)
 
 # 🟢 ĐÃ SỬA data: Update_DangKyLich_Schema Ở DÒNG DƯỚI NÀY
 @dangkylich_router.put("/suadangkylich/{id}", tags=["dangkylich"], description="Sửa đăng ký lịch", response_model=DataResponse[DangKyLich_Schema])
-async def update_dangkylich(id: int, data: Update_DangKyLich_Schema, db: Session = Depends(get_db)):
+async def update_dangkylich(id: str, data: Update_DangKyLich_Schema, db: Session = Depends(get_db)):
     try:
         dangkylich = db.query(DangKyLich).filter(DangKyLich.madangky == id).first()
         if not dangkylich:
@@ -47,7 +56,6 @@ async def update_dangkylich(id: int, data: Update_DangKyLich_Schema, db: Session
             setattr(dangkylich, key, value)
 
         db.commit()
-        db.refresh(dangkylich)
         return DataResponse.success_response(dangkylich)
     except Exception as e:
         db.rollback()
@@ -55,7 +63,7 @@ async def update_dangkylich(id: int, data: Update_DangKyLich_Schema, db: Session
         return DataResponse.custom_response(code="400", message=str(e), data=None)
 
 @dangkylich_router.delete("/xoadangkylich/{id}", tags=["dangkylich"], description="Xóa đăng ký lịch", response_model=DataResponse[DangKyLich_Schema])
-async def delete_dangkylich(id: int, db: Session = Depends(get_db)):
+async def delete_dangkylich(id: str, db: Session = Depends(get_db)):
     dangkylich = db.query(DangKyLich).filter(DangKyLich.madangky == id).first()
     if not dangkylich:
         return DataResponse.custom_response(code="404", message="Không tìm thấy đăng ký lịch", data=None)

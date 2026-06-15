@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Time, Float, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, String, Date, DateTime, Time, Float, ForeignKey, CheckConstraint, text
 from app.models.base_model import Base
 
 class HocVien(Base):
     __tablename__ = "HOCVIEN"
 
-    mahocvien = Column(Integer, primary_key=True)
-    manguoidung = Column(Integer, ForeignKey("NGUOIDUNG.manguoidung", ondelete="CASCADE"), nullable=False)
+    mahocvien = Column(String(10), primary_key=True, server_default=text("''"))
+    manguoidung = Column(String(10), ForeignKey("NGUOIDUNG.manguoidung", ondelete="CASCADE"), nullable=False)
     tenhocvien = Column(String(100), nullable=False)
     namsinh = Column(Integer)
     hocluc = Column(String(50))

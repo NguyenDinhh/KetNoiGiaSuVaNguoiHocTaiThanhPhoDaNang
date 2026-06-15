@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
 class MonHoc_Schema(BaseModel):
-    mamonhoc: int
-    mahelop: int
+    mamonhoc: str
+    mahelop: str
     tenmonhoc: str
     mota: str
     trangthai: int  # 1: Hoạt động, 0: Ngưng áp dụng
@@ -11,7 +11,7 @@ class MonHoc_Schema(BaseModel):
         from_attributes = True
 
 class Create_MonHoc_Schema(BaseModel):
-    mahelop: int
+    mahelop: str
     tenmonhoc: str
     mota: str
     trangthai: int

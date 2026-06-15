@@ -108,7 +108,7 @@ const Header = ({ onRegisterClick, onLoginClick }) => {
                   <>
                     <Link to="/nguoihoc#HoSoCaNhan" className="header-dropdown-item" onClick={() => setIsDropdownOpen(false)}>
                       <span className="material-symbols-outlined">person</span>
-                      Hồ sơ cá nhân
+                      Thông tin cá nhân
                     </Link>
                     <Link to="/nguoihoc#QuanLyHocVien" className="header-dropdown-item" onClick={() => setIsDropdownOpen(false)}>
                       <span className="material-symbols-outlined">badge</span>

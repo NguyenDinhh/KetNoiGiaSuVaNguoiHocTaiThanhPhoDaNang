@@ -91,8 +91,8 @@ const GiaSu = () => {
     // 🟢 Đã truyền hàm setTabHienTai xuống cho TongQuanGS
     { id: 'overview', icon: 'dashboard', label: 'Tổng quan', component: <TongQuanGS setTabHienTai={setTabHienTai} /> },
     { id: 'profile', icon: 'person', label: 'Trang cá nhân', component: <TrangCaNhan /> },
-    { id: 'booking_requests', icon: 'event_available', label: 'Yêu cầu đăng ký lịch', component: <YeuCauDangKyLich /> },
-    { id: 'job_posts', icon: 'search', label: 'Yêu cầu tìm gia sư', component: <BaiDangTimGiaSu /> },
+    { id: 'booking_requests', icon: 'event_available', label: 'Quản lý đăng ký lịch', component: <YeuCauDangKyLich /> },
+    { id: 'job_posts', icon: 'search', label: 'Tìm lớp ứng tuyển', component: <BaiDangTimGiaSu /> },
     { id: 'schedule', icon: 'calendar_month', label: 'Lịch dạy', component: <LichDay /> },
     { id: 'stats', icon: 'insights', label: 'Thống kê', component: <ThongKeGS /> }
   ];

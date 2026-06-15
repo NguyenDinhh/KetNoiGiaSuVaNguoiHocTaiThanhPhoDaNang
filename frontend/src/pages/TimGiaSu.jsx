@@ -55,20 +55,20 @@ const TimGiaSu = () => {
         const giaSuDaDuyet = tatCaGiaSu
           .filter(gs => Number(gs.trangthaiduyet) === 1)
           .map(gs => {
-            const nd = tatCaNguoiDung.find(n => Number(n.id || n.manguoidung) === Number(gs.manguoidung)) || {};
+            const nd = tatCaNguoiDung.find(n => String(n.id) === String(gs.manguoidung)) || {};
 
-            const lopCuaGS = tatCaGSMH.filter(l => Number(l.magiasu) === Number(gs.magiasu));
-            const mangMaLop = lopCuaGS.map(l => Number(l.magiasu_monhoc));
+            const lopCuaGS = tatCaGSMH.filter(l => String(l.magiasu) === String(gs.magiasu));
+            const mangMaLop = lopCuaGS.map(l => String(l.magiasu_monhoc));
 
-            const dkCuaGS = tatCaDK.filter(dk => mangMaLop.includes(Number(dk.magiasu_monhoc)));
-            const utCuaGS = tatCaUT.filter(ut => Number(ut.magiasu) === Number(gs.magiasu) && Number(ut.trangthai) === 1);
+            const dkCuaGS = tatCaDK.filter(dk => mangMaLop.includes(String(dk.magiasu_monhoc)));
+            const utCuaGS = tatCaUT.filter(ut => String(ut.magiasu) === String(gs.magiasu) && Number(ut.trangthai) === 1);
 
-            const mangMaDK = dkCuaGS.map(dk => Number(dk.madangky));
-            const mangMaYC = utCuaGS.map(ut => Number(ut.mayeucau));
+            const mangMaDK = dkCuaGS.map(dk => String(dk.madangky));
+            const mangMaYC = utCuaGS.map(ut => String(ut.mayeucau));
 
             const danhGiaCuaGS = tatCaDG.filter(dg =>
-              (dg.madangky && mangMaDK.includes(Number(dg.madangky))) ||
-              (dg.mayeucau && mangMaYC.includes(Number(dg.mayeucau)))
+              (dg.madangky && mangMaDK.includes(String(dg.madangky))) ||
+              (dg.mayeucau && mangMaYC.includes(String(dg.mayeucau)))
             );
 
             const luotDG = danhGiaCuaGS.length;
@@ -134,9 +134,9 @@ const TimGiaSu = () => {
 
       // 1. Map Bằng cấp
       const bangCapCuaGiaSu = (listGSBC || [])
-        .filter(bc => Number(bc.magiasu) === Number(giasu.magiasu))
+        .filter(bc => String(bc.magiasu) === String(giasu.magiasu))
         .map(bc => {
-          const thongTinBC = bangCapMaster.find(master => Number(master.mabangcap) === Number(bc.mabangcap)) || {};
+          const thongTinBC = bangCapMaster.find(master => String(master.mabangcap) === String(bc.mabangcap)) || {};
           return {
             ...bc,
             tenbangcap: thongTinBC.tenbangcap || `Bằng cấp #${bc.mabangcap}`,
@@ -146,10 +146,10 @@ const TimGiaSu = () => {
 
       // 2. Map Môn học
       const monHocGS = (listGSMH || [])
-        .filter(mh => Number(mh.magiasu) === Number(giasu.magiasu))
+        .filter(mh => String(mh.magiasu) === String(giasu.magiasu))
         .map(mh => {
-          const thongTinMH = monHocMaster.find(master => Number(master.mamonhoc) === Number(mh.mamonhoc)) || {};
-          const thongTinKV = khuVucMaster.find(master => Number(master.makhuvuc) === Number(mh.makhuvuc)) || {};
+          const thongTinMH = monHocMaster.find(master => String(master.mamonhoc) === String(mh.mamonhoc)) || {};
+          const thongTinKV = khuVucMaster.find(master => String(master.makhuvuc) === String(mh.makhuvuc)) || {};
           return {
             ...mh,
             tenmonhoc: thongTinMH.tenmonhoc || `Môn học #${mh.mamonhoc}`,
@@ -159,18 +159,18 @@ const TimGiaSu = () => {
         });
 
       // 3. Móc nối toàn bộ danh sách Đánh giá
-      const lopCuaGS = (listGSMH || []).filter(l => Number(l.magiasu) === Number(giasu.magiasu));
-      const mangMaLop = lopCuaGS.map(l => Number(l.magiasu_monhoc));
+      const lopCuaGS = (listGSMH || []).filter(l => String(l.magiasu) === String(giasu.magiasu));
+      const mangMaLop = lopCuaGS.map(l => String(l.magiasu_monhoc));
 
-      const dkCuaGS = (listDK || []).filter(dk => mangMaLop.includes(Number(dk.magiasu_monhoc)));
-      const utCuaGS = (listUT || []).filter(ut => Number(ut.magiasu) === Number(giasu.magiasu) && Number(ut.trangthai) === 1);
+      const dkCuaGS = (listDK || []).filter(dk => mangMaLop.includes(String(dk.magiasu_monhoc)));
+      const utCuaGS = (listUT || []).filter(ut => String(ut.magiasu) === String(giasu.magiasu) && Number(ut.trangthai) === 1);
 
-      const mangMaDK = dkCuaGS.map(dk => Number(dk.madangky));
-      const mangMaYC = utCuaGS.map(ut => Number(ut.mayeucau));
+      const mangMaDK = dkCuaGS.map(dk => String(dk.madangky));
+      const mangMaYC = utCuaGS.map(ut => String(ut.mayeucau));
 
       const danhGiaGoc = (listDG || []).filter(dg =>
-        (dg.madangky && mangMaDK.includes(Number(dg.madangky))) ||
-        (dg.mayeucau && mangMaYC.includes(Number(dg.mayeucau)))
+        (dg.madangky && mangMaDK.includes(String(dg.madangky))) ||
+        (dg.mayeucau && mangMaYC.includes(String(dg.mayeucau)))
       );
 
       const danhGiaHoanChinh = danhGiaGoc.map(dg => {
@@ -178,16 +178,16 @@ const TimGiaSu = () => {
         let tenPhuHuynh = 'Học viên hệ thống';
 
         if (dg.madangky) {
-          const donDK = dkCuaGS.find(dk => Number(dk.madangky) === Number(dg.madangky));
-          const lopHoc = lopCuaGS.find(l => Number(l.magiasu_monhoc) === Number(donDK?.magiasu_monhoc));
-          const mon = monHocMaster.find(m => Number(m.mamonhoc) === Number(lopHoc?.mamonhoc));
-          const nd = (listND || []).find(n => Number(n.id || n.manguoidung) === Number(donDK?.manguoidung));
+          const donDK = dkCuaGS.find(dk => String(dk.madangky) === String(dg.madangky));
+          const lopHoc = lopCuaGS.find(l => String(l.magiasu_monhoc) === String(donDK?.magiasu_monhoc));
+          const mon = monHocMaster.find(m => String(m.mamonhoc) === String(lopHoc?.mamonhoc));
+          const nd = (listND || []).find(n => String(n.id || n.manguoidung) === String(donDK?.manguoidung));
           if (mon) tenMon = mon.tenmonhoc;
           if (nd) tenPhuHuynh = nd.name || nd.hoten;
         } else if (dg.mayeucau) {
-          const yeuCau = (listYC || []).find(yc => Number(yc.mayeucau) === Number(dg.mayeucau));
-          const mon = monHocMaster.find(m => Number(m.mamonhoc) === Number(yeuCau?.mamonhoc));
-          const nd = (listND || []).find(n => Number(n.id || n.manguoidung) === Number(yeuCau?.manguoidung));
+          const yeuCau = (listYC || []).find(yc => String(yc.mayeucau) === String(dg.mayeucau));
+          const mon = monHocMaster.find(m => String(m.mamonhoc) === String(yeuCau?.mamonhoc));
+          const nd = (listND || []).find(n => String(n.id || n.manguoidung) === String(yeuCau?.manguoidung));
           if (mon) tenMon = mon.tenmonhoc;
           if (nd) tenPhuHuynh = nd.name || nd.hoten;
         }

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.orm import as_declarative
 
@@ -13,4 +13,4 @@ class Base:
 
 class BaseModel(Base):
     __abstract__ = True
-    id: int = Column(Integer, primary_key=True)
+    id: str = Column(String(10), primary_key=True)

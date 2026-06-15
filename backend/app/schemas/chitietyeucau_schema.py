@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from datetime import time
 
 class ChiTietYeuCau_Schema(BaseModel):
-    machitietyeucau: int
-    mayeucau: int
+    machitietyeucau: str
+    mayeucau: str
     ngayhoc: str
     thoigianbatdau: time
     thoigianketthuc: time
@@ -13,7 +13,7 @@ class ChiTietYeuCau_Schema(BaseModel):
         from_attributes = True
 
 class Create_ChiTietYeuCau_Schema(BaseModel):
-    mayeucau: int
+    mayeucau: str
     ngayhoc: str
     thoigianbatdau: time
     thoigianketthuc: time

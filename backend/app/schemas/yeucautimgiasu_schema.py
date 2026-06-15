@@ -2,10 +2,10 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class YeuCauTimGiaSu_Schema(BaseModel):
-    mayeucau: int
-    manguoidung: int
-    makhuvuc: int
-    mamonhoc: int
+    mayeucau: str
+    manguoidung: str
+    makhuvuc: str
+    mamonhoc: str
     ngaytao: datetime
     ngaybatdauhoc: datetime
     sobuoihoc: int
@@ -16,9 +16,9 @@ class YeuCauTimGiaSu_Schema(BaseModel):
         from_attributes = True
 
 class Create_YeuCauTimGiaSu_Schema(BaseModel):
-    manguoidung: int
-    makhuvuc: int
-    mamonhoc: int
+    manguoidung: str
+    makhuvuc: str
+    mamonhoc: str
     ngaybatdauhoc: datetime
     sobuoihoc: int
     tonghocphi: int

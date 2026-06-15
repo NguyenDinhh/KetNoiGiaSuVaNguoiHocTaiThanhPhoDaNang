@@ -14,7 +14,7 @@ async def get_danhsachchitietyeucau(db: Session = Depends(get_db)):
     return DataResponse.success_response(chitietyeucaus)
 
 @chitietyeucau_router.get("/chitietyeucau/{id}", tags=["chitietyeucau"], description="Lấy 1 chi tiết yêu cầu", response_model=DataResponse[ChiTietYeuCau_Schema])
-async def get_chitietyeucau(id: int, db: Session = Depends(get_db)):
+async def get_chitietyeucau(id: str, db: Session = Depends(get_db)):
     chitiet = db.query(ChiTietYeuCau).filter(ChiTietYeuCau.machitietyeucau == id).first()
     if not chitiet:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)
@@ -22,17 +22,26 @@ async def get_chitietyeucau(id: int, db: Session = Depends(get_db)):
 
 @chitietyeucau_router.post("/themchitietyeucau", tags=["chitietyeucau"], description="Thêm chi tiết yêu cầu", response_model=DataResponse[ChiTietYeuCau_Schema])
 async def create_chitietyeucau(data: Create_ChiTietYeuCau_Schema, db: Session = Depends(get_db)):
-    chitiet = ChiTietYeuCau(**data.model_dump())
     try:
+        chitiet = ChiTietYeuCau(machitietyeucau="", **data.model_dump())
         db.add(chitiet)
         db.commit()
-        db.refresh(chitiet)
-        return DataResponse.success_response(chitiet)
-    except:
-        return DataResponse.custom_response(code="400", message="Lỗi", data=None)
+        
+        chitiet_da_tao = db.query(ChiTietYeuCau).filter(
+            ChiTietYeuCau.mayeucau == data.mayeucau
+        ).order_by(ChiTietYeuCau.machitietyeucau.desc()).first()
+        
+        if not chitiet_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất!", data=None)
+        
+        return DataResponse.success_response(chitiet_da_tao)
+    except Exception as e:
+        db.rollback()
+        print(f"LỖI thêm chi tiết yêu cầu: {str(e)}")
+        return DataResponse.custom_response(code="500", message=f"Lỗi: {str(e)}", data=None)
 
 @chitietyeucau_router.put("/suachitietyeucau/{id}", tags=["chitietyeucau"], description="Sửa chi tiết yêu cầu", response_model=DataResponse[ChiTietYeuCau_Schema])
-async def update_chitietyeucau(id: int, data: Create_ChiTietYeuCau_Schema, db: Session = Depends(get_db)):
+async def update_chitietyeucau(id: str, data: Create_ChiTietYeuCau_Schema, db: Session = Depends(get_db)):
     chitiet = db.query(ChiTietYeuCau).filter(ChiTietYeuCau.machitietyeucau == id).first()
     if not chitiet:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)
@@ -40,11 +49,10 @@ async def update_chitietyeucau(id: int, data: Create_ChiTietYeuCau_Schema, db: S
     for key, value in update_data.items():
         setattr(chitiet, key, value)
     db.commit()
-    db.refresh(chitiet)
     return DataResponse.success_response(chitiet)
 
 @chitietyeucau_router.delete("/xoachitietyeucau/{id}", tags=["chitietyeucau"], description="Xóa chi tiết yêu cầu", response_model=DataResponse[ChiTietYeuCau_Schema])
-async def delete_chitietyeucau(id: int, db: Session = Depends(get_db)):
+async def delete_chitietyeucau(id: str, db: Session = Depends(get_db)):
     chitiet = db.query(ChiTietYeuCau).filter(ChiTietYeuCau.machitietyeucau == id).first()
     if not chitiet:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)

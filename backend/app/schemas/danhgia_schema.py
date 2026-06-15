@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Optional
 
 class DanhGia_Schema(BaseModel):
-    madanhgia: int
-    mayeucau: Optional[int] = None  # 🟢 Chuyển thành tùy chọn
-    madangky: Optional[int] = None  # 🟢 Chuyển thành tùy chọn
+    madanhgia: str
+    mayeucau: Optional[str] = None  # 🟢 Chuyển thành tùy chọn
+    madangky: Optional[str] = None  # 🟢 Chuyển thành tùy chọn
     sodiem: float  # 1.0 - 5.0
     noidung: str
     ngaydanhgia: datetime
@@ -14,8 +14,8 @@ class DanhGia_Schema(BaseModel):
         from_attributes = True
 
 class Create_DanhGia_Schema(BaseModel):
-    mayeucau: Optional[int] = None  # 🟢 Cho phép bằng Null
-    madangky: Optional[int] = None  # 🟢 Cho phép bằng Null
+    mayeucau: Optional[str] = None  # 🟢 Cho phép bằng Null
+    madangky: Optional[str] = None  # 🟢 Cho phép bằng Null
     sodiem: float  # 1.0 - 5.0
     noidung: str
 

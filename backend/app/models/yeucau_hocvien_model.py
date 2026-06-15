@@ -1,10 +1,10 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, text
 from app.models.base_model import Base
 
 class YeuCauHocVien(Base):
     __tablename__ = "YEUCAU_HOCVIEN"
 
-    mayeucau_hocvien = Column(Integer, primary_key=True, autoincrement=True)
-    mahocvien = Column(Integer, ForeignKey("HOCVIEN.mahocvien"), nullable=False)
-    mayeucau = Column(Integer, ForeignKey("YEUCAUTIMGIASU.mayeucau"), nullable=False)
-    madangky = Column(Integer, ForeignKey("DANGKYLICH.madangky"))
+    mayeucau_hocvien = Column(String(10), primary_key=True, server_default=text("''"))
+    mahocvien = Column(String(10), ForeignKey("HOCVIEN.mahocvien"), nullable=False)
+    mayeucau = Column(String(10), ForeignKey("YEUCAUTIMGIASU.mayeucau"), nullable=False)
+    madangky = Column(String(10), ForeignKey("DANGKYLICH.madangky"))

@@ -32,7 +32,7 @@ const LichDay = () => {
       setLoading(true);
       const userLocal = JSON.parse(localStorage.getItem("thongTinUser"));
       if (!userLocal) return;
-      const maND = Number(userLocal.manguoidung);
+      const maND = userLocal.manguoidung;
 
       // Tải đồng bộ các bảng để map thông tin hiển thị lên Card ca dạy
       const [
@@ -67,25 +67,25 @@ const LichDay = () => {
       const listChiTietYeuCau = Array.isArray(resChiTietYeuCau) ? resChiTietYeuCau : (resChiTietYeuCau?.data || []);
       const listUngTuyen = Array.isArray(resUngTuyen) ? resUngTuyen : (resUngTuyen?.data || []);
 
-      const giasuCuaToi = listGiaSu.find(gs => Number(gs.manguoidung) === maND);
+      const giasuCuaToi = listGiaSu.find(gs => String(gs.manguoidung) === maND);
 
       let danhSachCaDayHoanChinh = [];
 
       if (giasuCuaToi?.magiasu) {
 
         // --- LUỒNG ĐĂNG KÝ LỊCH (Học viên chủ động chọn lịch của tôi) ---
-        const lopCuaToi = listLopHoc.filter(l => Number(l.magiasu) === Number(giasuCuaToi.magiasu));
-        const mangMaLopCuaToi = lopCuaToi.map(l => Number(l.magiasu_monhoc));
-        const dangKyLopCuaToi = listDangKy.filter(dk => mangMaLopCuaToi.includes(Number(dk.magiasu_monhoc)) && Number(dk.trangthai) === 1);
+        const lopCuaToi = listLopHoc.filter(l => String(l.magiasu) === String(giasuCuaToi.magiasu));
+        const mangMaLopCuaToi = lopCuaToi.map(l => String(l.magiasu_monhoc));
+        const dangKyLopCuaToi = listDangKy.filter(dk => mangMaLopCuaToi.includes(String(dk.magiasu_monhoc)) && Number(dk.trangthai) === 1);
 
         dangKyLopCuaToi.forEach(dk => {
-          const lop = lopCuaToi.find(l => Number(l.magiasu_monhoc) === Number(dk.magiasu_monhoc)) || {};
-          const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(lop.mamonhoc));
-          const phuHuynh = listNguoiDung.find(nd => Number(nd.id || nd.manguoidung) === Number(dk.manguoidung)) || {};
+          const lop = lopCuaToi.find(l => String(l.magiasu_monhoc) === String(dk.magiasu_monhoc)) || {};
+          const mon = listMonHoc.find(m => String(m.mamonhoc) === String(lop.mamonhoc));
+          const phuHuynh = listNguoiDung.find(nd => String(nd.id || nd.manguoidung) === String(dk.manguoidung)) || {};
 
-          const mangYCHocVien = listYeuCauHV.filter(yc => Number(yc.madangky) === Number(dk.madangky));
-          const hocVienCuaDon = mangYCHocVien.map(yc => listHocVien.find(hv => Number(hv.mahocvien) === Number(yc.mahocvien))).filter(Boolean);
-          const chiTietKhungGio = listChiTietLich.filter(ct => Number(ct.madangky) === Number(dk.madangky));
+          const mangYCHocVien = listYeuCauHV.filter(yc => String(yc.madangky) === String(dk.madangky));
+          const hocVienCuaDon = mangYCHocVien.map(yc => listHocVien.find(hv => String(hv.mahocvien) === String(yc.mahocvien))).filter(Boolean);
+          const chiTietKhungGio = listChiTietLich.filter(ct => String(ct.madangky) === String(dk.madangky));
 
           chiTietKhungGio.forEach(ct => {
             danhSachCaDayHoanChinh.push({
@@ -104,17 +104,17 @@ const LichDay = () => {
         });
 
         // --- LUỒNG YÊU CẦU TÌM GIA SƯ (Tôi đi ứng tuyển bài viết lớp học khác và đậu) ---
-        const ungTuyenDauCuaToi = listUngTuyen.filter(ut => Number(ut.magiasu) === Number(giasuCuaToi.magiasu) && Number(ut.trangthai) === 1);
+        const ungTuyenDauCuaToi = listUngTuyen.filter(ut => String(ut.magiasu) === String(giasuCuaToi.magiasu) && Number(ut.trangthai) === 1);
 
         ungTuyenDauCuaToi.forEach(ut => {
-          const yc = listYeuCau.find(y => Number(y.mayeucau) === Number(ut.mayeucau) && Number(y.trangthai) === 1);
+          const yc = listYeuCau.find(y => String(y.mayeucau) === String(ut.mayeucau) && Number(y.trangthai) === 1);
           if (yc) {
-            const mon = listMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc));
-            const phuHuynh = listNguoiDung.find(nd => Number(nd.id || nd.manguoidung) === Number(yc.manguoidung)) || {};
+            const mon = listMonHoc.find(m => String(m.mamonhoc) === String(yc.mamonhoc));
+            const phuHuynh = listNguoiDung.find(nd => String(nd.id || nd.manguoidung) === String(yc.manguoidung)) || {};
 
-            const mangYCHocVien = listYeuCauHV.filter(y => Number(y.mayeucau) === Number(yc.mayeucau));
-            const hocVienCuaYeuCau = mangYCHocVien.map(y => listHocVien.find(hv => Number(hv.mahocvien) === Number(y.mahocvien))).filter(Boolean);
-            const chiTietKhungGioYC = listChiTietYeuCau.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau));
+            const mangYCHocVien = listYeuCauHV.filter(y => String(y.mayeucau) === String(yc.mayeucau));
+            const hocVienCuaYeuCau = mangYCHocVien.map(y => listHocVien.find(hv => String(hv.mahocvien) === String(y.mahocvien))).filter(Boolean);
+            const chiTietKhungGioYC = listChiTietYeuCau.filter(ct => String(ct.mayeucau) === String(yc.mayeucau));
 
             chiTietKhungGioYC.forEach(ct => {
               danhSachCaDayHoanChinh.push({

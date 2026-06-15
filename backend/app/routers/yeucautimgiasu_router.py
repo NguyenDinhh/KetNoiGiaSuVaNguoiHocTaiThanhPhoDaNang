@@ -20,7 +20,7 @@ async def get_danhsachyeucautimgiasu(db: Session = Depends(get_db)):
     return DataResponse.success_response(yeucaus)
 
 @yeucautimgiasu_router.get("/yeucautimgiasu/{id}", tags=["yeucautimgiasu"], description="Lấy 1 yêu cầu tìm gia sư", response_model=DataResponse[YeuCauTimGiaSu_Schema])
-async def get_yeucautimgiasu(id: int, db: Session = Depends(get_db)):
+async def get_yeucautimgiasu(id: str, db: Session = Depends(get_db)):
     yeucau = db.query(YeuCauTimGiaSu).filter(YeuCauTimGiaSu.mayeucau == id).first()
     if not yeucau:
         return DataResponse.custom_response(code="404", message="Không tìm thấy yêu cầu", data=None)
@@ -28,17 +28,37 @@ async def get_yeucautimgiasu(id: int, db: Session = Depends(get_db)):
 
 @yeucautimgiasu_router.post("/themyeucautimgiasu", tags=["yeucautimgiasu"], description="Tạo yêu cầu tìm gia sư", response_model=DataResponse[YeuCauTimGiaSu_Schema])
 async def create_yeucautimgiasu(data: Create_YeuCauTimGiaSu_Schema, db: Session = Depends(get_db)):
-    yeucau = YeuCauTimGiaSu(**data.model_dump())
     try:
+        print(f"DEBUG: Nhận request thêm yêu cầu - manguoidung: {data.manguoidung}")
+        
+        yeucau = YeuCauTimGiaSu(mayeucau="", **data.model_dump())
+        print(f"DEBUG: Tạo object YeuCauTimGiaSu thành công")
+        
         db.add(yeucau)
+        print(f"DEBUG: Đã add vào session")
+        
         db.commit()
-        db.refresh(yeucau)
-        return DataResponse.success_response(yeucau)
-    except:
-        return DataResponse.custom_response(code="400", message="Lỗi", data=None)
+        print(f"DEBUG: Commit thành công")
+        
+        yeucau_da_tao = db.query(YeuCauTimGiaSu).filter(
+            YeuCauTimGiaSu.manguoidung == data.manguoidung
+        ).order_by(YeuCauTimGiaSu.mayeucau.desc()).first()
+        print(f"DEBUG: Query lại - tìm thấy: {yeucau_da_tao.mayeucau if yeucau_da_tao else 'None'}")
+        
+        if not yeucau_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm thành công nhưng lỗi truy xuất dữ liệu!", data=None)
+        
+        print(f"DEBUG: Trả về response thành công")
+        return DataResponse.success_response(yeucau_da_tao)
+    except Exception as e:
+        db.rollback()
+        print(f"LỖI thêm yêu cầu: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        return DataResponse.custom_response(code="500", message=f"Lỗi: {str(e)}", data=None)
 
 @yeucautimgiasu_router.put("/suayeucautimgiasu/{id}", tags=["yeucautimgiasu"], description="Sửa yêu cầu tìm gia sư", response_model=DataResponse[YeuCauTimGiaSu_Schema])
-async def update_yeucautimgiasu(id: int, data: Create_YeuCauTimGiaSu_Schema, db: Session = Depends(get_db)):
+async def update_yeucautimgiasu(id: str, data: Create_YeuCauTimGiaSu_Schema, db: Session = Depends(get_db)):
     yeucau = db.query(YeuCauTimGiaSu).filter(YeuCauTimGiaSu.mayeucau == id).first()
     if not yeucau:
         return DataResponse.custom_response(code="404", message="Không tìm thấy yêu cầu", data=None)
@@ -46,11 +66,10 @@ async def update_yeucautimgiasu(id: int, data: Create_YeuCauTimGiaSu_Schema, db:
     for key, value in update_data.items():
         setattr(yeucau, key, value)
     db.commit()
-    db.refresh(yeucau)
     return DataResponse.success_response(yeucau)
 
 @yeucautimgiasu_router.patch("/capnhattrangthaiyeucau/{id}", tags=["yeucautimgiasu"], description="Cập nhật nhanh trạng thái yêu cầu", response_model=DataResponse[YeuCauTimGiaSu_Schema])
-async def update_trangthai_yeucautimgiasu(id: int, data: Update_TrangThai_YeuCau_Schema, db: Session = Depends(get_db)):
+async def update_trangthai_yeucautimgiasu(id: str, data: Update_TrangThai_YeuCau_Schema, db: Session = Depends(get_db)):
     yeucau = db.query(YeuCauTimGiaSu).filter(YeuCauTimGiaSu.mayeucau == id).first()
 
     if not yeucau:
@@ -58,12 +77,10 @@ async def update_trangthai_yeucautimgiasu(id: int, data: Update_TrangThai_YeuCau
 
     yeucau.trangthai = data.trangthai
     db.commit()
-    db.refresh(yeucau)
-
     return DataResponse.success_response(yeucau)
 
 @yeucautimgiasu_router.delete("/xoayeucautimgiasu/{id}", tags=["yeucautimgiasu"], description="Xóa yêu cầu tìm gia sư (và các ứng tuyển bị từ chối)")
-async def delete_yeucautimgiasu(id: int, db: Session = Depends(get_db)):
+async def delete_yeucautimgiasu(id: str, db: Session = Depends(get_db)):
     yeucau = db.query(YeuCauTimGiaSu).filter(YeuCauTimGiaSu.mayeucau == id).first()
     if not yeucau:
         return DataResponse.custom_response(

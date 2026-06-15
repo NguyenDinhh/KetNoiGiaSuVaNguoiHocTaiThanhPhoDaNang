@@ -1,12 +1,12 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, DateTime, text
 from sqlalchemy.sql import func
 from app.models.base_model import Base
 
 class GiaSu(Base):
     __tablename__ = "GIASU"
 
-    magiasu = Column(Integer, primary_key=True, autoincrement=True)
-    manguoidung = Column(Integer, ForeignKey("NGUOIDUNG.manguoidung", ondelete="CASCADE"), nullable=False, unique=True)
+    magiasu = Column(String(10), primary_key=True, server_default=text("''"))
+    manguoidung = Column(String(10), ForeignKey("NGUOIDUNG.manguoidung", ondelete="CASCADE"), nullable=False, unique=True)
     cccdmattruoc = Column(String(255), nullable=False)
     cccdmatsau = Column(String(255), nullable=False)
     namsinh = Column(Integer)

@@ -147,7 +147,7 @@ const BaiDangTimGiaSu = () => {
           const nhungNguoiThamGia = listYCHV.filter(y => y.mayeucau === yc.mayeucau);
           const thongTinHocVien = nhungNguoiThamGia.map(y => listHV.find(h => h.mahocvien === y.mahocvien)).filter(Boolean);
 
-          const nguoiHoc = listNguoiDung.find(nd => Number(nd.id) === Number(yc.manguoidung)) || {};
+          const nguoiHoc = listNguoiDung.find(nd => String(nd.id) === String(yc.manguoidung)) || {};
           const danhGiaCuaDon = listDanhGia.find(dg => dg.mayeucau === yc.mayeucau);
 
           const soLuongUngTuyen = listTatCaUngTuyen.filter(ut => ut.mayeucau === yc.mayeucau).length;
@@ -188,8 +188,10 @@ const BaiDangTimGiaSu = () => {
     if (window.confirm(`Bạn muốn ứng tuyển dạy lớp [${tenMonHoc}]?\nHồ sơ của bạn sẽ được gửi đến người học để chờ duyệt.`)) {
       try {
         const payloadUngTuyen = {
-          mayeucau: mayeucau,
-          magiasu: maGiaSuHienTai
+          mayeucau: String(mayeucau),
+          magiasu: String(maGiaSuHienTai),
+          trangthai: 0,
+          lydotuchoi: "" 
         };
 
         await GiaSu_UngTuyen_Service.themUngTuyenMoi(payloadUngTuyen);
@@ -433,19 +435,19 @@ const BaiDangTimGiaSu = () => {
   };
 
   const monHocDropdown = boLocHeLop
-    ? danhSachMonHoc.filter(m => m.mahelop === Number(boLocHeLop))
+    ? danhSachMonHoc.filter(m => m.mahelop === String(boLocHeLop))
     : danhSachMonHoc;
 
-  // Lọc danh sách cho Tab 1 (Tìm Lớp Mới)
   const listTimLopMoi = danhSachBaiDang.filter(bai => {
     if (danhSachDaUngTuyen[bai.mayeucau] !== undefined) return false;
     if (bai.trangthai !== 0) return false;
 
-    if (boLocKhuVuc && bai.makhuvuc !== Number(boLocKhuVuc)) return false;
-    if (boLocHeLop && bai.mahelop !== Number(boLocHeLop)) return false;
-    if (boLocMonHoc && bai.mamonhoc !== Number(boLocMonHoc)) return false;
+    // SỬA: Ép kiểu tất cả về String trước khi so sánh
+    if (boLocKhuVuc && String(bai.makhuvuc) !== String(boLocKhuVuc)) return false;
+    if (boLocHeLop && String(bai.mahelop) !== String(boLocHeLop)) return false;
+    if (boLocMonHoc && String(bai.mamonhoc) !== String(boLocMonHoc)) return false;
 
-    // 🟢 LỌC THEO HỌC PHÍ - Khoảng từ min đến max
+    // Học phí vẫn là số, giữ nguyên logic cũ
     const hocPhi = Number(bai.tonghocphi) || 0;
     if (boLocHocPhiMin && hocPhi < Number(boLocHocPhiMin)) return false;
     if (boLocHocPhiMax && hocPhi > Number(boLocHocPhiMax)) return false;
@@ -555,7 +557,7 @@ const BaiDangTimGiaSu = () => {
 
           {listTimLopMoi.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', background: '#fff', borderRadius: '12px' }}>
-              Không tìm thấy bài đăng nào phù hợp với bộ lọc.
+              Không có yêu cầu phù hợp.
             </div>
           ) : (
             <div className="baidang-grid">

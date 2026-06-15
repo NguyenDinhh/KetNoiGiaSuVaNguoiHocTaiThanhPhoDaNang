@@ -2,9 +2,9 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class GiaSuBangCap_Schema(BaseModel):
-    mabangcapgiasu: int
-    magiasu: int
-    mabangcap: int
+    mabangcapgiasu: str
+    magiasu: str
+    mabangcap: str
     chuyennganh: str
     namtotnghiep: int
     cosodaotao: str
@@ -15,8 +15,8 @@ class GiaSuBangCap_Schema(BaseModel):
         from_attributes = True
 
 class Create_GiaSuBangCap_Schema(BaseModel):
-    magiasu: int
-    mabangcap: int
+    magiasu: str
+    mabangcap: str
     chuyennganh: str
     namtotnghiep: int
     cosodaotao: str
@@ -24,8 +24,8 @@ class Create_GiaSuBangCap_Schema(BaseModel):
     trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
 
 class Update_GiaSuBangCap_Schema(BaseModel):
-    magiasu: int
-    mabangcap: int
+    magiasu: str
+    mabangcap: str
     chuyennganh: str
     namtotnghiep: int
     cosodaotao: str

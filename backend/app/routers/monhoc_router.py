@@ -14,14 +14,14 @@ async def get_danhsachmonhoc(db: Session = Depends(get_db)):
     return DataResponse.success_response(monhocs)
 
 @monhoc_router.get("/monhoc/{id}", tags=["monhoc"], description="Lấy 1 môn học", response_model=DataResponse[MonHoc_Schema])
-async def get_monhoc(id: int, db: Session = Depends(get_db)):
+async def get_monhoc(id: str, db: Session = Depends(get_db)):
     monhoc = db.query(MonHoc).filter(MonHoc.mamonhoc == id).first()
     if not monhoc:
         return DataResponse.custom_response(code="404", message="Không tìm thấy môn học", data=None)
     return DataResponse.success_response(monhoc)
 
 @monhoc_router.get("/monhoc/theolop/{mahelop}", tags=["monhoc"], description="Lấy danh sách môn học theo mã hệ lớp", response_model=DataResponse[List[MonHoc_Schema]])
-async def lay_mon_hoc_theo_lop(mahelop: int, db: Session = Depends(get_db)):
+async def lay_mon_hoc_theo_lop(mahelop: str, db: Session = Depends(get_db)):
     try:
         # Tìm tất cả môn học có mahelop khớp với tham số truyền vào
         danh_sach = db.query(MonHoc).filter(MonHoc.mahelop == mahelop).all()
@@ -32,17 +32,20 @@ async def lay_mon_hoc_theo_lop(mahelop: int, db: Session = Depends(get_db)):
 
 @monhoc_router.post("/themmonhoc", tags=["monhoc"], description="Thêm môn học mới", response_model=DataResponse[MonHoc_Schema])
 async def create_monhoc(data: Create_MonHoc_Schema, db: Session = Depends(get_db)):
-    monhoc = MonHoc(**data.model_dump())
     try:
+        monhoc = MonHoc(mamonhoc="", **data.model_dump())
         db.add(monhoc)
         db.commit()
-        db.refresh(monhoc)
-        return DataResponse.success_response(monhoc)
-    except:
-        return DataResponse.custom_response(code="400", message="Lỗi", data=None)
+        
+        monhoc_moi = db.query(MonHoc).order_by(MonHoc.mamonhoc.desc()).first()
+        return DataResponse.success_response(monhoc_moi)
+    except Exception as e:
+        db.rollback()
+        print(f"Lỗi thêm môn học: {str(e)}")
+        return DataResponse.custom_response(code="500", message="Thêm môn học thất bại", data=None)
 
 @monhoc_router.put("/suamonhoc/{id}", tags=["monhoc"], description="Sửa thông tin môn học", response_model=DataResponse[MonHoc_Schema])
-async def update_monhoc(id: int, data: Create_MonHoc_Schema, db: Session = Depends(get_db)):
+async def update_monhoc(id: str, data: Create_MonHoc_Schema, db: Session = Depends(get_db)):
     monhoc = db.query(MonHoc).filter(MonHoc.mamonhoc == id).first()
     if not monhoc:
         return DataResponse.custom_response(code="404", message="Không tìm thấy môn học", data=None)
@@ -50,11 +53,10 @@ async def update_monhoc(id: int, data: Create_MonHoc_Schema, db: Session = Depen
     for key, value in update_data.items():
         setattr(monhoc, key, value)
     db.commit()
-    db.refresh(monhoc)
     return DataResponse.success_response(monhoc)
 
 @monhoc_router.delete("/xoamonhoc/{id}", tags=["monhoc"], description="Xóa môn học", response_model=DataResponse[MonHoc_Schema])
-async def delete_monhoc(id: int, db: Session = Depends(get_db)):
+async def delete_monhoc(id: str, db: Session = Depends(get_db)):
     monhoc = db.query(MonHoc).filter(MonHoc.mamonhoc == id).first()
     if not monhoc:
         return DataResponse.custom_response(code="404", message="Không tìm thấy môn học", data=None)

@@ -70,7 +70,7 @@ const QuanLyYeuCau = () => {
       navigate('/');
       return;
     }
-    const maND = Number(userLocal.manguoidung);
+    const maND = userLocal.manguoidung;
 
     const loadDuLieu = async () => {
       try {
@@ -110,10 +110,10 @@ const QuanLyYeuCau = () => {
         setDanhSachMonHoc(listMonHoc);
         setDanhSachKhuVuc(listKhuVuc);
         setDanhSachHeLop(listHeLop);
-        setDanhSachHocVienCuaToi(listHocVien.filter(hv => Number(hv.manguoidung) === maND));
+        setDanhSachHocVienCuaToi(listHocVien.filter(hv => String(hv.manguoidung) === maND));
 
         const thongTinChiTietGiaSu = listGiaSu.map(gs => {
-          const nd = listNguoiDung.find(n => Number(n.id || n.manguoidung) === Number(gs.manguoidung)) || {};
+          const nd = listNguoiDung.find(n => String(n.id || n.manguoidung) === String(gs.manguoidung)) || {};
           return {
             magiasu: gs.magiasu,
             hoten: nd.name || nd.hoten || 'Chưa cập nhật',
@@ -123,15 +123,15 @@ const QuanLyYeuCau = () => {
         });
         setDanhSachGiaSuFull(thongTinChiTietGiaSu);
 
-        const yeuCauCuaToi = listYeuCau.filter(yc => Number(yc.manguoidung) === maND);
+        const yeuCauCuaToi = listYeuCau.filter(yc => String(yc.manguoidung) === maND);
         const duLieuHoanChinh = yeuCauCuaToi.map(yc => {
-          const monHoc = listMonHoc.find(m => Number(m.mamonhoc) === Number(yc.mamonhoc));
-          const khuVuc = listKhuVuc.find(k => Number(k.makhuvuc) === Number(yc.makhuvuc));
-          const danhSachUngTuyenCuaLopNay = listTatCaUngTuyen.filter(ut => Number(ut.mayeucau) === Number(yc.mayeucau));
-          const mangYCHV_CuaLop = listYCHV.filter(y => Number(y.mayeucau) === Number(yc.mayeucau));
-          const danhSachHocVienCuaLop = mangYCHV_CuaLop.map(y => listHocVien.find(h => Number(h.mahocvien) === Number(y.mahocvien))).filter(Boolean);
-          const đánhGiáĐãCó = listDanhGia.find(dg => Number(dg.mayeucau) === Number(yc.mayeucau));
-          const danhSachKhungGio = listChiTietYC.filter(ct => Number(ct.mayeucau) === Number(yc.mayeucau)); // BỔ SUNG: Lọc khung giờ thuộc yêu cầu này
+          const monHoc = listMonHoc.find(m => String(m.mamonhoc) === String(yc.mamonhoc));
+          const khuVuc = listKhuVuc.find(k => String(k.makhuvuc) === String(yc.makhuvuc));
+          const danhSachUngTuyenCuaLopNay = listTatCaUngTuyen.filter(ut => String(ut.mayeucau) === String(yc.mayeucau));
+          const mangYCHV_CuaLop = listYCHV.filter(y => String(y.mayeucau) === String(yc.mayeucau));
+          const danhSachHocVienCuaLop = mangYCHV_CuaLop.map(y => listHocVien.find(h => String(h.mahocvien) === String(y.mahocvien))).filter(Boolean);
+          const đánhGiáĐãCó = listDanhGia.find(dg => String(dg.mayeucau) === String(yc.mayeucau));
+          const danhSachKhungGio = listChiTietYC.filter(ct => String(ct.mayeucau) === String(yc.mayeucau)); // BỔ SUNG: Lọc khung giờ thuộc yêu cầu này
 
           return {
             ...yc,
@@ -181,7 +181,7 @@ const QuanLyYeuCau = () => {
     
     try {
       const payload = {
-        mayeucau: Number(formSua.mayeucau),
+        mayeucau: formSua.mayeucau,
         ngayhoc: String(khungGioMoi.ngayhoc),
         thoigianbatdau: khungGioMoi.thoigianbatdau,
         thoigianketthuc: khungGioMoi.thoigianketthuc,
@@ -209,7 +209,7 @@ const QuanLyYeuCau = () => {
 
       await GiaSu_UngTuyen_Service.capNhatTrangThaiUngTuyen(maUngTuyen, { ...ungTuyenDuocChon, trangthai: 1 });
 
-      const cacGiaSuKhac = yeuCauHienTai.danhSachUngTuyen.filter(ut => Number(ut.magiasu_ungtuyen || ut.id) !== Number(maUngTuyen) && Number(ut.trangthai) === 0);
+      const cacGiaSuKhac = yeuCauHienTai.danhSachUngTuyen.filter(ut => String(ut.magiasu_ungtuyen || ut.id) !== String(maUngTuyen) && Number(ut.trangthai) === 0);
       for (const utKhac of cacGiaSuKhac) {
         await GiaSu_UngTuyen_Service.capNhatTrangThaiUngTuyen(utKhac.magiasu_ungtuyen || utKhac.id, { ...utKhac, trangthai: 2 });
       }
@@ -258,9 +258,9 @@ const QuanLyYeuCau = () => {
     e.preventDefault();
     try {
       const payloadYeuCau = {
-        manguoidung: Number(formSua.manguoidung),
-        makhuvuc: Number(formSua.makhuvuc),
-        mamonhoc: Number(formSua.mamonhoc),
+        manguoidung: formSua.manguoidung,
+        makhuvuc: formSua.makhuvuc,
+        mamonhoc: formSua.mamonhoc,
         ngaybatdauhoc: formSua.ngaybatdauhoc,
         sobuoihoc: Number(formSua.sobuoihoc),
         tonghocphi: Number(formSua.tonghocphi),
@@ -308,24 +308,36 @@ const QuanLyYeuCau = () => {
     e.preventDefault();
     try {
       const payloadDanhGia = {
-        mayeucau: Number(reviewData.mayeucau),
+        mayeucau: String(reviewData.mayeucau),
         madangky: null,
         sodiem: parseFloat(reviewData.sosao),
         noidung: String(reviewData.nhanxet)
       };
 
+      console.log("DEBUG: Gửi đánh giá với payload:", payloadDanhGia);
+
       if (reviewData.madanhgia) {
-        await DanhGia_Service.capNhatDanhGia(reviewData.madanhgia, payloadDanhGia);
+        const result = await DanhGia_Service.capNhatDanhGia(reviewData.madanhgia, payloadDanhGia);
+        console.log("DEBUG: Kết quả cập nhật đánh giá:", result);
+        
+        const resultCapNhat = await YeuCauTimGiaSu_Service.capNhatTrangThaiYeuCau(String(reviewData.mayeucau), 2);
+        console.log("DEBUG: Đảm bảo trạng thái yêu cầu = 2:", resultCapNhat);
+        
         alert("🎉 Đã cập nhật đánh giá thành công!");
       } else {
-        await DanhGia_Service.themDanhGiaMoi(payloadDanhGia);
-        await YeuCauTimGiaSu_Service.capNhatTrangThaiYeuCau(reviewData.mayeucau, 2);
+        const resultDanhGia = await DanhGia_Service.themDanhGiaMoi(payloadDanhGia);
+        console.log("DEBUG: Kết quả thêm đánh giá:", resultDanhGia);
+        
+        const resultCapNhat = await YeuCauTimGiaSu_Service.capNhatTrangThaiYeuCau(String(reviewData.mayeucau), 2);
+        console.log("DEBUG: Kết quả cập nhật trạng thái yêu cầu:", resultCapNhat);
+        
         alert("🎉 Đã hoàn thành khóa học và ghi nhận đánh giá Gia sư!");
       }
 
       setIsReviewOpen(false);
       window.location.reload();
     } catch (error) {
+      console.error("LỖI khi xử lý đánh giá:", error);
       alert(`Đã xảy ra lỗi: ${error.message || "Không thể thực hiện đánh giá"}`);
     }
   };
@@ -347,7 +359,7 @@ const QuanLyYeuCau = () => {
     try {
       const userLocal = JSON.parse(localStorage.getItem("thongTinUser"));
       const payloadYeuCau = {
-        manguoidung: Number(userLocal.manguoidung), makhuvuc: Number(formData.makhuvuc), mamonhoc: Number(formData.mamonhoc),
+        manguoidung: userLocal.manguoidung, makhuvuc: formData.makhuvuc, mamonhoc: formData.mamonhoc,
         ngaybatdauhoc: formData.ngaybatdauhoc, sobuoihoc: Number(formData.sobuoihoc), tonghocphi: Number(formData.tonghocphi),
         trangthai: 0
       };
@@ -359,13 +371,13 @@ const QuanLyYeuCau = () => {
 
       for (const kg of khungGioList) {
         await ChiTietYeuCau_Service.themChiTietYeuCauMoi({
-          mayeucau: Number(newMaYeuCau), ngayhoc: String(kg.ngayhoc),
+          mayeucau: newMaYeuCau, ngayhoc: String(kg.ngayhoc),
           thoigianbatdau: kg.thoigianbatdau, thoigianketthuc: kg.thoigianketthuc, ghichu: String(kg.ghichu || "")
         });
       }
 
       for (const mahocvien of selectedStudents) {
-        await YeuCau_HocVien_Service.themYeuCauHocVienMoi({ mayeucau: Number(newMaYeuCau), mahocvien: Number(mahocvien) });
+        await YeuCau_HocVien_Service.themYeuCauHocVienMoi({ mayeucau: newMaYeuCau, mahocvien: mahocvien });
       }
 
       alert("🎉 Đã tạo yêu cầu tìm Gia sư thành công!");
@@ -382,11 +394,11 @@ const QuanLyYeuCau = () => {
     if (m.trangthai !== 1) return false;
     
     // Kiểm tra hệ lớp của môn học có hoạt động không
-    const heLop = danhSachHeLop.find(hl => hl.mahelop === Number(m.mahelop));
+    const heLop = danhSachHeLop.find(hl => hl.mahelop === String(m.mahelop));
     if (!heLop || heLop.trangthai !== 1) return false;
     
     // Nếu có bộ lọc hệ lớp, chỉ lấy môn học thuộc hệ lớp đó
-    if (boLocHeLop && Number(m.mahelop) !== Number(boLocHeLop)) return false;
+    if (boLocHeLop && String(m.mahelop) !== String(boLocHeLop)) return false;
     
     return true;
   });
@@ -495,7 +507,7 @@ const QuanLyYeuCau = () => {
           <div className="ql-applicants-area" style={{ marginTop: '16px' }}>
             <div style={{fontWeight: '700', color: '#334155', marginBottom: '12px'}}>Danh sách Gia sư ứng tuyển ({yc.danhSachUngTuyen.length}):</div>
             {yc.danhSachUngTuyen.map(ut => {
-              const infoGS = danhSachGiaSuFull.find(g => Number(g.magiasu) === Number(ut.magiasu)) || {};
+              const infoGS = danhSachGiaSuFull.find(g => String(g.magiasu) === String(ut.magiasu)) || {};
               return (
                 <div className="ql-applicant-card" key={ut.magiasu_ungtuyen}>
                   <div className="ql-tutor-info">

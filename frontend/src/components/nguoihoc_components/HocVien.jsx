@@ -33,11 +33,8 @@ const HocVien = () => {
       const data = await HocVien_Service.layDanhSachHocVien();
       const tatCaHocVien = Array.isArray(data) ? data : [];
 
-      // LỌC CHỈ LẤY:
-      // Học viên thuộc về tài khoản này (manguoidung)
-      // Hiển thị cả học viên hoạt động và bị khóa
       const hocVienCuaToi = tatCaHocVien.filter(hv =>
-        Number(hv.manguoidung) === Number(currentUserId)
+        String(hv.manguoidung) === String(currentUserId)
       );
 
       setDanhSachHocVien(hocVienCuaToi);
@@ -91,7 +88,7 @@ const HocVien = () => {
       if (editingHocVien) {
         // LUỒNG CẬP NHẬT (SỬA)
         const payloadSua = {
-          manguoidung: Number(currentUserId),
+          manguoidung: currentUserId,
           tenhocvien: formInput.tenhocvien,
           namsinh: Number(formInput.namsinh),
           hocluc: formInput.hocluc,
@@ -109,14 +106,16 @@ const HocVien = () => {
         }
 
         const payloadThem = {
-          manguoidung: Number(currentUserId),
+          manguoidung: currentUserId,
           tenhocvien: formInput.tenhocvien,
           namsinh: Number(formInput.namsinh),
           hocluc: formInput.hocluc,
           diachi: formInput.diachi,
           ghichu: formInput.ghichu
         };
-        await HocVien_Service.themHocVienMoi(payloadThem);
+        console.log("Payload gửi đi:", payloadThem);
+        const response = await HocVien_Service.themHocVienMoi(payloadThem);
+        console.log("Response nhận về:", response);
         alert("Thêm học viên mới thành công!");
       }
       setIsModalOpen(false);

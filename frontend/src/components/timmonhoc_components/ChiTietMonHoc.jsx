@@ -37,7 +37,7 @@ const ChiTietMonHoc = ({ item, onClose }) => {
 
         // Lọc các khung giờ khớp với mã gia sư môn học và đang hoạt động
         const khungGioHopLe = mangKhungGio.filter(
-          kg => Number(kg.magiasu_monhoc) === Number(item.magiasu_monhoc) && Number(kg.trangthai) === 1
+          kg => String(kg.magiasu_monhoc) === String(item.magiasu_monhoc) && Number(kg.trangthai) === 1
         );
 
         setDanhSachKhungGio(khungGioHopLe);

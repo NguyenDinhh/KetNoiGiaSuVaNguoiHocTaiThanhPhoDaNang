@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
 class GiaSuMonHoc_Schema(BaseModel):
-    magiasu_monhoc: int
-    magiasu: int
-    mamonhoc: int
-    makhuvuc: int
+    magiasu_monhoc: str
+    magiasu: str
+    mamonhoc: str
+    makhuvuc: str
     hocphimoibuoi: int
     thoiluonghoc: int
     sobuoihoc: int
@@ -14,9 +14,9 @@ class GiaSuMonHoc_Schema(BaseModel):
         from_attributes = True
 
 class Create_GiaSuMonHoc_Schema(BaseModel):
-    magiasu: int
-    mamonhoc: int
-    makhuvuc: int
+    magiasu: str
+    mamonhoc: str
+    makhuvuc: str
     hocphimoibuoi: int
     thoiluonghoc: int
     sobuoihoc: int

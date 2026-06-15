@@ -14,7 +14,7 @@ async def get_danhsachchitietdangkylich(db: Session = Depends(get_db)):
     return DataResponse.success_response(chitietdangkylichs)
 
 @chitietdangkylich_router.get("/chitietdangkylich/{id}", tags=["chitietdangkylich"], description="Lấy 1 chi tiết đăng ký lịch", response_model=DataResponse[ChiTietDangKyLich_Schema])
-async def get_chitietdangkylich(id: int, db: Session = Depends(get_db)):
+async def get_chitietdangkylich(id: str, db: Session = Depends(get_db)):
     chitiet = db.query(ChiTietDangKyLich).filter(ChiTietDangKyLich.machitietdangky == id).first()
     if not chitiet:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)
@@ -23,18 +23,28 @@ async def get_chitietdangkylich(id: int, db: Session = Depends(get_db)):
 @chitietdangkylich_router.post("/themchitietdangkylich", tags=["chitietdangkylich"], description="Thêm chi tiết đăng ký lịch", response_model=DataResponse[ChiTietDangKyLich_Schema])
 async def create_chitietdangkylich(data: Create_ChiTietDangKyLich_Schema, db: Session = Depends(get_db)):
     try:
-        chitiet = ChiTietDangKyLich(**data.model_dump())
+        chitiet = ChiTietDangKyLich(machitietdangky="", **data.model_dump())
         db.add(chitiet)
         db.commit()
-        db.refresh(chitiet)
-        return DataResponse.success_response(chitiet)
+        
+        chitiet_da_tao = db.query(ChiTietDangKyLich).filter(
+            ChiTietDangKyLich.madangky == data.madangky,
+            ChiTietDangKyLich.mamonhoc == data.mamonhoc
+        ).order_by(ChiTietDangKyLich.machitietdangky.desc()).first()
+        
+        if not chitiet_da_tao:
+            return DataResponse.custom_response(code="500", message="Không tìm thấy chi tiết vừa tạo", data=None)
+        
+        return DataResponse.success_response(chitiet_da_tao)
     except Exception as e:
-        db.rollback() # 🟢 Bắt buộc rollback để chống treo DB
-        print("❌ LỖI DATABASE KHI THÊM CHI TIẾT:", e) # 🟢 In lỗi ra Terminal
+        db.rollback()
+        print(f"LỖI: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
         return DataResponse.custom_response(code="400", message=str(e), data=None)
 
 @chitietdangkylich_router.put("/suachitietdangkylich/{id}", tags=["chitietdangkylich"], description="Sửa chi tiết đăng ký lịch", response_model=DataResponse[ChiTietDangKyLich_Schema])
-async def update_chitietdangkylich(id: int, data: Create_ChiTietDangKyLich_Schema, db: Session = Depends(get_db)):
+async def update_chitietdangkylich(id: str, data: Create_ChiTietDangKyLich_Schema, db: Session = Depends(get_db)):
     try:
         chitiet = db.query(ChiTietDangKyLich).filter(ChiTietDangKyLich.machitietdangky == id).first()
         if not chitiet:
@@ -45,7 +55,6 @@ async def update_chitietdangkylich(id: int, data: Create_ChiTietDangKyLich_Schem
             setattr(chitiet, key, value)
 
         db.commit()
-        db.refresh(chitiet)
         return DataResponse.success_response(chitiet)
     except Exception as e:
         db.rollback()
@@ -53,7 +62,7 @@ async def update_chitietdangkylich(id: int, data: Create_ChiTietDangKyLich_Schem
         return DataResponse.custom_response(code="400", message=str(e), data=None)
 
 @chitietdangkylich_router.delete("/xoachitietdangkylich/{id}", tags=["chitietdangkylich"], description="Xóa chi tiết đăng ký lịch", response_model=DataResponse[ChiTietDangKyLich_Schema])
-async def delete_chitietdangkylich(id: int, db: Session = Depends(get_db)):
+async def delete_chitietdangkylich(id: str, db: Session = Depends(get_db)):
     chitiet = db.query(ChiTietDangKyLich).filter(ChiTietDangKyLich.machitietdangky == id).first()
     if not chitiet:
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)

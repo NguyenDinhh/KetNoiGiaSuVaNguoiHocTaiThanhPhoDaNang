@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class HeLop_Schema(BaseModel):
-    mahelop: int
+    mahelop: str
     tenhelop: str
     mota: str
     trangthai: int  # 1: Hoạt động, 0: Ngưng áp dụng

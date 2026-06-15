@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, Time, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, String, Time, ForeignKey, CheckConstraint, text
 from app.models.base_model import Base
 
 class ChiTietYeuCau(Base):
     __tablename__ = "CHITIETYEUCAU"
 
-    machitietyeucau = Column(Integer, primary_key=True, autoincrement=True)
-    mayeucau = Column(Integer, ForeignKey("YEUCAUTIMGIASU.mayeucau", ondelete="CASCADE"), nullable=False)
+    machitietyeucau = Column(String(10), primary_key=True, server_default=text("''"))
+    mayeucau = Column(String(10), ForeignKey("YEUCAUTIMGIASU.mayeucau", ondelete="CASCADE"), nullable=False)
     ngayhoc = Column(String(10))
     thoigianbatdau = Column(Time)
     thoigianketthuc = Column(Time)

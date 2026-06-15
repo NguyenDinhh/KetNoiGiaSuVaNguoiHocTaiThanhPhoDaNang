@@ -17,7 +17,7 @@ async def get_danhsachhocvien(db: Session = Depends(get_db)):
     return DataResponse.success_response(hocviens)
 
 @hocvien_router.get("/hocvien/{id}", tags=["hocvien"], description="Lấy 1 học viên", response_model=DataResponse[HocVien_Schema])
-async def get_hocvien(id: int, db: Session = Depends(get_db)):
+async def get_hocvien(id: str, db: Session = Depends(get_db)):
     hocvien = db.query(HocVien).filter(HocVien.mahocvien == id).first()
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)
@@ -25,17 +25,56 @@ async def get_hocvien(id: int, db: Session = Depends(get_db)):
 
 @hocvien_router.post("/themhocvien", tags=["hocvien"], description="Thêm học viên mới", response_model=DataResponse[HocVien_Schema])
 async def create_hocvien(data: Create_HocVien_Schema, db: Session = Depends(get_db)):
-    hocvien = HocVien(**data.model_dump())
     try:
-        db.add(hocvien)
+        print(f"DEBUG: Nhận request thêm học viên - manguoidung: {data.manguoidung}")
+        
+        so_hocvien_active = db.query(HocVien).filter(
+            HocVien.manguoidung == data.manguoidung,
+            HocVien.trangthai == 1
+        ).count()
+        print(f"DEBUG: Số học viên active hiện tại: {so_hocvien_active}")
+        
+        if so_hocvien_active >= 10:
+            print("DEBUG: Đã đạt giới hạn 10 học viên")
+            return DataResponse.custom_response(code="400", message="Đã đạt giới hạn 10 học viên hoạt động!", data=None)
+        
+        hocvien_moi = HocVien(
+            mahocvien="",
+            manguoidung=data.manguoidung,
+            tenhocvien=data.tenhocvien,
+            namsinh=data.namsinh,
+            hocluc=data.hocluc,
+            diachi=data.diachi,
+            ghichu=data.ghichu,
+            trangthai=1
+        )
+        print(f"DEBUG: Tạo object HocVien thành công")
+        
+        db.add(hocvien_moi)
+        print(f"DEBUG: Đã add vào session")
+        
         db.commit()
-        db.refresh(hocvien)
-        return DataResponse.success_response(hocvien)
-    except:
-        return DataResponse.custom_response(code="400", message="Lỗi", data=None)
+        print(f"DEBUG: Commit thành công")
+        
+        hocvien_da_tao = db.query(HocVien).filter(
+            HocVien.manguoidung == data.manguoidung
+        ).order_by(HocVien.mahocvien.desc()).first()
+        print(f"DEBUG: Query lại - tìm thấy: {hocvien_da_tao.mahocvien if hocvien_da_tao else 'None'}")
+        
+        if not hocvien_da_tao:
+            return DataResponse.custom_response(code="500", message="Thêm học viên thành công nhưng lỗi truy xuất dữ liệu!", data=None)
+        
+        print(f"DEBUG: Trả về response thành công")
+        return DataResponse.success_response(hocvien_da_tao)
+    except Exception as e:
+        db.rollback()
+        print(f"LỖI thêm học viên: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        return DataResponse.custom_response(code="500", message=f"Lỗi: {str(e)}", data=None)
 
 @hocvien_router.put("/suahocvien/{id}", tags=["hocvien"], description="Sửa thông tin học viên", response_model=DataResponse[HocVien_Schema])
-async def update_hocvien(id: int, data: Update_HocVien_Schema, db: Session = Depends(get_db)):
+async def update_hocvien(id: str, data: Update_HocVien_Schema, db: Session = Depends(get_db)):
     hocvien = db.query(HocVien).filter(HocVien.mahocvien == id).first()
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)
@@ -47,7 +86,7 @@ async def update_hocvien(id: int, data: Update_HocVien_Schema, db: Session = Dep
     return DataResponse.success_response(hocvien)
 
 @hocvien_router.delete("/xoahocvien/{id}", tags=["hocvien"], description="Xóa học viên", response_model=DataResponse[HocVien_Schema])
-async def delete_hocvien(id: int, db: Session = Depends(get_db)):
+async def delete_hocvien(id: str, db: Session = Depends(get_db)):
     hocvien = db.query(HocVien).filter(HocVien.mahocvien == id).first()
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)
@@ -56,7 +95,7 @@ async def delete_hocvien(id: int, db: Session = Depends(get_db)):
     return DataResponse.custom_response(code="200", message="Xóa thành công", data=hocvien)
 
 @hocvien_router.put("/khoahocvien/{id}", tags=["hocvien"], description="Khóa học viên (trangthai = 0)", response_model=DataResponse[HocVien_Schema])
-async def khoa_hocvien(id: int, db: Session = Depends(get_db)):
+async def khoa_hocvien(id: str, db: Session = Depends(get_db)):
     hocvien = db.query(HocVien).filter(HocVien.mahocvien == id).first()
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)
@@ -94,7 +133,7 @@ async def khoa_hocvien(id: int, db: Session = Depends(get_db)):
     return DataResponse.success_response(hocvien)
 
 @hocvien_router.put("/mokhoahocvien/{id}", tags=["hocvien"], description="Mở khóa học viên (trangthai = 1)", response_model=DataResponse[HocVien_Schema])
-async def mokhoa_hocvien(id: int, db: Session = Depends(get_db)):
+async def mokhoa_hocvien(id: str, db: Session = Depends(get_db)):
     hocvien = db.query(HocVien).filter(HocVien.mahocvien == id).first()
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)

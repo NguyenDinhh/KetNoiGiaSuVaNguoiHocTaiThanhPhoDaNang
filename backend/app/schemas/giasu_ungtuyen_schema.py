@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Optional
 
 class GiaSuUngTuyen_Schema(BaseModel):
-    magiasu_ungtuyen: int
-    mayeucau: int
-    magiasu: int
+    magiasu_ungtuyen: str
+    mayeucau: str
+    magiasu: str
     thoigian_ungtuyen: datetime
     trangthai: int  # 0: Đang chờ, 1: Chấp nhận, 2: Từ chối
     lydotuchoi: Optional[str] = None
@@ -14,12 +14,12 @@ class GiaSuUngTuyen_Schema(BaseModel):
         from_attributes = True
 
 class Create_GiaSuUngTuyen_Schema(BaseModel):
-    mayeucau: int
-    magiasu: int
+    mayeucau: str
+    magiasu: str
 
 class Update_GiaSuUngTuyen_Schema(BaseModel):
-    mayeucau: Optional[int] = None
-    magiasu: Optional[int] = None
+    mayeucau: Optional[str] = None
+    magiasu: Optional[str] = None
     thoigian_ungtuyen: Optional[datetime] = None
     trangthai: Optional[int] = None
     lydotuchoi: Optional[str] = None

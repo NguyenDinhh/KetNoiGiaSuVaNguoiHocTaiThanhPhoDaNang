@@ -125,7 +125,7 @@ const BangCapManagementTable = () => {
     const cacYeuCauThem = danhSachTick.map(mamonhoc => {
       const payload = {
         mabangcap: bangCapDangXem.mabangcap,
-        mamonhoc: parseInt(mamonhoc)
+        mamonhoc: mamonhoc
       };
       return BangCap_MonHoc_Service.ganMonHoc(payload);
     });

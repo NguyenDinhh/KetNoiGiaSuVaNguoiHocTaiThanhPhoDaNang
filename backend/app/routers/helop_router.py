@@ -14,7 +14,7 @@ async def get_danhsachhelop(db: Session = Depends(get_db)):
     return DataResponse.success_response(helops)
 
 @helop_router.get("/helop/{id}", tags=["helop"], description="Lấy 1 hệ lớp", response_model=DataResponse[HeLop_Schema])
-async def get_helop(id: int, db: Session = Depends(get_db)):
+async def get_helop(id: str, db: Session = Depends(get_db)):
     helop = db.query(HeLop).filter(HeLop.mahelop == id).first()
     if not helop:
         return DataResponse.custom_response(code="404", message="Không tìm thấy hệ lớp", data=None)
@@ -22,17 +22,28 @@ async def get_helop(id: int, db: Session = Depends(get_db)):
 
 @helop_router.post("/themhelop", tags=["helop"], description="Thêm hệ lớp mới", response_model=DataResponse[HeLop_Schema])
 async def create_helop(data: Create_HeLop_Schema, db: Session = Depends(get_db)):
-    helop = HeLop(**data.model_dump())
     try:
+        helop = HeLop(mahelop="", **data.model_dump())
         db.add(helop)
         db.commit()
-        db.refresh(helop)
-        return DataResponse.success_response(helop)
-    except:
-        return DataResponse.custom_response(code="400", message="Lỗi", data=None)
+        
+        helop_da_tao = db.query(HeLop).filter(
+            HeLop.tenhelop == data.tenhelop
+        ).order_by(HeLop.mahelop.desc()).first()
+        
+        if not helop_da_tao:
+            return DataResponse.custom_response(code="500", message="Không tìm thấy hệ lớp vừa tạo", data=None)
+        
+        return DataResponse.success_response(helop_da_tao)
+    except Exception as e:
+        db.rollback()
+        print(f"LỖI: {str(e)}")
+        import traceback
+        print(f"TRACEBACK: {traceback.format_exc()}")
+        return DataResponse.custom_response(code="400", message=str(e), data=None)
 
 @helop_router.put("/suahelop/{id}", tags=["helop"], description="Sửa tên hệ lớp", response_model=DataResponse[HeLop_Schema])
-async def update_helop(id: int, data: Create_HeLop_Schema, db: Session = Depends(get_db)):
+async def update_helop(id: str, data: Create_HeLop_Schema, db: Session = Depends(get_db)):
     helop = db.query(HeLop).filter(HeLop.mahelop == id).first()
     if not helop:
         return DataResponse.custom_response(code="404", message="Không tìm thấy hệ lớp", data=None)
@@ -40,11 +51,10 @@ async def update_helop(id: int, data: Create_HeLop_Schema, db: Session = Depends
     for key, value in update_data.items():
         setattr(helop, key, value)
     db.commit()
-    db.refresh(helop)
     return DataResponse.success_response(helop)
 
 @helop_router.delete("/xoahelop/{id}", tags=["helop"], description="Xóa hệ lớp", response_model=DataResponse[HeLop_Schema])
-async def delete_helop(id: int, db: Session = Depends(get_db)):
+async def delete_helop(id: str, db: Session = Depends(get_db)):
     helop = db.query(HeLop).filter(HeLop.mahelop == id).first()
     if not helop:
         return DataResponse.custom_response(code="404", message="Không tìm thấy hệ lớp", data=None)

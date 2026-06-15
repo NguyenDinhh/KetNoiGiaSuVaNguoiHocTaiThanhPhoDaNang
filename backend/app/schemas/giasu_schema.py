@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Optional
 
 class GiaSu_Schema(BaseModel):
-    magiasu: int
-    manguoidung: int
+    magiasu: str
+    manguoidung: str
     cccdmattruoc: Optional[str] = None
     cccdmatsau: Optional[str] = None
     namsinh: Optional[int] = None
@@ -18,7 +18,7 @@ class GiaSu_Schema(BaseModel):
         from_attributes = True
 
 class Create_GiaSu_Schema(BaseModel):
-    manguoidung: int
+    manguoidung: str
     cccdmattruoc: str
     cccdmatsau: str
     namsinh: int
@@ -27,7 +27,7 @@ class Create_GiaSu_Schema(BaseModel):
     trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
 
 class Update_GiaSu_Schema(BaseModel):
-    manguoidung: Optional[int] = None
+    manguoidung: Optional[str] = None
     cccdmattruoc: Optional[str] = None
     cccdmatsau: Optional[str] = None
     namsinh: Optional[int] = None
