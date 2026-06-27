@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/css/NguoiHoc.css';
 
-// ================= CÁC SERVICE CẦN THIẾT =================
 import YeuCauTimGiaSu_Service from '../../services/YeuCauTimGiaSu_Service';
 import ChiTietYeuCau_Service from '../../services/ChiTietYeuCau_Service';
 import YeuCau_HocVien_Service from '../../services/YeuCau_HocVien_Service';
@@ -18,10 +17,10 @@ import DanhGia_Service from '../../services/DanhGia_Service';
 const QuanLyYeuCau = () => {
   const navigate = useNavigate();
 
-  // QUẢN LÝ TAB CHÍNH CỦA TRANG
+  
   const [activeMainTab, setActiveMainTab] = useState('danh_sach');
 
-  // ================= STATE DANH SÁCH YÊU CẦU =================
+  
   const [danhSachYeuCau, setDanhSachYeuCau] = useState([]);
   const [dangTai, setDangTai] = useState(true);
   const [danhSachGiaSuFull, setDanhSachGiaSuFull] = useState([]);
@@ -32,12 +31,12 @@ const QuanLyYeuCau = () => {
   const [formSua, setFormSua] = useState({ mayeucau: '', ngaybatdauhoc: '', sobuoihoc: '', tonghocphi: '', danhSachKhungGio: [] });
   const [khungGioMoi, setKhungGioMoi] = useState({ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' });
 
-  // STATE PHỤC VỤ ĐÁNH GIÁ (SAO & MODAL)
+  
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewData, setReviewData] = useState({ madanhgia: null, mayeucau: null, sosao: 5, nhanxet: '' });
   const [hoveredStar, setHoveredStar] = useState(0);
 
-  // 🟢 STATES QUẢN LÝ THU/PHÓNG (EXPAND/COLLAPSE)
+  
   const [expanded, setExpanded] = useState({
     choDuyet: true,
     dangHoc: true,
@@ -45,7 +44,7 @@ const QuanLyYeuCau = () => {
     tuChoi: false
   });
 
-  // ================= STATE FORM TẠO MỚI YÊU CẦU =================
+  
   const [danhSachKhuVuc, setDanhSachKhuVuc] = useState([]);
   const [danhSachMonHoc, setDanhSachMonHoc] = useState([]);
   const [danhSachHeLop, setDanhSachHeLop] = useState([]);
@@ -57,12 +56,12 @@ const QuanLyYeuCau = () => {
   const [khungGioList, setKhungGioList] = useState([{ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' }]);
   const [selectedStudents, setSelectedStudents] = useState([]);
   
-  // State cho modal từ chối gia sư
+  
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [ungTuyenCanTuChoi, setUngTuyenCanTuChoi] = useState(null);
   const [lyDoTuChoi, setLyDoTuChoi] = useState('');
 
-  // ================= FETCH DỮ LIỆU TỔNG (CHẠY 1 LẦN) =================
+  
   useEffect(() => {
     let isMounted = true;
     const userLocal = JSON.parse(localStorage.getItem("thongTinUser"));
@@ -78,7 +77,7 @@ const QuanLyYeuCau = () => {
           resYeuCau, resMonHoc, resKhuVuc, resHeLop,
           resHocVien, resYCHV, resTatCaUngTuyen,
           resGiaSu, resNguoiDung, resDanhGia,
-          resChiTietYC // BỔ SUNG: Lấy chi tiết yêu cầu (Khung giờ)
+          resChiTietYC 
         ] = await Promise.all([
           YeuCauTimGiaSu_Service.layDanhSachYeuCau().catch(() => []),
           MonHoc_Service.layDanhSachMonHoc().catch(() => []),
@@ -105,7 +104,7 @@ const QuanLyYeuCau = () => {
         const listGiaSu = Array.isArray(resGiaSu) ? resGiaSu : resGiaSu?.data || [];
         const listNguoiDung = Array.isArray(resNguoiDung) ? resNguoiDung : resNguoiDung?.data || [];
         const listDanhGia = Array.isArray(resDanhGia) ? resDanhGia : resDanhGia?.data || [];
-        const listChiTietYC = Array.isArray(resChiTietYC) ? resChiTietYC : resChiTietYC?.data || []; // Mảng chứa các khung giờ
+        const listChiTietYC = Array.isArray(resChiTietYC) ? resChiTietYC : resChiTietYC?.data || []; 
 
         setDanhSachMonHoc(listMonHoc);
         setDanhSachKhuVuc(listKhuVuc);
@@ -131,7 +130,7 @@ const QuanLyYeuCau = () => {
           const mangYCHV_CuaLop = listYCHV.filter(y => String(y.mayeucau) === String(yc.mayeucau));
           const danhSachHocVienCuaLop = mangYCHV_CuaLop.map(y => listHocVien.find(h => String(h.mahocvien) === String(y.mahocvien))).filter(Boolean);
           const đánhGiáĐãCó = listDanhGia.find(dg => String(dg.mayeucau) === String(yc.mayeucau));
-          const danhSachKhungGio = listChiTietYC.filter(ct => String(ct.mayeucau) === String(yc.mayeucau)); // BỔ SUNG: Lọc khung giờ thuộc yêu cầu này
+          const danhSachKhungGio = listChiTietYC.filter(ct => String(ct.mayeucau) === String(yc.mayeucau)); 
 
           return {
             ...yc,
@@ -141,7 +140,7 @@ const QuanLyYeuCau = () => {
             danhGiaCuaToi: đánhGiáĐãCó || null,
             danhSachUngTuyen: danhSachUngTuyenCuaLopNay,
             danhSachHocVien: danhSachHocVienCuaLop,
-            danhSachKhungGio: danhSachKhungGio // Đính kèm mảng khung giờ vào YeuCau
+            danhSachKhungGio: danhSachKhungGio 
           };
         });
 
@@ -157,23 +156,23 @@ const QuanLyYeuCau = () => {
     return () => { isMounted = false; };
   }, [navigate]);
 
-  // ====================================================================
-  // LOGIC HÀNH ĐỘNG: DUYỆT - TỪ CHỐI - XÓA - SỬA
-  // ====================================================================
+  
+  
+  
 
-  // BỔ SUNG: Hàm xử lý xóa Chi Tiết Yêu Cầu (Khung giờ)
+  
   const handleDeleteChiTiet = async (maChiTietYeuCau) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa lịch học này không?")) return;
     try {
       await ChiTietYeuCau_Service.xoaChiTietYeuCau(maChiTietYeuCau);
       alert("Đã xóa khung giờ thành công!");
-      window.location.reload(); // Reload lại để cập nhật danh sách mới nhất
+      window.location.reload(); 
     } catch (error) {
       alert("Xóa khung giờ thất bại!");
     }
   };
 
-  // BỔ SUNG: Hàm thêm khung giờ mới khi đang chỉnh sửa
+  
   const handleThemKhungGioMoi = async () => {
     if (!khungGioMoi.thoigianbatdau || !khungGioMoi.thoigianketthuc) {
       return alert("Vui lòng chọn đầy đủ thời gian bắt đầu và kết thúc!");
@@ -191,10 +190,10 @@ const QuanLyYeuCau = () => {
       await ChiTietYeuCau_Service.themChiTietYeuCauMoi(payload);
       alert("Đã thêm khung giờ mới thành công!");
       
-      // Reset form thêm khung giờ
+      
       setKhungGioMoi({ ngayhoc: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30', ghichu: '' });
       
-      // Reload lại để cập nhật danh sách mới nhất
+      
       window.location.reload();
     } catch (error) {
       alert("Thêm khung giờ thất bại!");
@@ -272,9 +271,9 @@ const QuanLyYeuCau = () => {
     } catch (error) { alert("Lỗi khi lưu thông tin cập nhật."); }
   };
 
-  // ====================================================================
-  // HÀM XÓA YÊU CẦU (Backend sẽ xóa cả ứng tuyển, học viên, khung giờ, đánh giá)
-  // ====================================================================
+  
+  
+  
   const handleDelete = async (mayeucau) => {
     if (!window.confirm("⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA YÊU CẦU NÀY?\n\nHành động này sẽ XÓA VĨNH VIỄN:\n✗ Tất cả ứng tuyển (kể cả bị từ chối)\n✗ Danh sách học viên\n✗ Khung giờ\n✗ Đánh giá (nếu có)")) {
       return;
@@ -291,7 +290,7 @@ const QuanLyYeuCau = () => {
   };
 
   const handleMoDanhGia = (yc) => {
-    if (yc.danhGiaCuaToi) { // Fix lỗi typo từ yc.danhGiaCShadow
+    if (yc.danhGiaCuaToi) { 
       setReviewData({
         madanhgia: yc.danhGiaCuaToi.madanhgia,
         mayeucau: yc.mayeucau,
@@ -385,33 +384,33 @@ const QuanLyYeuCau = () => {
     } catch (error) { alert("Quá trình lưu dữ liệu gặp lỗi."); }
   };
 
-  // Lọc môn học theo:
-  // 1. Hệ lớp được chọn (nếu có)
-  // 2. Môn học có trangthai = 1
-  // 3. Hệ lớp của môn học có trangthai = 1
+  
+  
+  
+  
   const monHocDropdown = danhSachMonHoc.filter(m => {
-    // Kiểm tra môn học có hoạt động không
+    
     if (m.trangthai !== 1) return false;
     
-    // Kiểm tra hệ lớp của môn học có hoạt động không
+    
     const heLop = danhSachHeLop.find(hl => hl.mahelop === String(m.mahelop));
     if (!heLop || heLop.trangthai !== 1) return false;
     
-    // Nếu có bộ lọc hệ lớp, chỉ lấy môn học thuộc hệ lớp đó
+    
     if (boLocHeLop && String(m.mahelop) !== String(boLocHeLop)) return false;
     
     return true;
   });
 
-  // ====================================================================
-  // 🟢 PHÂN LOẠI DANH SÁCH THEO MÃ TRẠNG THÁI (0, 1, 2, 3)
-  // ====================================================================
+  
+  
+  
   const listChoDuyet = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 0);
   const listDangHoc = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 1);
   const listHoanThanh = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 2);
   const listTuChoi = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 3);
 
-  // 🟢 HÀM RENDER KHỐI DANH SÁCH (CÓ THU PHÓNG)
+  
   const renderSection = (title, list, expandedKey, color, icon, canEditDelete = false) => {
     if (list.length === 0) return null;
     const isExpanded = expanded[expandedKey];
@@ -452,13 +451,13 @@ const QuanLyYeuCau = () => {
     if (Number(yc.trangthai) === 2) { statusText = 'Đã hoàn thành'; statusClass = 'completed'; }
     if (Number(yc.trangthai) === 3) { statusText = 'Đã từ chối'; statusClass = 'rejected'; }
 
-    // ✅ LOGIC MỚI: Kiểm tra có ứng tuyển đang chờ không
+    
     const coGiaSuDangCho = yc.danhSachUngTuyen.some(ut => Number(ut.trangthai) === 0);
     const tatCaBiTuChoi = yc.danhSachUngTuyen.length > 0 && yc.danhSachUngTuyen.every(ut => Number(ut.trangthai) === 2);
 
-    // Hiện nút sửa/xóa khi:
-    // - canEditDelete = true (trangthai = 0)
-    // - VÀ (không có ứng tuyển HOẶC tất cả ứng tuyển đều bị từ chối)
+    
+    
+    
     const hienNutSuaXoa = canEditDelete && (!coGiaSuDangCho || tatCaBiTuChoi);
 
     return (
@@ -552,9 +551,9 @@ const QuanLyYeuCau = () => {
         <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Đang tải dữ liệu...</div>
       ) : activeMainTab === 'danh_sach' ? (
 
-        /* ================= TAB 1: DANH SÁCH YÊU CẦU ================= */
+        
         <>
-          {/* KHỐI Ô THỐNG KÊ */}
+          {}
           <div className="nh-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
             <div className="nh-stat-card" style={{ background: '#fff', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '5px solid #f59e0b' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fef3c7', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#d97706' }}><span className="material-symbols-outlined">hourglass_top</span></div>
@@ -587,7 +586,7 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* MODAL ĐÁNH GIÁ */}
+          {}
           {isReviewOpen && (
             <div className="bc-modal-overlay">
               <div className="bc-modal-content" style={{ maxWidth: '420px', textAlign: 'center' }}>
@@ -641,7 +640,7 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* MODAL TỪ CHỐI GIA SƯ */}
+          {}
           {isRejectModalOpen && ungTuyenCanTuChoi && (
             <div className="bc-modal-overlay">
               <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
@@ -712,7 +711,7 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* BỔ SUNG: Modal Xem chi tiết (Hiển thị mảng khung giờ) */}
+          {}
           {isDetailOpen && detailData && (
             <div className="bc-modal-overlay">
               <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
@@ -746,7 +745,7 @@ const QuanLyYeuCau = () => {
             </div>
           )}
 
-          {/* BỔ SUNG: Modal Sửa (Hiển thị mảng khung giờ & nút xóa khung giờ) */}
+          {}
           {isEditOpen && (
             <div className="bc-modal-overlay">
               <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
@@ -763,11 +762,11 @@ const QuanLyYeuCau = () => {
                   </div>
                 </form>
 
-                {/* KHU VỰC QUẢN LÝ LỊCH HỌC TRONG MODAL SỬA */}
+                {}
                 <div style={{ marginTop: '24px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
                   <h4 style={{ marginBottom: '12px', color: '#334155' }}>Quản lý khung giờ (Lịch học)</h4>
                   
-                  {/* DANH SÁCH KHUNG GIỜ HIỆN CÓ */}
+                  {}
                   {formSua.danhSachKhungGio && formSua.danhSachKhungGio.length > 0 ? (
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                       {formSua.danhSachKhungGio.map(kg => (
@@ -791,7 +790,7 @@ const QuanLyYeuCau = () => {
                     <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>Chưa thiết lập khung giờ nào.</p>
                   )}
 
-                  {/* FORM THÊM KHUNG GIỜ MỚI */}
+                  {}
                   <div style={{ marginTop: '16px', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
                     <p style={{ fontWeight: 'bold', color: '#0284c7', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add_circle</span>
@@ -874,7 +873,7 @@ const QuanLyYeuCau = () => {
         </>
       ) : (
 
-        /* ================= TAB 2: BIỂU MẪU TẠO MỚI 3 BƯỚC (GIỮ NGUYÊN) ================= */
+        
         <div className="yctg-container">
           <div className="yctg-header">
             <h1 className="yctg-title">Tạo Yêu Cầu Tìm Gia Sư Mới</h1>
@@ -914,7 +913,7 @@ const QuanLyYeuCau = () => {
                     <div className="yctg-form-group" style={{ flex: 1.5 }}><label className="yctg-form-label">Ngày</label><select className="yctg-form-control" value={kg.ngayhoc} onChange={(e) => { const newList=[...khungGioList]; newList[index].ngayhoc=e.target.value; setKhungGioList(newList); }}>{['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'].map(t => <option key={t} value={t}>{t}</option>)}</select></div>
                     <div className="yctg-form-group"><label className="yctg-form-label">Từ</label><input type="time" className="yctg-form-control" value={kg.thoigianbatdau} onChange={(e) => { const newList=[...khungGioList]; newList[index].thoigianbatdau=e.target.value; setKhungGioList(newList); }} /></div>
                     <div className="yctg-form-group"><label className="yctg-form-label">Đến</label><input type="time" className="yctg-form-control" value={kg.thoigianketthuc} onChange={(e) => { const newList=[...khungGioList]; newList[index].thoigianketthuc=e.target.value; setKhungGioList(newList); }} /></div>
-                    {khungGioList.length > 1 && <button type="button" className="yctg-btn-remove" onClick={() => { const newList=[...khungGioList]; newList.splice(index,1); setKhungGioList(newList); }}><span className="material-symbols-outlined">delete</span></button>}
+                    <div className='yctg-form-group'>{khungGioList.length > 1 && <button type="button" className="yctg-btn-remove" onClick={() => { const newList=[...khungGioList]; newList.splice(index,1); setKhungGioList(newList); }}><span className="material-symbols-outlined">delete</span></button>}</div>
 
                     <div className="yctg-form-group" style={{ flexBasis: '100%', marginBottom: 0, marginTop: '8px' }}>
                       <input type="text" className="yctg-form-control" value={kg.ghichu} onChange={(e) => { const newList=[...khungGioList]; newList[index].ghichu=e.target.value; setKhungGioList(newList); }} placeholder="Ghi chú thêm cho ca này (VD: Học tại nhà ngoại, dạy Online...)" />

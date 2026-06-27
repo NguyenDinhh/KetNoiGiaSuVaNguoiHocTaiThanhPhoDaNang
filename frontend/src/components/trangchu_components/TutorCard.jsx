@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Import CÁC SERVICE CẦN THIẾT
 import GiaSu_Service from '../../services/GiaSu_Service';
 import NguoiDung_Service from '../../services/NguoiDung_Service';
 import GiaSu_MonHoc_Service from '../../services/GiaSu_MonHoc_Service';
@@ -20,7 +19,7 @@ const TutorCard = () => {
 
   const navigate = useNavigate();
 
-  // --- STATE CHO MODAL CHI TIẾT ---
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTutor, setSelectedTutor] = useState(null);
 
@@ -96,14 +95,14 @@ const TutorCard = () => {
     fetchGiaSu();
   }, []);
 
-  // --- HÀM XỬ LÝ MỞ MODAL VÀ TẢI CHI TIẾT ---
+  
   const handleXemChiTiet = async (giasu) => {
     setSelectedTutor(giasu);
     setIsModalOpen(true);
     setLoadingChiTiet(true);
 
     try {
-      // Kéo toàn bộ bảng để map dữ liệu chi tiết
+      
       const [
         listGSBC, listBangCap, listGSMH, listMonHoc, listKhuVuc,
         listDK, listUT, listDG, listND, listYC
@@ -124,7 +123,7 @@ const TutorCard = () => {
       const monHocMaster = Array.isArray(listMonHoc) ? listMonHoc : listMonHoc?.data || [];
       const khuVucMaster = Array.isArray(listKhuVuc) ? listKhuVuc : listKhuVuc?.data || [];
 
-      // 1. Map Bằng cấp
+      
       const bangCapCuaGiaSu = (listGSBC || [])
         .filter(bc => String(bc.magiasu) === String(giasu.magiasu))
         .map(bc => {
@@ -136,7 +135,7 @@ const TutorCard = () => {
           };
         });
 
-      // 2. Map Môn học
+      
       const monHocGS = (listGSMH || [])
         .filter(mh => String(mh.magiasu) === String(giasu.magiasu))
         .map(mh => {
@@ -150,7 +149,7 @@ const TutorCard = () => {
           };
         });
 
-      // 3. Map Đánh giá
+      
       const lopCuaGS = (listGSMH || []).filter(l => String(l.magiasu) === String(giasu.magiasu));
       const mangMaLop = lopCuaGS.map(l => String(l.magiasu_monhoc));
 
@@ -228,7 +227,7 @@ const TutorCard = () => {
         {danhSachGiaSu.map((gs, index) => (
           <div className="tutor-card" key={gs.magiasu || index}>
             <div className="tutor-card-header-bg">
-              {/* TOP LABEL */}
+              {}
 
               <div className="tutor-avatar-badge" style={{ overflow: 'hidden', padding: 0, border: '3px solid #fff', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {gs.anhdaidien && gs.anhdaidien.trim() !== '' && gs.anhdaidien !== 'string' ? (
@@ -249,7 +248,7 @@ const TutorCard = () => {
               <p><span>Môn dạy:</span> Đang cập nhật</p>
             </div>
 
-            {/* ĐIỂM SAO THỰC TẾ */}
+            {}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#fbbf24', fontVariationSettings: "'FILL' 1" }}>star</span>
               <strong style={{ color: '#1e293b', fontSize: '12px' }}>
@@ -260,7 +259,7 @@ const TutorCard = () => {
               </span>
             </div>
 
-            {/* BUTTON GỌI HÀM LẤY CHI TIẾT */}
+            {}
             <button className="btn-tutor-detail" onClick={() => handleXemChiTiet(gs)}>
               Xem chi tiết
             </button>
@@ -268,7 +267,7 @@ const TutorCard = () => {
         ))}
       </div>
 
-      {/* ================= MODAL CHI TIẾT GIA SƯ ================= */}
+      {}
       {isModalOpen && selectedTutor && (
         <div className="tutor-modal-overlay" onClick={closeModal}>
           <div className="tutor-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -311,7 +310,7 @@ const TutorCard = () => {
                 </div>
               ) : (
                 <>
-                  {/* --- BẰNG CẤP --- */}
+                  {}
                   <div className="tutor-modal-section">
                     <h4>Bằng cấp / Chứng chỉ ({danhSachBangCap.length})</h4>
                     {danhSachBangCap.length === 0 ? (
@@ -328,7 +327,7 @@ const TutorCard = () => {
                     )}
                   </div>
 
-                  {/* --- LỚP ĐANG DẠY --- */}
+                  {}
                   <div className="tutor-modal-section">
                     <h4>Các lớp đang nhận dạy ({monHocCuaGiaSu.length})</h4>
                     {monHocCuaGiaSu.length === 0 ? (
@@ -352,7 +351,7 @@ const TutorCard = () => {
                     )}
                   </div>
 
-                  {/* --- ĐÁNH GIÁ CỦA HỌC VIÊN --- */}
+                  {}
                   <div className="tutor-modal-section">
                     <h4>Đánh giá & Nhận xét từ học viên ({danhSachDanhGia.length})</h4>
                     {danhSachDanhGia.length === 0 ? (

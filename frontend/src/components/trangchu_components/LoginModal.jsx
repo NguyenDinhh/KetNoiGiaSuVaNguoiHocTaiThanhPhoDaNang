@@ -20,24 +20,24 @@ const LoginModal = ({ onClose }) => {
 
       const thongTin = data.thong_tin;
 
-      // ==============================================================
-      // CHỐT CHẶN TÀI KHOẢN BỊ KHÓA: Kiểm tra trạng thái ngay lập tức
-      // Giả sử: 1 là Hoạt động, 0 là Bị khóa
+      
+      
+      
       if (thongTin.trangthai === 0) {
         alert("TÀI KHOẢN ĐÃ BỊ KHÓA!\nTài khoản của bạn đã bị quản trị viên vô hiệu hóa. Vui lòng liên hệ Hotline trung tâm để được hỗ trợ.");
         setIsLoading(false);
-        return; // KẾT THÚC HÀM TẠI ĐÂY, KHÔNG CHO ĐI TIẾP
+        return; 
       }
-      // ==============================================================
+      
 
-      // Nếu tài khoản bình thường (trangthai !== 0) -> Cho phép đăng nhập
+      
       localStorage.setItem("matruycap", data.matruycap);
       localStorage.setItem("thongTinUser", JSON.stringify(thongTin));
 
       alert("Đăng nhập thành công!");
       onClose();
 
-      // PHÂN LUỒNG QUYỀN TRUY CẬP
+      
       const vaiTro = thongTin.vaitro;
 
       if (vaiTro === 0) {

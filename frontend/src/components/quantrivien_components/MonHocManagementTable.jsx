@@ -8,7 +8,7 @@ const MonHocManagementTable = () => {
   const [dangTai, setDangTai] = useState(true);
   const [thongKe, setThongKe] = useState({ tongSo: 0, dangHoatDong: 0, dangTamNgung: 0 });
   const [tuKhoaTimKiem, setTuKhoaTimKiem] = useState("");
-  const [heLopDangLoc, setHeLopDangLoc] = useState("ALL"); // State lọc theo hệ lớp
+  const [heLopDangLoc, setHeLopDangLoc] = useState("ALL"); 
 
   const [hienThiForm, setHienThiForm] = useState(false);
   const [formDuLieu, setFormDuLieu] = useState({ mahelop: "", tenmonhoc: "", mota: "", trangthai: 1 });
@@ -184,7 +184,7 @@ const MonHocManagementTable = () => {
               <input type="text" placeholder="Tìm kiếm tên môn học..." value={tuKhoaTimKiem} onChange={(e) => setTuKhoaTimKiem(e.target.value)} />
             </div>
             
-            {/* Dropdown lọc theo Hệ lớp */}
+            {}
             <select 
               value={heLopDangLoc} 
               onChange={(e) => setHeLopDangLoc(e.target.value)}
@@ -232,7 +232,7 @@ const MonHocManagementTable = () => {
               </tr>
             </thead>
             <tbody>
-              {/* 2. CHỈNH LẠI colSpan=6 ĐỂ KHUNG LOADING KHÔNG BỊ HỤT */}
+              {}
               {dangTai ? (
                 <tr><td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--admin-text-variant)' }}>Đang tải danh mục...</td></tr>
               ) : danhSachDaLoc.length === 0 ? (
@@ -240,7 +240,7 @@ const MonHocManagementTable = () => {
               ) : (
                 danhSachDaLoc.map((monHoc) => {
 
-                  // 3. LOGIC TÌM TÊN HỆ LỚP: Lấy mahelop đi tra cứu trong danhSachHeLop
+                  
                   const heLopTuongUng = danhSachHeLop.find(hl => hl.mahelop === monHoc.mahelop);
                   const tenHeLopHienThi = heLopTuongUng ? heLopTuongUng.tenhelop : "Chưa gắn hệ";
 
@@ -249,7 +249,7 @@ const MonHocManagementTable = () => {
                       <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>#{monHoc.mamonhoc}</td>
                       <td><span style={{ fontWeight: 600, color: 'var(--admin-primary)' }}>{monHoc.tenmonhoc}</span></td>
 
-                      {/* 4. IN TÊN HỆ LỚP RA GIAO DIỆN */}
+                      {}
                       <td>
                         <span style={{ fontWeight: 500, color: '#005088', backgroundColor: '#e6f0f9', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>
                           {tenHeLopHienThi}

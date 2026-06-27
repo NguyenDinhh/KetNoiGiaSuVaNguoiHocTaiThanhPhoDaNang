@@ -13,7 +13,7 @@ const ThongKeGS = () => {
   const [kpi, setKpi] = useState({
     tongDoanhThu: 0,
     soHocVien: 0,
-    soLopDay: 0, // Chỉ đếm lớp đang dạy (trạng thái 1)
+    soLopDay: 0, 
     soDonCho: 0,
     thongKeDon: { tong: 0, thanhCong: 0, tuChoi: 0, choDuyet: 0 }
   });
@@ -48,11 +48,11 @@ const ThongKeGS = () => {
       const cacYeuCau = Array.isArray(resYeuCau) ? resYeuCau : (resYeuCau?.data || []);
       const cacNguoiDung = Array.isArray(resNguoiDung) ? resNguoiDung : (resNguoiDung?.data || []);
 
-      // ==========================================
-      // 1. ĐỒNG BỘ: LUỒNG ĐĂNG KÝ LỊCH
-      // Mã gốc: 0 (Chờ), 1 (Duyệt/Đang dạy), 2 (Từ chối), 3 (Hoàn thành)
-      // Khớp 100% với mã Chuẩn hóa của chúng ta.
-      // ==========================================
+      
+      
+      
+      
+      
       const lopCuaToi = cacLop.filter(l => String(l.magiasu) === maGS);
       const mangMaLop = lopCuaToi.map(l => String(l.magiasu_monhoc));
 
@@ -67,10 +67,10 @@ const ThongKeGS = () => {
           ngaytao: new Date(dk.ngaytao || dk.ngaytao_dk || Date.now())
         }));
 
-      // ==========================================
-      // 2. ĐỒNG BỘ: LUỒNG ỨNG TUYỂN YÊU CẦU
-      // Mã gốc Yêu Cầu: 0 (Chờ), 1 (Đang dạy), 2 (Hoàn thành)
-      // ==========================================
+      
+      
+      
+      
       const luongUngTuyen = cacUngTuyen
         .filter(ut => String(ut.magiasu) === maGS)
         .map(ut => {
@@ -78,15 +78,15 @@ const ThongKeGS = () => {
           const utTrangThai = Number(ut.trangthai);
           const ycTrangThai = Number(yeuCauGoc.trangthai);
 
-          let ttChung = 0; // Mặc định là Chờ
+          let ttChung = 0; 
           if (utTrangThai === 1) {
-            // Gia sư này trúng thầu -> Phụ thuộc vào tiến độ của Yêu cầu gốc
-            ttChung = ycTrangThai === 2 ? 3 : 1; // 3: Hoàn thành, 1: Đang dạy
+            
+            ttChung = ycTrangThai === 2 ? 3 : 1; 
           } else if (utTrangThai === 2 || (ycTrangThai !== 0 && utTrangThai !== 1)) {
-            // Bị từ chối thẳng mặt HOẶC yêu cầu đã chốt cho người khác
-            ttChung = 2; // Từ chối
+            
+            ttChung = 2; 
           } else {
-            ttChung = 0; // Chờ duyệt
+            ttChung = 0; 
           }
 
           return {
@@ -99,7 +99,7 @@ const ThongKeGS = () => {
           };
         });
 
-      // 3. GỘP CHUNG VÀ TÍNH TOÁN KPI
+      
       const tatCaGiaoDich = [...luongDangKy, ...luongUngTuyen];
 
       let doanhThu = 0;
@@ -110,29 +110,29 @@ const ThongKeGS = () => {
       const setMaHocVienUnique = new Set();
 
       tatCaGiaoDich.forEach(gd => {
-        if (gd.trangThaiChung === 1) { // Đang dạy
+        if (gd.trangThaiChung === 1) { 
           dangDay++;
           doanhThu += gd.hocphi;
           if (gd.manguoidung) setMaHocVienUnique.add(gd.manguoidung);
-        } else if (gd.trangThaiChung === 3) { // Hoàn thành
+        } else if (gd.trangThaiChung === 3) { 
           hoanThanh++;
           doanhThu += gd.hocphi;
           if (gd.manguoidung) setMaHocVienUnique.add(gd.manguoidung);
-        } else if (gd.trangThaiChung === 2) { // Từ chối
+        } else if (gd.trangThaiChung === 2) { 
           tuChoi++;
-        } else if (gd.trangThaiChung === 0) { // Chờ duyệt
+        } else if (gd.trangThaiChung === 0) { 
           choDuyet++;
         }
       });
 
-      // 4. LẤY 5 GIAO DỊCH GẦN NHẤT ĐỂ HIỂN THỊ LỊCH SỬ
+      
       const top5GiaoDich = [...tatCaGiaoDich]
-        .sort((a, b) => b.ngaytao - a.ngaytao) // Sắp xếp mới nhất lên đầu
+        .sort((a, b) => b.ngaytao - a.ngaytao) 
         .slice(0, 5)
         .map((gd, index) => {
           const userHocVien = cacNguoiDung.find(nd => String(nd.id || nd.manguoidung) === String(gd.manguoidung));
           
-          // Tính thời gian tương đối
+          
           const now = new Date();
           const diffMs = now - gd.ngaytao;
           const diffMins = Math.floor(diffMs / 60000);
@@ -156,19 +156,19 @@ const ThongKeGS = () => {
             ...gd,
             tenHocVien: userHocVien?.name || userHocVien?.hoten || 'Học viên ẩn danh',
             thoiGianText,
-            thuTu: index + 1 // 1 = mới nhất
+            thuTu: index + 1 
           };
         });
 
-      // 5. CẬP NHẬT STATE
+      
       setKpi({
         tongDoanhThu: doanhThu,
         soHocVien: setMaHocVienUnique.size,
-        soLopDay: dangDay, // Chỉ hiện số lớp ĐANG DẠY thực tế lúc này
+        soLopDay: dangDay, 
         soDonCho: choDuyet,
         thongKeDon: {
           tong: tatCaGiaoDich.length,
-          thanhCong: dangDay + hoanThanh, // Biểu đồ gộp chung Đang dạy + Hoàn thành = Thành công
+          thanhCong: dangDay + hoanThanh, 
           tuChoi,
           choDuyet
         }
@@ -190,7 +190,7 @@ const ThongKeGS = () => {
     );
   }
 
-  // TÍNH TOÁN % CHO BIỂU ĐỒ TRÒN
+  
   const { tong, thanhCong, tuChoi, choDuyet } = kpi.thongKeDon;
   const tyLeThanhCong = tong > 0 ? (thanhCong / tong * 503).toFixed(2) : 0;
   const tyLeCho = tong > 0 ? (choDuyet / tong * 503).toFixed(2) : 0;
@@ -213,7 +213,7 @@ const ThongKeGS = () => {
       </header>
 
       <div className="tk-content">
-        {/* PHẦN THỐNG KÊ TỔNG QUAN */}
+        {}
         <div className="tk-stats-grid">
           <div className="tk-stat-card gradient-purple">
             <div className="tk-stat-icon">
@@ -274,10 +274,10 @@ const ThongKeGS = () => {
           </div>
         </div>
 
-        {/* PHẦN BIỂU ĐỒ VÀ LỊCH SỬ */}
+        {}
         <div className="tk-main-grid">
           
-          {/* BIỂU ĐỒ TRÒN */}
+          {}
           <div className="tk-card">
             <h3 className="tk-card-title">
               <span className="material-symbols-outlined" style={{ color: '#8b5cf6' }}>pie_chart</span>
@@ -286,11 +286,11 @@ const ThongKeGS = () => {
             <div className="tk-pie-chart">
               <div className="pie-visual">
                 <svg viewBox="0 0 200 200" className="pie-svg">
-                  {/* Thành công (Đang dạy + Hoàn thành) -> Xanh lá */}
+                  {}
                   <circle cx="100" cy="100" r="80" fill="none" stroke="#10b981" strokeWidth="40" strokeDasharray={`${tyLeThanhCong} 503`} transform="rotate(-90 100 100)" />
-                  {/* Chờ duyệt -> Cam */}
+                  {}
                   <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" strokeWidth="40" strokeDasharray={`${tyLeCho} 503`} strokeDashoffset={offsetCho} transform="rotate(-90 100 100)" />
-                  {/* Từ chối -> Đỏ */}
+                  {}
                   <circle cx="100" cy="100" r="80" fill="none" stroke="#ef4444" strokeWidth="40" strokeDasharray={`${tyLeTuChoi} 503`} strokeDashoffset={offsetTuChoi} transform="rotate(-90 100 100)" />
                 </svg>
                 <div className="pie-center-text">
@@ -329,7 +329,7 @@ const ThongKeGS = () => {
               </div>
             </div>
             
-            {/* TỈ LỆ THÀNH CÔNG */}
+            {}
             {tong > 0 && (
               <div style={{ marginTop: '20px', padding: '16px', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #86efac' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -346,7 +346,7 @@ const ThongKeGS = () => {
             )}
           </div>
 
-          {/* LỊCH SỬ KẾT NỐI GẦN ĐÂY */}
+          {}
           <div className="tk-card">
             <h3 className="tk-card-title">
               <span className="material-symbols-outlined" style={{ color: '#3b82f6' }}>history</span>
@@ -370,7 +370,7 @@ const ThongKeGS = () => {
                   const loaiColor = gd.loai === 'Đăng ký lịch' ? '#3b82f6' : '#8b5cf6';
                   const loaiIcon = gd.loai === 'Đăng ký lịch' ? 'event_note' : 'handshake';
                   
-                  // Badge hiển thị mức độ mới: "Mới nhất", "Mới", hoặc không có
+                  
                   const badgeNew = index === 0 ? (
                     <span style={{
                       fontSize: '10px',

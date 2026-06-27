@@ -23,11 +23,9 @@ async def get_monhoc(id: str, db: Session = Depends(get_db)):
 @monhoc_router.get("/monhoc/theolop/{mahelop}", tags=["monhoc"], description="Lấy danh sách môn học theo mã hệ lớp", response_model=DataResponse[List[MonHoc_Schema]])
 async def lay_mon_hoc_theo_lop(mahelop: str, db: Session = Depends(get_db)):
     try:
-        # Tìm tất cả môn học có mahelop khớp với tham số truyền vào
         danh_sach = db.query(MonHoc).filter(MonHoc.mahelop == mahelop).all()
         return DataResponse.success_response(danh_sach)
     except Exception as e:
-        # Dùng custom_response cho đồng bộ với phong cách code của ông
         return DataResponse.custom_response(code="500", message=f"Lỗi hệ thống: {str(e)}", data=None)
 
 @monhoc_router.post("/themmonhoc", tags=["monhoc"], description="Thêm môn học mới", response_model=DataResponse[MonHoc_Schema])

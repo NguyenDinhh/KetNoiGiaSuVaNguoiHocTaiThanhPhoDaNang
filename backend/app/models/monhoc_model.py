@@ -8,7 +8,7 @@ class MonHoc(Base):
     mahelop = Column(String(10), ForeignKey("HELOP.mahelop"), nullable=False)
     tenmonhoc = Column(String(255), nullable=False)
     mota = Column(String(1000))
-    trangthai = Column(Integer, default=1)  # 1: Hoạt động, 0: Ngưng áp dụng
+    trangthai = Column(Integer, default=1)
 
     __table_args__ = (
         UniqueConstraint('tenmonhoc', 'mahelop', name='UC_MonHoc_HeLop'),

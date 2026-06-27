@@ -29,7 +29,7 @@ const DanhGia_Service = {
             const phanHoi = await fetch(`${DIA_CHI_API}/themdanhgia`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(duLieuForm) // Javascript tự động parse null thành null trong JSON string
+                body: JSON.stringify(duLieuForm) 
             });
             if (!phanHoi.ok) {
                 const loiData = await phanHoi.json();
@@ -41,10 +41,10 @@ const DanhGia_Service = {
             throw loi;
         }
     },
-// 🟢 Cập nhật đánh giá cũ
+
     capNhatDanhGia: async (maDanhGia, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suadanhgia/${maDanhGia}`, { // Nhớ check router Backend có /suadanhgia/{id} chưa nhé
+            const phanHoi = await fetch(`${DIA_CHI_API}/suadanhgia/${maDanhGia}`, { 
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)

@@ -4,14 +4,12 @@ import QuickSearch from '../components/trangchu_components/TimKiemNhanh.jsx';
 import TutorCard from '../components/trangchu_components/TutorCard';
 import ClassCard from '../components/trangchu_components/ClassCard';
 
-// 🟢 ĐÃ XÓA: Các Service không dùng tới nữa vì các Card con tự gọi rồi
-
 const HomePage = () => {
   const navigate = useNavigate();
 
-  // 🟢 ĐÃ XÓA: Khối state danhSachYeuCau và useEffect fetchYeuCau lằng nhằng lúc trước
+  
 
-  // HÀM XỬ LÝ KHI BẤM NÚT TÌM KIẾM TỪ COMPONENT QuickSearch
+  
   const handleTimKiemNhanh = (duLieuTimKiem) => {
     navigate({
       pathname: '/tim-mon-hoc',
@@ -21,7 +19,7 @@ const HomePage = () => {
 
   return (
     <div className="homepage-wrapper">
-      {/* 1. Phần Banner */}
+      {}
       <div className="hero-container">
         <div className="hero-content">
           <h1 className="hero-title">KẾT NỐI GIA SƯ VÀ NGƯỜI HỌC TẠI THÀNH PHỐ <br/> ĐÀ NẴNG</h1>
@@ -37,15 +35,15 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* 2. Phần Tìm kiếm nhanh */}
+      {}
       <div className="quick-search-wrapper">
         <QuickSearch onSearch={handleTimKiemNhanh} />
       </div>
 
-      {/* 3 & 4. KHỐI CHUNG HÀNG: Gia sư nổi bật & Lớp học cần gia sư */}
+      {}
       <div className="main-content-split-row">
 
-        {/* Cột bên trái: Gia sư nổi bật */}
+        {}
         <section className="sub-column-section">
           <h2 className="section-title border-left-blue">Gia sư nổi bật mới</h2>
           <div className="card-carousel-scroll">
@@ -56,13 +54,12 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* Cột bên phải: Lớp học cần gia sư */}
+        {}
         <section className="sub-column-section">
           <h2 className="section-title border-left-green">Lớp học cần gia sư!</h2>
           <div className="card-carousel-scroll">
 
-            {/* 🟢 CHỈ CẦN GỌI ĐÚNG 1 DÒNG NÀY
-                ClassCard bây giờ tự lo kéo data, tự lo loading, và tự render đúng 3 lớp mới nhất ở cuối */}
+            {}
             <ClassCard />
 
           </div>
@@ -73,10 +70,10 @@ const HomePage = () => {
 
       </div>
 
-      {/* 5. KHỐI THÔNG TIN: Giới thiệu & Tại sao chọn chúng tôi */}
+      {}
       <section className="info-section-container">
 
-        {/* Nửa bên trái: Giới thiệu & Liên hệ */}
+        {}
         <div className="info-left-block">
           <h2 className="info-block-title">
             Khởi tạo hành trình tri thức cùng nền tảng Gia Sư Đà Nẵng!
@@ -115,7 +112,7 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Nửa bên phải: Lý do chọn thương hiệu */}
+        {}
         <div className="info-right-block">
           <h3 className="why-choose-heading">Tại sao chọn chúng tôi?</h3>
           <div className="why-cards-flex-row">

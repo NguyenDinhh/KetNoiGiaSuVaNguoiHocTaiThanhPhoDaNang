@@ -100,7 +100,6 @@ async def khoa_hocvien(id: str, db: Session = Depends(get_db)):
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)
     
-    # Kiểm tra học viên có DangKyLich đang hoạt động (trangthai = 1)
     dangky_active = db.query(YeuCauHocVien).join(DangKyLich).filter(
         YeuCauHocVien.mahocvien == id,
         DangKyLich.trangthai == 1
@@ -113,7 +112,6 @@ async def khoa_hocvien(id: str, db: Session = Depends(get_db)):
             data=None
         )
     
-    # Kiểm tra học viên có YeuCauTimGiaSu đang hoạt động (trangthai = 1)
     yeucau_active = db.query(YeuCauHocVien).join(YeuCauTimGiaSu).filter(
         YeuCauHocVien.mahocvien == id,
         YeuCauTimGiaSu.trangthai == 1
@@ -126,7 +124,6 @@ async def khoa_hocvien(id: str, db: Session = Depends(get_db)):
             data=None
         )
     
-    # Khóa học viên
     hocvien.trangthai = 0
     db.commit()
     db.refresh(hocvien)
@@ -138,7 +135,6 @@ async def mokhoa_hocvien(id: str, db: Session = Depends(get_db)):
     if not hocvien:
         return DataResponse.custom_response(code="404", message="Không tìm thấy học viên", data=None)
     
-    # Đếm số học viên đang hoạt động của người dùng này
     so_hocvien_active = db.query(HocVien).filter(
         HocVien.manguoidung == hocvien.manguoidung,
         HocVien.trangthai == 1
@@ -151,7 +147,6 @@ async def mokhoa_hocvien(id: str, db: Session = Depends(get_db)):
             data=None
         )
     
-    # Mở khóa học viên
     hocvien.trangthai = 1
     db.commit()
     db.refresh(hocvien)

@@ -10,7 +10,7 @@ class YeuCauTimGiaSu_Schema(BaseModel):
     ngaybatdauhoc: datetime
     sobuoihoc: int
     tonghocphi: int
-    trangthai: int  # 0: Mới tạo, 1: Đã có gia sư, 2: Hoàn thành
+    trangthai: int
 
     class Config:
         from_attributes = True

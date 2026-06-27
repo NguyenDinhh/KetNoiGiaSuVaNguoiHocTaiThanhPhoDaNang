@@ -8,7 +8,7 @@ class GiaSuMonHoc_Schema(BaseModel):
     hocphimoibuoi: int
     thoiluonghoc: int
     sobuoihoc: int
-    trangthai: int  # 1: Hoạt động, 0: Không hoạt động
+    trangthai: int
 
     class Config:
         from_attributes = True

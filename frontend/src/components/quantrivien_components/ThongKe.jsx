@@ -9,10 +9,10 @@ import GiaSu_MonHoc_Service from '../../services/GiaSu_MonHoc_Service';
 import GiaSu_UngTuyen_Service from '../../services/GiaSu_UngTuyen_Service';
 
 const ThongKe = () => {
-  const [loaiThongKe, setLoaiThongKe] = useState('nguoihoc'); // 'nguoihoc' hoặc 'giasu'
+  const [loaiThongKe, setLoaiThongKe] = useState('nguoihoc'); 
   const [dangTai, setDangTai] = useState(true);
 
-  // State cho thống kê người học
+  
   const [thongKeNguoiHoc, setThongKeNguoiHoc] = useState({
     tongSo: 0,
     coHocVien: 0,
@@ -23,7 +23,7 @@ const ThongKe = () => {
     lichDaDangKy: 0
   });
 
-  // State cho thống kê gia sư
+  
   const [thongKeGiaSu, setThongKeGiaSu] = useState({
     tongSo: 0,
     daXacThuc: 0,
@@ -34,7 +34,7 @@ const ThongKe = () => {
     lichDayHoanThanh: 0
   });
 
-  // State cho top 5
+  
   const [topNguoiHoc, setTopNguoiHoc] = useState([]);
   const [topGiaSu, setTopGiaSu] = useState([]);
 
@@ -59,7 +59,7 @@ const ThongKe = () => {
 
   const taiThongKeNguoiHoc = async () => {
     try {
-      // Dùng Promise.all để gọi song song 4 API, tăng tốc độ load
+      
       const [dsNguoiDung, dsHocVien, dsYeuCau, dsDangKyLich] = await Promise.all([
         NguoiDung_Service.layDanhSachNguoiDung().catch(() => []),
         HocVien_Service.layDanhSachHocVien().catch(() => []),
@@ -72,10 +72,10 @@ const ThongKe = () => {
       const dataYeuCau = Array.isArray(dsYeuCau) ? dsYeuCau : (dsYeuCau?.data || []);
       const dataDangKyLich = Array.isArray(dsDangKyLich) ? dsDangKyLich : (dsDangKyLich?.data || []);
 
-      // Lọc chính xác người học
+      
       const nguoiHocList = dataNguoiDung.filter(nd => nd.role === 'Người học' || Number(nd.vaitro) === 2);
 
-      // Tính toán thống kê
+      
       const nguoiHocCoHocVien = new Set(dataHocVien.map(hv => hv.manguoidung)).size;
       const yeucauDangXuLy = dataYeuCau.filter(yc => Number(yc.trangthai) === 0 || Number(yc.trangthai) === 1).length;
       const yeucauHoanThanh = dataYeuCau.filter(yc => Number(yc.trangthai) === 2).length;
@@ -90,7 +90,7 @@ const ThongKe = () => {
         lichDaDangKy: dataDangKyLich.length
       });
 
-      // Tạo top 5 người học tích cực nhất
+      
       const nguoiHocTheoYeuCau = {};
       dataYeuCau.forEach(yc => {
         if (yc.manguoidung) {
@@ -119,7 +119,7 @@ const ThongKe = () => {
 
   const taiThongKeGiaSu = async () => {
     try {
-      // 1. Gọi song song TẤT CẢ các bảng cần thiết để móc nối dữ liệu Đánh Giá
+      
       const [giasuRes, danhgiaRes, lichRes, gsmhRes, utRes, ndRes] = await Promise.all([
         GiaSu_Service.layDanhSachGiaSu().catch(() => []),
         DanhGia_Service.layDanhSachDanhGia().catch(() => []),
@@ -136,17 +136,17 @@ const ThongKe = () => {
       const dsUT = Array.isArray(utRes) ? utRes : (utRes?.data || []);
       const dsNguoiDung = Array.isArray(ndRes) ? ndRes : (ndRes?.data || []);
 
-      // 2. Lọc các chỉ số cơ bản của Gia sư
+      
       const daXacThuc = dsGiaSu.filter(gs => Number(gs.trangthaiduyet) === 1).length;
       const chuaXacThuc = dsGiaSu.filter(gs => Number(gs.trangthaiduyet) === 0).length;
-      const dangHoatDong = daXacThuc; // Tạm tính người đã duyệt là đang hoạt động
+      const dangHoatDong = daXacThuc; 
 
-      // 3. TÍNH TOÁN ĐÁNH GIÁ CHO TỪNG GIA SƯ
+      
       let tongDiemHeThong = 0;
       let tongLuotDanhGiaHeThong = 0;
 
       const giaSuVoiDanhGia = dsGiaSu.map(gs => {
-        // Tìm các mã liên kết
+        
         const lopCuaGS = dsGSMH.filter(l => String(l.magiasu) === String(gs.magiasu));
         const mangMaLop = lopCuaGS.map(l => String(l.magiasu_monhoc));
 
@@ -156,7 +156,7 @@ const ThongKe = () => {
         const mangMaDK = dkCuaGS.map(dk => String(dk.madangky));
         const mangMaYC = utCuaGS.map(ut => String(ut.mayeucau));
 
-        // Lọc đánh giá của riêng gia sư này
+        
         const danhGiaCuaGS = dsDanhGia.filter(dg =>
           (dg.madangky && mangMaDK.includes(String(dg.madangky))) ||
           (dg.mayeucau && mangMaYC.includes(String(dg.mayeucau)))
@@ -166,7 +166,7 @@ const ThongKe = () => {
         const tongDiemGS = danhGiaCuaGS.reduce((sum, item) => sum + Number(item.sodiem || item.diem || 0), 0);
         const diemTB = luotDG > 0 ? (tongDiemGS / luotDG) : 0;
 
-        // Cộng dồn vào hệ thống
+        
         tongDiemHeThong += tongDiemGS;
         tongLuotDanhGiaHeThong += luotDG;
 
@@ -177,12 +177,12 @@ const ThongKe = () => {
         };
       });
 
-      // 4. Tính điểm trung bình toàn hệ thống
+      
       const diemTrungBinhToanCuc = tongLuotDanhGiaHeThong > 0
         ? (tongDiemHeThong / tongLuotDanhGiaHeThong).toFixed(1)
         : 0;
 
-      // 5. Cập nhật State Thống Kê
+      
       setThongKeGiaSu({
         tongSo: dsGiaSu.length,
         daXacThuc: daXacThuc,
@@ -193,13 +193,13 @@ const ThongKe = () => {
         lichDayHoanThanh: dsDangKyLich.filter(l => Number(l.trangthai) === 2).length
       });
 
-      // 6. Xử lý Top 5 Gia sư có đánh giá cao nhất
+      
       const topList = giaSuVoiDanhGia
-        .filter(gs => gs.soDanhGia > 0) // Chỉ lấy người có đánh giá
+        .filter(gs => gs.soDanhGia > 0) 
         .sort((a, b) => b.diemTrungBinh - a.diemTrungBinh || b.soDanhGia - a.soDanhGia)
         .slice(0, 5)
         .map(gs => {
-          // Tìm tên từ bảng người dùng
+          
           const nd = dsNguoiDung.find(n => String(n.id || n.manguoidung) === String(gs.manguoidung));
           return {
             ten: nd?.name || nd?.hoten || gs.hoten || 'Không xác định',
@@ -226,7 +226,7 @@ const ThongKe = () => {
 
   return (
     <>
-      {/* Header */}
+      {}
       <header className="tk-header">
         <div>
           <h2 className="tk-header-title">Thống kê hệ thống</h2>
@@ -241,7 +241,7 @@ const ThongKe = () => {
         </button>
       </header>
 
-      {/* Tab chuyển đổi */}
+      {}
       <div className="tk-tabs">
         <button
           className={`tk-tab-btn ${loaiThongKe === 'nguoihoc' ? 'active' : ''}`}
@@ -259,7 +259,7 @@ const ThongKe = () => {
         </button>
       </div>
 
-      {/* Nội dung thống kê */}
+      {}
       {loaiThongKe === 'nguoihoc' ? (
         <ThongKeNguoiHocContent data={thongKeNguoiHoc} topList={topNguoiHoc} />
       ) : (
@@ -269,19 +269,18 @@ const ThongKe = () => {
   );
 };
 
-// Component thống kê người học
 const ThongKeNguoiHocContent = ({ data, topList }) => {
-  // Tính toán trước tỷ lệ để SVG không bị lỗi NaN khi tổng bằng 0
+  
   const tyLeCoHocVien = data.tongSo > 0 ? (data.coHocVien / data.tongSo * 503).toFixed(2) : 0;
   const tyLeChuaCo = data.tongSo > 0 ? (data.chuaCoHocVien / data.tongSo * 503).toFixed(2) : 0;
 
-  // Tỷ lệ thanh Progress
+  
   const phanTramDangXuLy = data.yeucauDaGui > 0 ? (data.yeucauDangXuLy / data.yeucauDaGui * 100).toFixed(0) : 0;
   const phanTramHoanThanh = data.yeucauDaGui > 0 ? (data.yeucauHoanThanh / data.yeucauDaGui * 100).toFixed(0) : 0;
 
   return (
     <div className="tk-content">
-      {/* Stats Cards */}
+      {}
       <div className="tk-stats-grid">
         <div className="tk-stat-card gradient-blue">
           <div className="tk-stat-icon">
@@ -324,9 +323,9 @@ const ThongKeNguoiHocContent = ({ data, topList }) => {
         </div>
       </div>
 
-      {/* Charts and Details */}
+      {}
       <div className="tk-main-grid">
-        {/* Biểu đồ tròn */}
+        {}
         <div className="tk-card">
           <h3 className="tk-card-title">
             <span className="material-symbols-outlined">pie_chart</span>
@@ -356,7 +355,7 @@ const ThongKeNguoiHocContent = ({ data, topList }) => {
           </div>
         </div>
 
-        {/* Thống kê yêu cầu */}
+        {}
         <div className="tk-card">
           <h3 className="tk-card-title">
             <span className="material-symbols-outlined">assignment</span>
@@ -393,7 +392,7 @@ const ThongKeNguoiHocContent = ({ data, topList }) => {
           </div>
         </div>
 
-        {/* Top người học */}
+        {}
         <div className="tk-card full-width">
           <h3 className="tk-card-title">
             <span className="material-symbols-outlined">emoji_events</span>
@@ -423,14 +422,13 @@ const ThongKeNguoiHocContent = ({ data, topList }) => {
   );
 };
 
-// Component thống kê gia sư
 const ThongKeGiaSuContent = ({ data, topList }) => {
   const tyLeDaXacThuc = data.tongSo > 0 ? (data.daXacThuc / data.tongSo * 503).toFixed(2) : 0;
   const tyLeChuaXacThuc = data.tongSo > 0 ? (data.chuaXacThuc / data.tongSo * 503).toFixed(2) : 0;
 
   return (
     <div className="tk-content">
-      {/* Stats Cards */}
+      {}
       <div className="tk-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
         <div className="tk-stat-card gradient-blue">
           <div className="tk-stat-icon">
@@ -463,9 +461,9 @@ const ThongKeGiaSuContent = ({ data, topList }) => {
         </div>
       </div>
 
-      {/* Charts and Details */}
+      {}
       <div className="tk-main-grid">
-        {/* Biểu đồ tròn */}
+        {}
         <div className="tk-card">
           <h3 className="tk-card-title">
             <span className="material-symbols-outlined">pie_chart</span>
@@ -495,7 +493,7 @@ const ThongKeGiaSuContent = ({ data, topList }) => {
           </div>
         </div>
 
-        {/* Thống kê hoạt động */}
+        {}
         <div className="tk-card">
           <h3 className="tk-card-title">
             <span className="material-symbols-outlined">analytics</span>
@@ -532,7 +530,7 @@ const ThongKeGiaSuContent = ({ data, topList }) => {
           </div>
         </div>
 
-        {/* Top gia sư */}
+        {}
         <div className="tk-card full-width">
           <h3 className="tk-card-title">
             <span className="material-symbols-outlined">emoji_events</span>

@@ -51,7 +51,7 @@ const KhuVucManagementTable = () => {
     setHienThiForm(true);
   };
 
-  // NÚT XÓA THAY VÌ ĐỔI TRẠNG THÁI
+  
   const xuLyXoa = (khuVuc) => {
     if (window.confirm(`Bạn có chắc chắn muốn XÓA VĨNH VIỄN khu vực "${khuVuc.tenkhuvuc}" không?`)) {
       KhuVuc_Service.xoaKhuVuc(khuVuc.makhuvuc)
@@ -143,7 +143,7 @@ const KhuVucManagementTable = () => {
           <div className="stat-number">{thongKe.tongSo}</div>
         </div>
 
-        {/* Ô Tìm kiếm được đẩy dạt sang phải */}
+        {}
         <div className="controls-filter-box" style={{ gridColumn: 'span 9' }}>
           <div className="search-filter-inline-row">
             <div className="inline-search-input-group">
@@ -214,7 +214,7 @@ const KhuVucManagementTable = () => {
                         </button>
                       )}
 
-                      {/* NÚT XÓA (MÀU ĐỎ) */}
+                      {}
                       <button type="button" className="btn-table-action-view" title="Xóa vĩnh viễn" style={{ color: 'var(--admin-error)' }} onClick={() => xuLyXoa(khuVuc)}>
                         <span className="material-symbols-outlined">delete</span>
                       </button>

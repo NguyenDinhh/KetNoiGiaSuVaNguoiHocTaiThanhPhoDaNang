@@ -18,7 +18,6 @@ async def get_danhsachdanhgia(db: Session = Depends(get_db)):
     danhgias = db.query(DanhGia).all()
     return DataResponse.success_response(danhgias)
 
-
 @danhgia_router.get(
     "/danhgia/{id}",
     tags=["danhgia"],
@@ -56,7 +55,6 @@ async def create_danhgia(data: Create_DanhGia_Schema, db: Session = Depends(get_
         db.add(danhgia)
         db.commit()
         
-        # Query lại dựa vào mayeucau hoặc madangky
         if data.mayeucau:
             danhgia_da_tao = db.query(DanhGia).filter(
                 DanhGia.mayeucau == data.mayeucau

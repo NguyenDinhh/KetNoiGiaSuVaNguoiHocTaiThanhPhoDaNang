@@ -1,7 +1,7 @@
-const API_URL = 'http://localhost:8000'; // Port chạy FastAPI
+const API_URL = 'http://localhost:8000';
 
 const NguoiDung_Service = {
-  // 1. LẤY DANH SÁCH NGƯỜI DÙNG
+  
   layDanhSachNguoiDung: async () => {
     try {
       const response = await fetch(`${API_URL}/danhsachnguoidung`);
@@ -10,7 +10,7 @@ const NguoiDung_Service = {
       const ketqua = await response.json();
       const danhsachRaw = ketqua.data;
 
-      // Chuyển đổi dữ liệu cho dễ nhìn trên UI
+      
       const danhsachDaSua = danhsachRaw.map(nguoidung => {
         let tenVaitro = "Chưa xác định";
         if (nguoidung.vaitro === 0) tenVaitro = "Quản trị viên";
@@ -38,7 +38,7 @@ const NguoiDung_Service = {
     }
   },
 
-  // 2. THỐNG KÊ NGƯỜI DÙNG
+  
   layThongKeNguoiDung: async () => {
     try {
       const response = await fetch(`${API_URL}/danhsachnguoidung`);
@@ -67,7 +67,7 @@ const NguoiDung_Service = {
     }
   },
 
-  // 3. ĐĂNG KÝ NGƯỜI DÙNG MỚI (BỔ SUNG)
+  
   dangKyNguoiDung: async (duLieuDangKy) => {
     try {
       const response = await fetch(`${API_URL}/dangky`, {
@@ -78,7 +78,7 @@ const NguoiDung_Service = {
 
       const ketqua = await response.json();
 
-      // Check code 200 từ hàm DataResponse.custom_response của Backend
+      
       if (ketqua.code !== "200") {
         throw new Error(ketqua.message || "Đăng ký thất bại!");
       }
@@ -89,7 +89,7 @@ const NguoiDung_Service = {
     }
   },
 
-  // 4. KHÓA / MỞ KHÓA NGƯỜI DÙNG (PATCH)
+  
   khoaMoKhoaNguoiDung: async (id) => {
     try {
       const response = await fetch(`${API_URL}/khoanguoidung/${id}`, {
@@ -106,7 +106,7 @@ const NguoiDung_Service = {
     }
   },
 
-  // 5. LẤY CHI TIẾT 1 NGƯỜI DÙNG
+  
   layChiTietNguoiDung: async (id) => {
     try {
       const response = await fetch(`${API_URL}/nguoidung/${id}`);
@@ -120,7 +120,7 @@ const NguoiDung_Service = {
     }
   },
 
-  // 6. CẬP NHẬT THÔNG TIN NGƯỜI DÙNG (PUT)
+  
   capNhatNguoiDung: async (id, dataCapNhat) => {
     try {
       const response = await fetch(`${API_URL}/suanguoidung/${id}`, {
@@ -137,9 +137,8 @@ const NguoiDung_Service = {
       throw error;
     }
   },
-// ... (các hàm cũ như dangKyNguoiDung vẫn giữ nguyên)
 
-  // THÊM HÀM NÀY VÀO
+  
   dangNhap: async (email, password) => {
     try {
       const response = await fetch(`${API_URL}/dangnhap`, {
@@ -150,7 +149,7 @@ const NguoiDung_Service = {
 
       const ketqua = await response.json();
 
-      // Nếu Backend trả về lỗi (401 - Sai pass, 404 - Không thấy tài khoản...)
+      
       if (ketqua.code !== "200" && ketqua.code !== 200) {
         throw new Error(ketqua.message || "Đăng nhập thất bại!");
       }

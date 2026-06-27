@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom'; // 🟢 Nhận params điều hướng từ trang chủ
+import { useSearchParams } from 'react-router-dom'; 
 import '../assets/css/TimMonHoc.css';
 
 import GiaSu_MonHoc_Service from '../services/GiaSu_MonHoc_Service';
@@ -22,7 +22,7 @@ const layDataAnToan = (res) => {
 };
 
 const TimMonHoc = () => {
-  // 🟢 1. Đón thêm biến mahelop truyền từ trang chủ sang
+  
   const [searchParams] = useSearchParams();
   const paramHeLop = searchParams.get('mahelop') || '';
   const paramMonHoc = searchParams.get('mamonhoc') || '';
@@ -37,7 +37,7 @@ const TimMonHoc = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 🟢 2. Khởi tạo bộ lọc đồng bộ với dữ liệu URL nhận vào
+  
   const [boLoc, setBoLoc] = useState({
     heLop: paramHeLop,
     monHoc: paramMonHoc,
@@ -69,7 +69,7 @@ const TimMonHoc = () => {
         setDanhSachHeLop(listHeLop);
         setDanhSachKhuVuc(listKhuVuc);
 
-        // Xử lý danh sách môn học hiển thị dựa trên bộ lọc heLop ban đầu (nếu có từ URL)
+        
         if (paramHeLop) {
           setDanhSachMonHoc(listMonHoc.filter(m => String(m.mahelop || m.maHeLop) === String(paramHeLop)));
         } else {
@@ -104,7 +104,7 @@ const TimMonHoc = () => {
 
           return {
             ...item,
-            mahelop: mon ? (mon.mahelop || mon.maHeLop) : null, // 🟢 SỬA LỖI 1: Phải lưu mã hệ lớp vào đây thì hàm .filter() ở dưới mới chạy được
+            mahelop: mon ? (mon.mahelop || mon.maHeLop) : null, 
             tenmonhoc: mon ? (mon.tenmonhoc || mon.tenMonHoc) : 'Chưa cập nhật',
             tenhelop: he ? (he.tenhelop || he.tenHeLop) : 'Chưa cập nhật',
             tenkhuvuc: khu ? (khu.tenkhuvuc || khu.tenKhuVuc) : 'Chưa cập nhật',
@@ -127,7 +127,7 @@ const TimMonHoc = () => {
     fetchToanBoDuLieu();
   }, []);
 
-  // 🟢 SỬA LỖI 2: Chỉ cập nhật danh sách môn học khi heLop THAY ĐỔI thực sự (Bỏ cơ chế tự xóa monHoc cũ khi khởi tạo)
+  
   useEffect(() => {
     if (boLoc.heLop) {
       const monDaLoc = tatCaMonHoc.filter((mon) => String(mon.mahelop || mon.maHeLop) === String(boLoc.heLop));
@@ -137,12 +137,12 @@ const TimMonHoc = () => {
     }
   }, [boLoc.heLop, tatCaMonHoc]);
 
-  // HÀM XỬ LÝ KHI NGƯỜI DÙNG THAY ĐỔI BỘ LỌC TRÊN UI DROPDOWN
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBoLoc(prev => {
       const newFilters = { ...prev, [name]: value };
-      // Chỉ reset môn học nếu người dùng CHỦ ĐỘNG click đổi hệ lớp trên giao diện
+      
       if (name === 'heLop') {
         newFilters.monHoc = '';
       }
@@ -151,7 +151,7 @@ const TimMonHoc = () => {
   };
 
   const danhSachHienThi = danhSachGiaSuMonHoc.filter(item => {
-    const khớpHệLớp = boLoc.heLop === '' || String(item.mahelop) === String(boLoc.heLop); // 🟢 Đã ăn khớp vì có mahelop ở trên
+    const khớpHệLớp = boLoc.heLop === '' || String(item.mahelop) === String(boLoc.heLop); 
     const khớpMôn = boLoc.monHoc === '' || String(item.mamonhoc || item.maMonHoc) === String(boLoc.monHoc);
     const khớpKhuVực = boLoc.khuVuc === '' || String(item.makhuvuc || item.maKhuVuc) === String(boLoc.khuVuc);
     const khớpHọcPhí = boLoc.hocPhi === '' || item.hocphitong <= Number(boLoc.hocPhi);

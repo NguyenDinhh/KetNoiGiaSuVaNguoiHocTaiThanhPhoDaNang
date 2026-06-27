@@ -1,34 +1,32 @@
 import React, { useState, useEffect } from 'react';
-// 🟢 ĐÃ THÊM: useLocation để theo dõi URL thay đổi liên tục
+
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../assets/css/NguoiHoc.css';
 
-// ================= CÁC COMPONENT CON =================
 import TrangCaNhanNH from '../components/nguoihoc_components/TrangCaNhanNH.jsx';
 import HocVien from '../components/nguoihoc_components/HocVien.jsx';
 import QuanLyYeuCau from '../components/nguoihoc_components/QuanLyYeuCau.jsx';
 import DangKyLich from '../components/nguoihoc_components/DangKyLich.jsx';
 
-// ================= SERVICE =================
 import NguoiDung_Service from '../services/NguoiDung_Service';
 
 const NguoiHoc = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Khởi tạo hook theo dõi URL
+  const location = useLocation(); 
 
-  // Khôi phục Tab từ URL (nếu có) để tránh mất màn hình khi F5
+  
   const tabBanDau = location.hash.replace('#', '') || 'HoSoCaNhan';
   const [tabHienTai, setTabHienTai] = useState(tabBanDau);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🟢 LOGIC BẮT BUỘC ĐỂ MENU DROP DOWN TỪ HEADER HOẠT ĐỘNG
-  // Mỗi khi `location.hash` trên thanh URL thay đổi, React sẽ chạy lại hàm này và gán tab hiện tại
+  
+  
   useEffect(() => {
     const hashMoi = location.hash.replace('#', '');
     if (hashMoi) {
       setTabHienTai(hashMoi);
     } else {
-      setTabHienTai('HoSoCaNhan'); // Tab mặc định nếu ko có hash
+      setTabHienTai('HoSoCaNhan'); 
     }
   }, [location.hash]);
 
@@ -48,7 +46,7 @@ const NguoiHoc = () => {
 
       try {
         const resCheck = await NguoiDung_Service.layChiTietNguoiDung(userParsed.manguoidung);
-        const checkUser = resCheck?.data || resCheck; // Bẫy bọc Data an toàn
+        const checkUser = resCheck?.data || resCheck; 
 
         if (checkUser && checkUser.trangthai === 0) {
           alert("TÀI KHOẢN CỦA BẠN ĐÃ BỊ KHÓA!\nHệ thống phát hiện tài khoản đã bị vô hiệu hóa bởi Quản trị viên.");
@@ -69,7 +67,7 @@ const NguoiHoc = () => {
     return () => { isMounted = false; };
   }, [navigate]);
 
-  // Cập nhật URL Hash khi chuyển Tab trong nội bộ trang Người Học
+  
   const handleChuyenTab = (menuId) => {
     setTabHienTai(menuId);
     window.location.hash = menuId;
@@ -83,7 +81,7 @@ const NguoiHoc = () => {
     }
   };
 
-  // 🟢 DANH SÁCH MENU ĐÃ ĐỒNG BỘ ID CHUẨN
+  
   const danhSachMenu = [
     { id: 'HoSoCaNhan', icon: 'person', label: 'Thông tin cá nhân', component: <TrangCaNhanNH /> },
     { id: 'QuanLyHocVien', icon: 'school', label: 'Hồ sơ học viên', component: <HocVien /> },

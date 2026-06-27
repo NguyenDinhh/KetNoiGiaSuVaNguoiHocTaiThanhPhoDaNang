@@ -5,7 +5,7 @@ class MonHoc_Schema(BaseModel):
     mahelop: str
     tenmonhoc: str
     mota: str
-    trangthai: int  # 1: Hoạt động, 0: Ngưng áp dụng
+    trangthai: int  
 
     class Config:
         from_attributes = True

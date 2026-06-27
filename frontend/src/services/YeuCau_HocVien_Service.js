@@ -25,7 +25,7 @@ const YeuCau_HocVien_Service = {
         }
     },
 
-    // 1. Dùng khi tạo Yêu Cầu Tìm Gia Sư (Chỉ gửi mahocvien và mayeucau)
+    
     themYeuCauHocVienMoi: async (duLieuForm) => {
         try {
             const phanHoi = await fetch(`${DIA_CHI_API}/themyeucauhocvien`, {
@@ -41,7 +41,7 @@ const YeuCau_HocVien_Service = {
         }
     },
 
-    // 2. Dùng khi Gia Sư Nhận Lớp (Chỉ gửi mahocvien và madangky)
+    
     themYeuCauHocVienTheoMaDangKy: async (duLieuForm) => {
         try {
             const phanHoi = await fetch(`${DIA_CHI_API}/themyeucauhocvien_theomadangky`, {

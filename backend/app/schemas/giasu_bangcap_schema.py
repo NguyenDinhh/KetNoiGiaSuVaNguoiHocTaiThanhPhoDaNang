@@ -9,7 +9,7 @@ class GiaSuBangCap_Schema(BaseModel):
     namtotnghiep: int
     cosodaotao: str
     anhbangcap: str
-    trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    trangthaiduyet: int
 
     class Config:
         from_attributes = True
@@ -21,7 +21,7 @@ class Create_GiaSuBangCap_Schema(BaseModel):
     namtotnghiep: int
     cosodaotao: str
     anhbangcap: str
-    trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    trangthaiduyet: int
 
 class Update_GiaSuBangCap_Schema(BaseModel):
     magiasu: str
@@ -30,4 +30,4 @@ class Update_GiaSuBangCap_Schema(BaseModel):
     namtotnghiep: int
     cosodaotao: str
     anhbangcap: str
-    trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    trangthaiduyet: int

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../assets/css/GiaSu.css';
 
-// ================= CÁC SERVICE HỆ THỐNG =================
 import GiaSu_MonHoc_Service from '../../services/GiaSu_MonHoc_Service';
 import KhungGio_GiaSu_MonHoc_Service from '../../services/KhungGio_GiaSu_MonHoc_Service';
 import GiaSu_Service from '../../services/GiaSu_Service';
@@ -34,7 +33,7 @@ const YeuCauDangKyLich = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewHienTai, setReviewHienTai] = useState(null);
   
-  // State cho modal từ chối
+  
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [dangKyCanTuChoi, setDangKyCanTuChoi] = useState(null);
   const [lyDoTuChoi, setLyDoTuChoi] = useState('');
@@ -50,7 +49,7 @@ const YeuCauDangKyLich = () => {
   const [isEditKhungGio, setIsEditKhungGio] = useState(false);
   const [formKhungGio, setFormKhungGio] = useState({ makhunggio: null, magiasu_monhoc: null, ngayday: 'Thứ 2', thoigianbatdau: '18:00', thoigianketthuc: '19:30' });
 
-  // State cho thu/phóng các nhóm
+  
   const [isChoDuyetExpanded, setIsChoDuyetExpanded] = useState(true);
   const [isDangDayExpanded, setIsDangDayExpanded] = useState(true);
   const [isHoanThanhExpanded, setIsHoanThanhExpanded] = useState(false);
@@ -143,7 +142,7 @@ const YeuCauDangKyLich = () => {
 
       const lopCuaToi = cacLop.filter(l => String(l.magiasu) === String(maGS));
       
-      // Sắp xếp: Lớp đang hoạt động (trangthai=1) lên trên, lớp bị khóa (trangthai=0) xuống dưới
+      
       lopCuaToi.sort((a, b) => Number(b.trangthai) - Number(a.trangthai));
       
       setDanhSachLop(lopCuaToi);
@@ -158,7 +157,7 @@ const YeuCauDangKyLich = () => {
 
         const nguoiHoc = (cacNguoiDung || []).find(nd => String(nd.id || nd.manguoidung) === String(dk.manguoidung)) || {};
         
-        // Lọc học viên từ YEUCAU_HOCVIEN theo madangky, sau đó join với bảng HOCVIEN
+        
         const maHocVienDangKy = arrYeuCauHocVien
           .filter(yc => String(yc.madangky) === String(dk.madangky))
           .map(yc => String(yc.mahocvien));
@@ -180,7 +179,7 @@ const YeuCauDangKyLich = () => {
         };
       });
 
-      // Sắp xếp theo trạng thái trước (0 lên trên), sau đó sắp xếp mỗi nhóm theo madangky giảm dần (mới nhất lên trên)
+      
       danhSachDangKyHoanChinh.sort((a, b) => {
         if (Number(a.trangthai) !== Number(b.trangthai)) {
           return Number(a.trangthai) - Number(b.trangthai);
@@ -198,7 +197,7 @@ const YeuCauDangKyLich = () => {
   };
 
   const handlePheDuyetDangKy = async (dk, trangThaiMoi) => {
-    // Nếu từ chối (trangThaiMoi = 2), mở modal nhập lý do
+    
     if (trangThaiMoi === 2) {
       setDangKyCanTuChoi(dk);
       setLyDoTuChoi('');
@@ -206,7 +205,7 @@ const YeuCauDangKyLich = () => {
       return;
     }
     
-    // Nếu phê duyệt (trangThaiMoi = 1)
+    
     const hanhDong = "ĐỒNG Ý";
     if (!window.confirm(`Bạn có chắc chắn muốn ${hanhDong} yêu cầu đăng ký lịch học này không?`)) return;
 
@@ -224,7 +223,7 @@ const YeuCauDangKyLich = () => {
       await DangKyLich_Service.capNhatDangKyLich(dk.madangky, payload);
 
       if (dk.danhSachKhungGioChon && dk.danhSachKhungGioChon.length > 0) {
-        const trangThaiKhungGioMoi = 2; // Đang dạy
+        const trangThaiKhungGioMoi = 2; 
         for (const ct of dk.danhSachKhungGioChon) {
           const kgGoc = danhSachKhungGio.find(k => String(k.makhunggio) === String(ct.makhunggio));
           if (kgGoc) {
@@ -263,13 +262,13 @@ const YeuCauDangKyLich = () => {
         ngaybatdauhoc: dk.ngaybatdauhoc,
         tonghocphi: dk.tonghocphi,
         ghichu: dk.ghichu || "",
-        trangthai: 2, // Từ chối
+        trangthai: 2, 
         lydotuchoi: lyDoTuChoi
       };
 
       await DangKyLich_Service.capNhatDangKyLich(dk.madangky, payload);
 
-      // Mở lại khung giờ (chuyển về trạng thái 1 - Sẵn sàng)
+      
       if (dk.danhSachKhungGioChon && dk.danhSachKhungGioChon.length > 0) {
         for (const ct of dk.danhSachKhungGioChon) {
           const kgGoc = danhSachKhungGio.find(k => String(k.makhunggio) === String(ct.makhunggio));
@@ -279,7 +278,7 @@ const YeuCauDangKyLich = () => {
               ngayday: kgGoc.ngayday,
               thoigianbatdau: String(kgGoc.thoigianbatdau).slice(0, 5),
               thoigianketthuc: String(kgGoc.thoigianketthuc).slice(0, 5),
-              trangthai: 1 // Mở lại
+              trangthai: 1 
             };
             await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(ct.makhunggio, payloadKhungGio);
           }
@@ -431,15 +430,15 @@ const YeuCauDangKyLich = () => {
     }
   };
 
-  // ====================================================================
-  // TÍNH TOÁN 4 NHÓM DANH SÁCH & HÀM RENDER COMPONENT CON
-  // ====================================================================
+  
+  
+  
   const listChoDuyet = danhSachDangKy.filter(dk => Number(dk.trangthai) === 0);
   const listDangDay = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
   const listHoanThanh = danhSachDangKy.filter(dk => Number(dk.trangthai) === 3);
   const listTuChoi = danhSachDangKy.filter(dk => Number(dk.trangthai) === 2);
 
-  // Hàm render thẻ Đăng ký
+  
   const renderCardDangKy = (dk, badgeText, badgeColor) => (
     <div key={dk.madangky} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
 
@@ -534,7 +533,7 @@ const YeuCauDangKyLich = () => {
   return (
     <div className="yc-container">
 
-      {/* ==================== PHẦN TRÊN: CÁC LỚP HỌC ĐANG MỞ ==================== */}
+      {}
       <div className="lh-bottom-section" style={{ marginBottom: '40px' }}>
         <div className="lh-header">
           <div>
@@ -554,14 +553,14 @@ const YeuCauDangKyLich = () => {
             Bạn chưa mở lớp học nào hoặc các lớp học đã bị khóa.
           </div>
         ) : (
-          /* 🟢 SỬ DỤNG LẠI CLASS CHUẨN GRID MÀ ÔNG YÊU CẦU (.lh-grid) */
+          
           <div className="lh-grid">
             {danhSachLop.map((lop) => {
               const khungGioCuaLop = danhSachKhungGio.filter(kg => kg.magiasu_monhoc === lop.magiasu_monhoc && (kg.trangthai === 1 || kg.trangthai === 2 || kg.trangthai === 3));
               
               const isLopBiKhoa = Number(lop.trangthai) === 0;
               
-              // ✅ LOGIC: Kiểm tra có khung giờ nào đang ở trạng thái 2 (đang dạy) hoặc 3 (chờ duyệt)
+              
               const coKhungGioDangDay = khungGioCuaLop.some(kg => kg.trangthai === 2);
               const coKhungGioChoDuyet = khungGioCuaLop.some(kg => kg.trangthai === 3);
               const hienNutChinhSua = !isLopBiKhoa && !coKhungGioDangDay && !coKhungGioChoDuyet;
@@ -670,7 +669,7 @@ const YeuCauDangKyLich = () => {
         )}
       </div>
 
-      {/* ==================== PHẦN DƯỚI: KHU VỰC YÊU CẦU ĐĂNG KÝ ==================== */}
+      {}
       <div className="yc-top-section" style={{ borderTop: '2px solid #e2e8f0', paddingTop: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <span className="material-symbols-outlined" style={{ fontSize: '44px', color: '#f59e0b' }}>event_available</span>
@@ -680,7 +679,7 @@ const YeuCauDangKyLich = () => {
           </div>
         </div>
 
-        {/* 🟢 KHỐI Ô THỐNG KÊ SỐ LƯỢNG YÊU CẦU */}
+        {}
         {!loadingDangKy && (
           <div className="nh-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
             <div className="nh-stat-card" style={{ background: '#fff', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '5px solid #f59e0b' }}>
@@ -848,7 +847,7 @@ const YeuCauDangKyLich = () => {
         )}
       </div>
 
-      {/* 🟢 MODAL XEM ĐÁNH GIÁ */}
+      {}
       {isReviewModalOpen && reviewHienTai && (
         <div className="bc-modal-overlay">
           <div className="bc-modal-content" style={{ maxWidth: '420px', textAlign: 'center' }}>
@@ -875,7 +874,7 @@ const YeuCauDangKyLich = () => {
         </div>
       )}
 
-      {/* 🟢 MODAL NHẬP LÝ DO TỪ CHỐI */}
+      {}
       {isRejectModalOpen && dangKyCanTuChoi && (
         <div className="bc-modal-overlay">
           <div className="bc-modal-content" style={{ maxWidth: '500px' }}>
@@ -946,7 +945,7 @@ const YeuCauDangKyLich = () => {
         </div>
       )}
 
-      {/* MODAL THÊM/SỬA LỚP */}
+      {}
       {isModalLopOpen && (
         <div className="bc-modal-overlay">
           <div className="bc-modal-content">
@@ -1003,7 +1002,7 @@ const YeuCauDangKyLich = () => {
         </div>
       )}
 
-      {/* MODAL THÊM/SỬA KHUNG GIỜ */}
+      {}
       {isModalKhungGioOpen && (
         <div className="bc-modal-overlay">
           <div className="bc-modal-content" style={{maxWidth: '400px'}}>

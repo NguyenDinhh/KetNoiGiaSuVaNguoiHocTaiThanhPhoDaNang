@@ -3,11 +3,11 @@ import React from 'react';
 const Footer = () => {
   return (
     <footer className="footer-container">
-      {/* Khối nội dung chính của Footer */}
+      {}
       <div className="footer-main">
         <div className="footer-content-grid">
           
-          {/* Cột 1: Giới thiệu */}
+          {}
           <div className="footer-column">
             <h3 className="footer-column-title">Kết nối gia sư và người học tại thành phố Đà Nẵng</h3>
             <p className="footer-description">
@@ -27,7 +27,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Cột 2: Liên kết nhanh */}
+          {}
           <div className="footer-column">
             <h3 className="footer-column-title">Liên kết nhanh</h3>
             <ul className="footer-link-list">
@@ -38,7 +38,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Cột 3: Hỗ trợ */}
+          {}
           <div className="footer-column">
             <h3 className="footer-column-title">Hỗ trợ</h3>
             <ul className="footer-link-list">
@@ -49,7 +49,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Cột 4: Liên hệ */}
+          {}
           <div className="footer-column">
             <h3 className="footer-column-title">Liên hệ</h3>
             <div className="footer-contact">
@@ -71,7 +71,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Thanh đáy cùng */}
+      {}
       <div className="footer-bottom-bar">
         <div className="footer-bottom-content">
           <p className="footer-copy">

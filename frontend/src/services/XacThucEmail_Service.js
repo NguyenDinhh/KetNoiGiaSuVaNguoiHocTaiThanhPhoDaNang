@@ -1,7 +1,7 @@
 const DIA_CHI_API = 'http://localhost:8000';
 
 const XacThucEmail_Service = {
-  // Hàm gọi API gửi mã
+  
   guiMaOTP: async (emailCuaNguoiDung) => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/api/gui-otp`, {
@@ -18,7 +18,7 @@ const XacThucEmail_Service = {
     }
   },
 
-  // Hàm gọi API xác thực mã
+  
   xacThucOTP: async (emailCuaNguoiDung, maOTP) => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/api/xac-thuc-otp`, {
@@ -27,7 +27,7 @@ const XacThucEmail_Service = {
         body: JSON.stringify({ email: emailCuaNguoiDung, otp: maOTP })
       });
 
-      // Khác với gửi mail, xác thực có thể trả về lỗi 400 (sai mã), ta phải bắt được câu lỗi đó
+      
       if (!phanHoi.ok) {
         const loiChiTiet = await phanHoi.json();
         throw new Error(loiChiTiet.detail || "Xác thực thất bại");

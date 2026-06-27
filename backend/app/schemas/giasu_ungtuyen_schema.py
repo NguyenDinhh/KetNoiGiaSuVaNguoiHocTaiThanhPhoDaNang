@@ -7,7 +7,7 @@ class GiaSuUngTuyen_Schema(BaseModel):
     mayeucau: str
     magiasu: str
     thoigian_ungtuyen: datetime
-    trangthai: int  # 0: Đang chờ, 1: Chấp nhận, 2: Từ chối
+    trangthai: int 
     lydotuchoi: Optional[str] = None
 
     class Config:

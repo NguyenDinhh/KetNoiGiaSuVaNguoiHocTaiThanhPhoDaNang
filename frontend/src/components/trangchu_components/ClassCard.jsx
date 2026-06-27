@@ -12,7 +12,7 @@ const ClassCard = () => {
   const [danhSachYeuCau, setDanhSachYeuCau] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🟢 STATE ĐỂ ĐÓNG/MỞ MODAL ĐĂNG NHẬP
+  
   const [hienThiLogin, setHienThiLogin] = useState(false);
 
   const navigate = useNavigate();
@@ -69,12 +69,12 @@ const ClassCard = () => {
     fetchDanhSachLop();
   }, []);
 
-  // --- HÀM XỬ LÝ BẤM NÚT ỨNG TUYỂN ---
+  
   const handleUngTuyen = (maYeuCau) => {
     const userString = localStorage.getItem("thongTinUser");
 
     if (!userString) {
-      // 🟢 NẾU CHƯA ĐĂNG NHẬP -> BẬT MODAL LÊN THAY VÌ CONFIRM CHUYỂN TRANG
+      
       setHienThiLogin(true);
       return;
     }
@@ -136,7 +136,7 @@ const ClassCard = () => {
         ))}
       </div>
 
-      {/* 🟢 CHÈN COMPONENT LOGIN MODAL VÀO DƯỚI CÙNG, ĐƯỢC KIỂM SOÁT BỞI STATE */}
+      {}
       {hienThiLogin && (
         <LoginModal onClose={() => setHienThiLogin(false)} />
       )}

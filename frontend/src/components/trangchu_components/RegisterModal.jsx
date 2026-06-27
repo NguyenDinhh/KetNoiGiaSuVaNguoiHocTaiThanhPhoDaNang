@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import '../../assets/css/RegisterModal.css';
 import Upload_Service from '../../services/Upload_Service';
 import XacThucEmail_Service from '../../services/XacThucEmail_Service';
-// 👇 THÊM 2 DÒNG IMPORT NÀY 👇
+
 import NguoiDung_Service from '../../services/NguoiDung_Service';
 import GiaSu_Service from '../../services/GiaSu_Service'
 
 const RegisterModal = ({ onClose }) => {
-  // ================= STATE QUẢN LÝ DỮ LIỆU =================
+  
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -24,7 +24,7 @@ const RegisterModal = ({ onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [dongYChinhSach, setDongYChinhSach] = useState(false);
 
-  // ================= STATE ẢNH & UPLOAD =================
+  
   const [avatarPreview, setAvatarPreview] = useState("");
   const [cccdTruocPreview, setCccdTruocPreview] = useState("");
   const [cccdSauPreview, setCccdSauPreview] = useState("");
@@ -33,19 +33,18 @@ const RegisterModal = ({ onClose }) => {
   const [loadingCccdTruoc, setLoadingCccdTruoc] = useState(false);
   const [loadingCccdSau, setLoadingCccdSau] = useState(false);
 
-  // ================= STATE XÁC THỰC EMAIL (OTP) =================
+  
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
-
-  // ================= CÁC HÀM XỬ LÝ (HANDLERS) =================
+  
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 1. Xử lý Avatar
+  
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -54,11 +53,11 @@ const RegisterModal = ({ onClose }) => {
     setLoadingAvatar(true);
     try {
       const ketQua = await Upload_Service.uploadAnh(file, "anhdaidien");
-      // Sửa chỗ này thành == "200" cho đồng bộ với chuỗi trả về từ Backend
+      
       if (ketQua.code == "200") {
         setAvatarPreview(ketQua.url);
       } else {
-        alert("Lỗi upload Avatar: " + ketQua.message); // Hiện lỗi từ Backend trả về
+        alert("Lỗi upload Avatar: " + ketQua.message); 
       }
     } catch (loi) {
       alert("Lỗi kết nối API Upload Avatar: " + loi.message);
@@ -67,7 +66,7 @@ const RegisterModal = ({ onClose }) => {
     }
   };
 
-  // 2. Xử lý CCCD Mặt Trước
+  
   const handleCccdFrontChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -88,7 +87,7 @@ const RegisterModal = ({ onClose }) => {
     }
   };
 
-  // 3. Xử lý CCCD Mặt Sau
+  
   const handleCccdBackChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -142,11 +141,11 @@ const RegisterModal = ({ onClose }) => {
     }
   };
 
-  // 👇 ĐÃ SỬA LẠI HÀM SUBMIT SỬ DỤNG SERVICE VÀ COMBO 2 BƯỚC 👇
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // --- CHỐT CHẶN AN TOÀN ---
+    
     if (!isEmailVerified) {
       alert("Vui lòng xác thực Email bằng mã OTP trước khi đăng ký!");
       return;
@@ -164,7 +163,7 @@ const RegisterModal = ({ onClose }) => {
     }
 
     try {
-      // BƯỚC 1: Lắp ráp dữ liệu chuẩn bị gửi cho bảng NGUOIDUNG
+      
       const duLieuNguoiDung = {
         hoten: formData.fullName,
         sodienthoai: formData.phone,
@@ -174,21 +173,21 @@ const RegisterModal = ({ onClose }) => {
         vaitro: role === 'gia_su' ? 1 : 2
       };
 
-      // Gọi API Đăng ký tài khoản gốc
+      
       const ketQuaNguoiDung = await NguoiDung_Service.dangKyNguoiDung(duLieuNguoiDung);
 
-      // 🔥 MÁY QUAY LÉN 1: In nguyên cục dữ liệu Backend trả về xem có gì bên trong
+      
       console.log("📍 TOÀN BỘ DATA BƯỚC 1 TRẢ VỀ LÀ:", ketQuaNguoiDung);
 
-      // BƯỚC 2: NẾU LÀ GIA SƯ -> BẮN TIẾP API THÊM BẢNG GIA SƯ
+      
       if (role === 'gia_su') {
-        // 🔥 Gài bẫy lấy ID kép: Đề phòng Backend trả về tên là 'id' thay vì 'manguoidung'
+        
         const idNguoiDungVuaTao = ketQuaNguoiDung.data.manguoidung || ketQuaNguoiDung.data.id;
 
-        // 🔥 MÁY QUAY LÉN 2: Xem ID bắt được là số mấy, hay là undefined
+        
         console.log("📍 ID NGƯỜI DÙNG SẼ TRUYỀN SANG BẢNG GIA SƯ LÀ:", idNguoiDungVuaTao);
 
-        // Chốt chặn an toàn: Nếu không có ID thì dừng lại luôn, khỏi gọi API Bước 2
+        
         if (!idNguoiDungVuaTao) {
             alert("LỖI LOGIC: Không bóc được ID từ bảng Người dùng để chuyển sang bảng Gia Sư!");
             return;
@@ -204,14 +203,14 @@ const RegisterModal = ({ onClose }) => {
           trangthaiduyet: 0
         };
 
-        // Gọi API Lưu hồ sơ Gia sư
+        
         await GiaSu_Service.themGiaSu(duLieuGiaSu);
 
       }
 
-      // THÀNH CÔNG TẤT CẢ
+      
       alert(role === 'gia_su' ? "Nộp hồ sơ Gia sư thành công! Vui lòng chờ hệ thống phê duyệt." : "Đăng ký tài khoản Người học thành công!");
-      onClose(); // Đóng form
+      onClose(); 
 
     } catch (loi) {
       console.error(loi);
@@ -219,8 +218,7 @@ const RegisterModal = ({ onClose }) => {
     }
   };
 
-
-  // ================= GIAO DIỆN COMPONENT =================
+  
   return (
     <div className="register-modal-overlay">
       <div className="register-card relative-card" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
@@ -234,7 +232,7 @@ const RegisterModal = ({ onClose }) => {
 
         <form onSubmit={handleSubmit} className="register-main-form">
 
-          {/* KHU VỰC 1: AVATAR */}
+          {}
           <div className="avatar-upload-wrapper">
             <div className="avatar-picker-circle" style={{ width: '80px', height: '80px', margin: '0 auto' }}>
               {loadingAvatar ? (
@@ -246,14 +244,9 @@ const RegisterModal = ({ onClose }) => {
                   <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#94a3b8' }}>add_a_photo</span>
                 </div>
               )}
-              <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden-file-input" />
-              <div className="avatar-edit-pencil-badge" style={{ bottom: '0', right: '0', width: '24px', height: '24px' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>edit</span>
-              </div>
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
             </div>
           </div>
-
-          {/* KHU VỰC 2: CHỌN VAI TRÒ */}
           <div className="role-selector-grid">
             <button type="button" className={`btn-role-choice ${role === 'hoc_vien' ? 'role-active-blue' : 'role-inactive'}`} onClick={() => setRole('hoc_vien')}>
               <span className="material-symbols-outlined">person</span>
@@ -265,7 +258,7 @@ const RegisterModal = ({ onClose }) => {
             </button>
           </div>
 
-          {/* KHU VỰC 3: HỌ TÊN & SĐT */}
+          {}
           <div className="input-row-flex-grid">
             <div className="form-input-item-group">
               <label>Họ và tên <span style={{color: 'red'}}>*</span></label>
@@ -277,7 +270,7 @@ const RegisterModal = ({ onClose }) => {
             </div>
           </div>
 
-          {/* KHU VỰC 4: EMAIL & XÁC THỰC OTP */}
+          {}
           <div className="form-input-item-group">
             <label>Email <span style={{color: 'red'}}>*</span></label>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -319,7 +312,7 @@ const RegisterModal = ({ onClose }) => {
             </div>
           )}
 
-          {/* KHU VỰC 5: HỒ SƠ GIA SƯ (CHỈ HIỆN KHI CHỌN GIA SƯ) */}
+          {}
           {role === 'gia_su' && (
             <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '20px', marginTop: '12px' }}>
               <h3 style={{ fontSize: '15px', fontWeight: 'bold', marginBottom: '16px', color: '#006b54', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -341,7 +334,7 @@ const RegisterModal = ({ onClose }) => {
                 </div>
               </div>
 
-              {/* CCCD VỚI PREVIEW ẢNH */}
+              {}
               <div className="input-row-flex-grid">
                 <div className="form-input-item-group">
                   <label>CCCD Mặt trước {loadingCccdTruoc && <span style={{color: 'orange', fontSize: '12px'}}>(Đang tải...)</span>}</label>
@@ -351,29 +344,10 @@ const RegisterModal = ({ onClose }) => {
                        {formData.cccdmattruoc && <div style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,128,0,0.8)', color: 'white', fontSize: '10px', textAlign: 'center', padding: '2px' }}>Đã lên mây</div>}
                     </div>
                   ) : (
-                    <input type="file" accept="image/*" onChange={handleCccdFrontChange} required style={{ border: '1px dashed #ccc', padding: '8px', borderRadius: '8px' }} />
-                  )}
-                </div>
-
-                <div className="form-input-item-group">
-                  <label>CCCD Mặt sau {loadingCccdSau && <span style={{color: 'orange', fontSize: '12px'}}>(Đang tải...)</span>}</label>
-                  {cccdSauPreview ? (
-                    <div style={{ position: 'relative', width: '100%', height: '100px', border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden' }}>
-                       <img src={cccdSauPreview} alt="Mặt sau" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                       {formData.cccdmatsau && <div style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,128,0,0.8)', color: 'white', fontSize: '10px', textAlign: 'center', padding: '2px' }}>Đã lên mây</div>}
-                    </div>
-                  ) : (
-                    <input type="file" accept="image/*" onChange={handleCccdBackChange} required style={{ border: '1px dashed #ccc', padding: '8px', borderRadius: '8px' }} />
+                    <input type="file" accept="image/*" onChange={(e) => handleCCCDChange(e, 'truoc')} style={{ width: '100%', height: '100px', cursor: 'pointer' }} />
                   )}
                 </div>
               </div>
-
-              <div className="form-input-item-group" style={{marginTop: '12px'}}>
-                <label>Giới thiệu bản thân</label>
-                <textarea name="gioithieubanthan" rows="3" onChange={handleInputChange} placeholder="Kinh nghiệm giảng dạy..." required style={{ width: '100%', padding: '10px 12px', border: '1px solid #ccc', borderRadius: '8px', resize: 'none' }}></textarea>
-              </div>
-
-              {/* CHECKBOX PHÁP LÝ */}
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: 'rgba(0, 107, 84, 0.05)', border: '1px solid rgba(0, 107, 84, 0.2)', borderRadius: '8px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                 <input type="checkbox" id="dongYDieuKhoan" checked={dongYChinhSach} onChange={(e) => setDongYChinhSach(e.target.checked)} style={{ marginTop: '4px', width: '16px', height: '16px', accentColor: '#006b54', cursor: 'pointer' }} />
                 <label htmlFor="dongYDieuKhoan" style={{ fontSize: '13px', color: '#334155', lineHeight: '1.5', cursor: 'pointer', margin: 0 }}>
@@ -383,7 +357,7 @@ const RegisterModal = ({ onClose }) => {
             </div>
           )}
 
-          {/* KHU VỰC 6: MẬT KHẨU */}
+          {}
           <div className="form-input-item-group" style={{ marginTop: '12px' }}>
             <label>Mật khẩu <span style={{color: 'red'}}>*</span></label>
             <div className="password-input-inner-box">
@@ -394,7 +368,7 @@ const RegisterModal = ({ onClose }) => {
             </div>
           </div>
 
-          {/* NÚT SUBMIT CHÍNH */}
+          {}
           <div className="submit-action-btn-zone">
             <button
               type="submit"

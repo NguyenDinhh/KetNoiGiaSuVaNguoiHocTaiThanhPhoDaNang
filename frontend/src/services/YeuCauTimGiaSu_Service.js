@@ -57,9 +57,9 @@ const YeuCauTimGiaSu_Service = {
     capNhatTrangThaiYeuCau: async (maYeuCau, trangThaiMoi) => {
         try {
             const phanHoi = await fetch(`${DIA_CHI_API}/capnhattrangthaiyeucau/${maYeuCau}`, {
-                method: 'PATCH', // Lưu ý dùng PATCH cho khớp với Router
+                method: 'PATCH', 
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ trangthai: trangThaiMoi }) // Chỉ gửi đúng 1 biến
+                body: JSON.stringify({ trangthai: trangThaiMoi }) 
             });
 
             if (!phanHoi.ok) {

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../assets/css/YeuCauTimGiaSu.css';
 
-// ================= CÁC SERVICE CẦN THIẾT =================
 import YeuCauTimGiaSu_Service from '../services/YeuCauTimGiaSu_Service';
 import MonHoc_Service from '../services/MonHoc_Service';
 import KhuVuc_Service from '../services/KhuVuc_Service';
@@ -10,7 +9,7 @@ import HeLop_Service from '../services/HeLop_Service';
 import ChiTietYeuCau_Service from '../services/ChiTietYeuCau_Service';
 import YeuCau_HocVien_Service from '../services/YeuCau_HocVien_Service';
 import HocVien_Service from '../services/HocVien_Service';
-// 🟢 THÊM SERVICE NÀY ĐỂ ĐẾM SỐ NGƯỜI ỨNG TUYỂN
+
 import GiaSu_UngTuyen_Service from '../services/GiaSu_UngTuyen_Service';
 
 const BaiDangTimGiaSu = () => {
@@ -18,12 +17,12 @@ const BaiDangTimGiaSu = () => {
   const [dangTai, setDangTai] = useState(true);
   const navigate = useNavigate();
 
-  // --- STATE LƯU TRỮ MASTER DATA ---
+  
   const [danhSachKhuVuc, setDanhSachKhuVuc] = useState([]);
   const [danhSachMonHoc, setDanhSachMonHoc] = useState([]);
   const [danhSachHeLop, setDanhSachHeLop] = useState([]);
 
-  // --- STATE BỘ LỌC ---
+  
   const [boLocKhuVuc, setBoLocKhuVuc] = useState('');
   const [boLocHeLop, setBoLocHeLop] = useState('');
   const [boLocMonHoc, setBoLocMonHoc] = useState('');
@@ -33,7 +32,7 @@ const BaiDangTimGiaSu = () => {
 
     const loadDuLieu = async () => {
       try {
-        // 🟢 GỌI THÊM API ỨNG TUYỂN VÀO PROMISE.ALL
+        
         const [
           resYeuCau, resMonHoc, resKhuVuc, resHeLop,
           resChiTiet, resYeuCauHocVien, resHocVien, resUngTuyen
@@ -63,7 +62,7 @@ const BaiDangTimGiaSu = () => {
         setDanhSachMonHoc(listMonHoc);
         setDanhSachHeLop(listHeLop);
 
-        // Chỉ lấy các yêu cầu đang mở (trạng thái = 0)
+        
         const yeuCauDangMo = listYeuCau.filter(yc => Number(yc.trangthai) === 0);
 
         const duLieuHoanChinh = yeuCauDangMo.map(yc => {
@@ -80,7 +79,7 @@ const BaiDangTimGiaSu = () => {
           const nhungNguoiThamGia = listYCHV.filter(y => String(y.mayeucau) === String(yc.mayeucau));
           const thongTinHocVien = nhungNguoiThamGia.map(y => listHV.find(h => String(h.mahocvien) === String(y.mahocvien))).filter(Boolean);
 
-          // 🟢 ĐẾM SỐ LƯỢNG GIA SƯ ĐÃ NỘP ĐƠN ỨNG TUYỂN VÀO YÊU CẦU NÀY
+          
           const soLuongUngTuyen = listUngTuyen.filter(ut => String(ut.mayeucau) === String(yc.mayeucau)).length;
 
           return {
@@ -91,11 +90,11 @@ const BaiDangTimGiaSu = () => {
             lichhoc_str: chuoiLichHoc || 'Chưa xếp lịch',
             ngaybatdau_str: yc.ngaybatdauhoc ? new Date(yc.ngaybatdauhoc).toLocaleDateString('vi-VN') : 'Đang cập nhật',
             danhsachhocvien: thongTinHocVien,
-            soLuongUngTuyen: soLuongUngTuyen // 🟢 GÁN VÀO ĐÂY ĐỂ RENDER RA UI
+            soLuongUngTuyen: soLuongUngTuyen 
           };
         });
 
-        // Sắp xếp bài mới nhất lên trên
+        
         setDanhSachBaiDang(duLieuHoanChinh.reverse());
         setDangTai(false);
       } catch (error) {
@@ -128,7 +127,7 @@ const BaiDangTimGiaSu = () => {
   return (
     <div className="pb-wrapper">
 
-      {/* BANNER */}
+      {}
       <section className="pb-hero">
         <h1 className="pb-hero-title">Lớp Học Đang Tìm Gia Sư</h1>
         <p className="pb-hero-desc">
@@ -136,7 +135,7 @@ const BaiDangTimGiaSu = () => {
         </p>
       </section>
 
-      {/* BỘ LỌC TÌM KIẾM (FLOATING) */}
+      {}
       <section className="pb-filter-container">
         <div className="pb-filter-card">
           <div className="pb-filter-grid">
@@ -171,7 +170,7 @@ const BaiDangTimGiaSu = () => {
         </div>
       </section>
 
-      {/* DANH SÁCH LỚP HỌC */}
+      {}
       <section className="pb-list-container">
         <div className="pb-list-header">
           <h2>Danh sách lớp học ({danhSachHienThi.length})</h2>
@@ -191,7 +190,7 @@ const BaiDangTimGiaSu = () => {
             {danhSachHienThi.map((baiDang) => (
               <div key={baiDang.mayeucau} className="pb-card">
 
-                {/* Header Thẻ */}
+                {}
                 <div className="pb-card-header">
                   <div className="pb-icon-circle">
                     <span className="material-symbols-outlined">menu_book</span>
@@ -205,26 +204,26 @@ const BaiDangTimGiaSu = () => {
                   </div>
                 </div>
 
-                {/* Nội dung Thẻ */}
+                {}
                 <div className="pb-card-body">
                   <div className="pb-info-row">
                     <span className="material-symbols-outlined">calendar_month</span>
                     <span><strong>Ngày bắt đầu:</strong> {baiDang.ngaybatdau_str}</span>
                   </div>
 
-                  {/* 🟢 ĐÃ TÁCH: DÒNG SỐ BUỔI */}
+                  {}
                   <div className="pb-info-row">
                     <span className="material-symbols-outlined">event_repeat</span>
                     <span><strong>Thời lượng:</strong> {baiDang.sobuoihoc} buổi</span>
                   </div>
 
-                  {/* 🟢 ĐÃ TÁCH: DÒNG LỊCH HỌC */}
+                  {}
                   <div className="pb-info-row">
                     <span className="material-symbols-outlined">schedule</span>
                     <span><strong>Lịch học:</strong> {baiDang.lichhoc_str}</span>
                   </div>
 
-                  {/* HIỂN THỊ SỐ LƯỢNG GIA SƯ ĐÃ ỨNG TUYỂN */}
+                  {}
                   <div className="pb-info-row" style={{ color: '#0369a1', background: '#e0f2fe', padding: '6px 10px', borderRadius: '6px', display: 'inline-flex', marginTop: '4px' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>how_to_reg</span>
                     <span>
@@ -248,7 +247,7 @@ const BaiDangTimGiaSu = () => {
                   </div>
                 </div>
 
-                {/* Footer Thẻ */}
+                {}
                 <div className="pb-card-footer">
                   <div className="pb-price-row">
                     <span className="pb-price-label">Tổng học phí:</span>

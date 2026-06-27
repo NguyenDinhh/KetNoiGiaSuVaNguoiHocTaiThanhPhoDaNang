@@ -4,7 +4,6 @@ from typing import List
 from app.schemas.base_schema import DataResponse
 from app.db.base import get_db
 from app.models.dangkylich_model import DangKyLich
-# 🟢 Import thêm Update_DangKyLich_Schema
 from app.schemas.dangkylich_schema import DangKyLich_Schema, Create_DangKyLich_Schema, Update_DangKyLich_Schema
 
 dangkylich_router = APIRouter()
@@ -43,7 +42,6 @@ async def create_dangkylich(data: Create_DangKyLich_Schema, db: Session = Depend
         print(f"TRACEBACK: {traceback.format_exc()}")
         return DataResponse.custom_response(code="400", message=str(e), data=None)
 
-# 🟢 ĐÃ SỬA data: Update_DangKyLich_Schema Ở DÒNG DƯỚI NÀY
 @dangkylich_router.put("/suadangkylich/{id}", tags=["dangkylich"], description="Sửa đăng ký lịch", response_model=DataResponse[DangKyLich_Schema])
 async def update_dangkylich(id: str, data: Update_DangKyLich_Schema, db: Session = Depends(get_db)):
     try:

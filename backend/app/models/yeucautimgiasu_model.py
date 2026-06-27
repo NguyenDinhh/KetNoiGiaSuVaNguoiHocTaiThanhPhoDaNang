@@ -13,4 +13,4 @@ class YeuCauTimGiaSu(Base):
     ngaybatdauhoc = Column(DateTime)
     sobuoihoc = Column(Integer, CheckConstraint('sobuoihoc > 0'))
     tonghocphi = Column(Integer, CheckConstraint('tonghocphi >= 0'))
-    trangthai = Column(Integer, default=0) # 0: Mới tạo, 1: Đã có gia sư, 2: Hoàn thành
+    trangthai = Column(Integer, default=0)

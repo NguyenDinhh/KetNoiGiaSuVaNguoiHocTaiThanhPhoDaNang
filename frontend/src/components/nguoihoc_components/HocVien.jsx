@@ -9,7 +9,7 @@ const HocVien = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHocVien, setEditingHocVien] = useState(null);
 
-  // Khởi tạo biểu mẫu theo đúng cấu trúc dữ liệu Pydantic Schema
+  
   const [formInput, setFormInput] = useState({
     tenhocvien: '',
     namsinh: '',
@@ -18,7 +18,7 @@ const HocVien = () => {
     ghichu: ''
   });
 
-  // Lấy mã người dùng đang đăng nhập từ hệ thống lưu trữ local
+  
   const userLocal = localStorage.getItem("thongTinUser");
   const currentUserId = userLocal ? JSON.parse(userLocal).manguoidung : null;
 
@@ -26,7 +26,7 @@ const HocVien = () => {
     taiDanhSachHocVienActive();
   }, []);
 
-  // Hàm tải dữ liệu và lọc học viên theo manguoidung (hiển thị cả bị khóa và đang hoạt động)
+  
   const taiDanhSachHocVienActive = async () => {
     try {
       setLoading(true);
@@ -54,7 +54,7 @@ const HocVien = () => {
   };
 
   const handleOpenModalThemMoi = () => {
-    // Đếm số học viên đang hoạt động (trangthai = 1)
+    
     const soHocVienDangHoatDong = danhSachHocVien.filter(hv => hv.trangthai === 1).length;
     
     if (soHocVienDangHoatDong >= 10) {
@@ -78,7 +78,7 @@ const HocVien = () => {
     setIsModalOpen(true);
   };
 
-  // Luồng xử lý lưu thông tin biểu mẫu (Thêm / Sửa)
+  
   const handleSaveHocVien = async (e) => {
     e.preventDefault();
     if (!currentUserId) return;
@@ -86,7 +86,7 @@ const HocVien = () => {
     setSubmitting(true);
     try {
       if (editingHocVien) {
-        // LUỒNG CẬP NHẬT (SỬA)
+        
         const payloadSua = {
           manguoidung: currentUserId,
           tenhocvien: formInput.tenhocvien,
@@ -98,7 +98,7 @@ const HocVien = () => {
         await HocVien_Service.capNhatHocVien(editingHocVien.mahocvien, payloadSua);
         alert("Cập nhật thông tin học viên thành công!");
       } else {
-        // LUỒNG THÊM MỚI (Kiểm tra chốt chặn số lượng hoạt động một lần nữa trước khi gửi)
+        
         const soHocVienDangHoatDong = danhSachHocVien.filter(hv => hv.trangthai === 1).length;
         
         if (soHocVienDangHoatDong >= 10) {
@@ -127,7 +127,7 @@ const HocVien = () => {
     }
   };
 
-  // Luồng xử lý Khóa học viên
+  
   const handleLockHocVien = async (id, name) => {
     if (window.confirm(`Bạn có chắc chắn muốn khóa học viên [ ${name} ] không?\nHọc viên bị khóa sẽ không thể sử dụng để đăng ký tìm gia sư.`)) {
       try {
@@ -140,7 +140,7 @@ const HocVien = () => {
     }
   };
 
-  // Luồng xử lý Mở khóa học viên
+  
   const handleUnlockHocVien = async (id, name) => {
     if (window.confirm(`Bạn có chắc chắn muốn mở khóa học viên [ ${name} ] không?`)) {
       try {
@@ -157,7 +157,7 @@ const HocVien = () => {
     return <div className="dkl-loading-message">Đang tải danh sách học viên...</div>;
   }
 
-  // Đếm số học viên đang hoạt động
+  
   const soHocVienDangHoatDong = danhSachHocVien.filter(hv => hv.trangthai === 1).length;
   const datGioiHanBaNguoi = soHocVienDangHoatDong >= 10;
 
@@ -169,7 +169,7 @@ const HocVien = () => {
           <p>Danh sách các học viên liên kết quản lý bởi tài khoản của bạn (Tối đa 10 học viên hoạt động).</p>
         </div>
 
-        {/* Nút thêm mới tự động ẩn/khóa thuộc tính khi đạt giới hạn 3 người */}
+        {}
         <button
           type="button"
           className="btn-nh-submit hv-btn-add"
@@ -180,14 +180,14 @@ const HocVien = () => {
         </button>
       </div>
 
-      {/* Hiển thị cảnh báo trực quan khi chạm ngưỡng giới hạn 10 người */}
+      {}
       {datGioiHanBaNguoi && (
         <div className="nh-hv-limit-warning">
           ⚠️ <strong>Thông báo:</strong> Bạn đã cấu hình đủ số lượng tối đa 10 học viên đang hoạt động. Để thêm học viên mới, vui lòng tiến hành "Khóa" bớt hồ sơ không còn nhu cầu học tập phía bên dưới hệ thống.
         </div>
       )}
 
-      {/* BẢNG DỮ LIỆU */}
+      {}
       <div className="nh-hv-table-responsive">
         {danhSachHocVien.length === 0 ? (
           <div className="dkl-empty-state">
@@ -259,7 +259,7 @@ const HocVien = () => {
         )}
       </div>
 
-      {/* HỘP THOẠI MODAL THÊM / SỬA HỌC VIÊN */}
+      {}
       {isModalOpen && (
         <div className="nh-hv-modal-overlay">
           <div className="nh-hv-modal-content">

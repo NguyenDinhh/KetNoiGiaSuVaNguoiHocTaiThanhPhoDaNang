@@ -22,7 +22,6 @@ async def get_danhsachgiasuungtuyen(db: Session = Depends(get_db)):
     giasu_ungtuyens = db.query(GiaSuUngTuyen).all()
     return DataResponse.success_response(giasu_ungtuyens)
 
-
 @giasu_ungtuyen_router.get(
     "/giasuungtuyen/{id}",
     tags=["giasu_ungtuyen"],

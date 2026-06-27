@@ -14,7 +14,6 @@ class ResponseSchemaBase(BaseModel):
         self.message = message
         return self
 
-
 class DataResponse(ResponseSchemaBase, Generic[T]):
     data: Optional[T] = None
 

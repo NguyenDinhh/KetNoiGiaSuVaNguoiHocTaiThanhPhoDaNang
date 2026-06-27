@@ -8,10 +8,10 @@ class GiaSu_Schema(BaseModel):
     cccdmattruoc: Optional[str] = None
     cccdmatsau: Optional[str] = None
     namsinh: Optional[int] = None
-    gioitinh: Optional[int] = None  # 0: Nam, 1: Nữ
+    gioitinh: Optional[int] = None
     gioithieubanthan: Optional[str] = None
     ngaydangki: Optional[datetime] = None
-    trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    trangthaiduyet: int
     lydotuchoi: Optional[str] = None
 
     class Config:
@@ -22,9 +22,9 @@ class Create_GiaSu_Schema(BaseModel):
     cccdmattruoc: str
     cccdmatsau: str
     namsinh: int
-    gioitinh: int  # 0: Nam, 1: Nữ
+    gioitinh: int
     gioithieubanthan: str
-    trangthaiduyet: int  # 0: Chờ duyệt, 1: Đã duyệt, 2: Từ chối
+    trangthaiduyet: int
 
 class Update_GiaSu_Schema(BaseModel):
     manguoidung: Optional[str] = None

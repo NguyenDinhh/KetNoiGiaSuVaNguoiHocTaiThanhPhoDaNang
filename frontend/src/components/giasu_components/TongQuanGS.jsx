@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../assets/css/GiaSu.css';
 
-// ================= CÁC SERVICE API HỆ THỐNG =================
 import GiaSu_Service from '../../services/GiaSu_Service';
 import GiaSu_MonHoc_Service from '../../services/GiaSu_MonHoc_Service';
 import DangKyLich_Service from '../../services/DangKyLich_Service';
@@ -16,16 +15,16 @@ const TongQuanGS = ({ setTabHienTai }) => {
   const [loading, setLoading] = useState(true);
   const [tenGiaSu, setTenGiaSu] = useState('Gia sư');
 
-  // STATE LƯU TRỮ DỮ LIỆU THỐNG KÊ
+  
   const [stats, setStats] = useState({ lopDangDay: 0, yeuCauChoDuyet: 0, thuNhapDuKien: 0, danhGiaTB: 0, luotDanhGia: 0 });
   const [lichHomNay, setLichHomNay] = useState([]);
   const [thongBaoMoi, setThongBaoMoi] = useState([]);
   const [danhSachDanhGiaChiTiet, setDanhSachDanhGiaChiTiet] = useState([]);
 
-  // 🟢 STATE MỚI: ĐIỀU KHIỂN VIỆC HIỆN THÊM / RÚT GỌN ĐÁNH GIÁ
+  
   const [hienTatCa, setHienTatCa] = useState(false);
 
-  // Lấy ngày hiện tại và format Thứ
+  
   const today = new Date();
   const dateString = today.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const daysMap = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
@@ -69,7 +68,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
         const mangMaLop = lopCuaToi.map(l => String(l.magiasu_monhoc));
         const dkCuaToi = cacDangKy.filter(dk => mangMaLop.includes(String(dk.magiasu_monhoc)));
 
-        // 🟢 LẤY CÁC YÊU CẦU MÀ GIA SƯ NÀY ĐƯỢC DUYỆT (từ YEUCAUTIMGIASU qua GIASU_UNGTUYEN)
+        
         const ungTuyenCuaToi = cacUngTuyen.filter(ut => String(ut.magiasu) === String(giasuData.magiasu) && Number(ut.trangthai) === 1);
         const mangMaYeuCau = ungTuyenCuaToi.map(ut => String(ut.mayeucau));
         const yeuCauCuaToi = cacYeuCau.filter(yc => mangMaYeuCau.includes(String(yc.mayeucau)));
@@ -77,13 +76,13 @@ const TongQuanGS = ({ setTabHienTai }) => {
         const dangDay = dkCuaToi.filter(dk => Number(dk.trangthai) === 1);
         const choDuyet = dkCuaToi.filter(dk => Number(dk.trangthai) === 0);
         
-        // 🟢 TÍNH TỔNG THU NHẬP: từ cả DangKyLich và YeuCauTimGiaSu
+        
         const thuNhapTuDangKy = dangDay.reduce((sum, dk) => sum + (Number(dk.tonghocphi) || 0), 0);
         const yeuCauDangDay = yeuCauCuaToi.filter(yc => Number(yc.trangthai) === 1);
         const thuNhapTuYeuCau = yeuCauDangDay.reduce((sum, yc) => sum + (Number(yc.tonghocphi) || 0), 0);
         const tongThuNhap = thuNhapTuDangKy + thuNhapTuYeuCau;
 
-        // 🟢 LẤY ĐÁNH GIÁ TỪ CẢ 2 NGUỒN
+        
         const mangMaDK = dkCuaToi.map(dk => String(dk.madangky));
         const danhGiaTuDangKy = cacDanhGia.filter(dg => dg.madangky && mangMaDK.includes(String(dg.madangky)));
         const danhGiaTuYeuCau = cacDanhGia.filter(dg => dg.mayeucau && mangMaYeuCau.includes(String(dg.mayeucau)));
@@ -96,14 +95,14 @@ const TongQuanGS = ({ setTabHienTai }) => {
           let môn = null;
           let ngườiĐánhGiá = null;
           
-          // Nếu là đánh giá từ DANGKYLICH
+          
           if (dg.madangky) {
             const đơn = dkCuaToi.find(dk => String(dk.madangky) === String(dg.madangky));
             const lớp = lopCuaToi.find(l => String(l.magiasu_monhoc) === String(đơn?.magiasu_monhoc));
             môn = cacMon.find(m => String(m.mamonhoc) === String(lớp?.mamonhoc));
             ngườiĐánhGiá = cacND.find(nd => String(nd.id || nd.manguoidung) === String(đơn?.manguoidung));
           } 
-          // Nếu là đánh giá từ YEUCAUTIMGIASU
+          
           else if (dg.mayeucau) {
             const yêuCầu = yeuCauCuaToi.find(yc => String(yc.mayeucau) === String(dg.mayeucau));
             môn = cacMon.find(m => String(m.mamonhoc) === String(yêuCầu?.mamonhoc));
@@ -150,7 +149,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
     return () => { isMounted = false; };
   }, [thuHomNay]);
 
-  // 🟢 LOGIC TÍNH TOÁN DANH SÁCH HIỂN THỊ
+  
   const danhGiaHienThi = hienTatCa ? danhSachDanhGiaChiTiet : danhSachDanhGiaChiTiet.slice(0, 3);
 
   if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Đang đồng bộ dữ liệu hệ thống...</div>;
@@ -158,7 +157,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
   return (
     <div className="tq-dashboard-wrapper">
 
-      {/* HEADER */}
+      {}
       <div className="tq-header-section">
         <div>
           <h1 className="tq-greeting">Chào ngày mới, {tenGiaSu}! 👋</h1>
@@ -169,7 +168,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
         </button>
       </div>
 
-      {/* STATS */}
+      {}
       <div className="tq-stats-grid">
         <div className="tq-stat-card"><div className="tq-icon-box" style={{ background: '#e2f1ed', color: '#006b54' }}><span className="material-symbols-outlined">menu_book</span></div><div className="tq-stat-info"><p className="tq-stat-label">Lớp đang dạy</p><h3 className="tq-stat-value">{stats.lopDangDay}</h3></div></div>
         <div className="tq-stat-card" onClick={() => setTabHienTai('booking_requests')} style={{cursor: 'pointer'}}><div className="tq-icon-box" style={{ background: '#fef3c7', color: '#f59e0b' }}><span className="material-symbols-outlined">notifications_active</span></div><div className="tq-stat-info"><p className="tq-stat-label">Yêu cầu chờ duyệt</p><h3 className="tq-stat-value" style={{ color: '#f59e0b' }}>{stats.yeuCauChoDuyet}</h3></div></div>
@@ -180,7 +179,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
       <div className="tq-main-layout">
         <div className="tq-col-left">
 
-          {/* LỊCH DẠY HÔM NAY */}
+          {}
           <div className="tq-section-card">
             <div className="tq-section-header">
               <h2 className="tq-section-title"><span className="material-symbols-outlined" style={{ color: '#0284c7' }}>calendar_today</span> Lịch Dạy Hôm Nay</h2>
@@ -199,7 +198,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
             </div>
           </div>
 
-          {/* 🟢 PHẦN ĐÁNH GIÁ VỚI NÚT HIỆN THÊM / RÚT GỌN */}
+          {}
           <div className="tq-section-card" style={{marginTop: '24px'}}>
             <div className="tq-section-header">
               <h2 className="tq-section-title">
@@ -238,7 +237,7 @@ const TongQuanGS = ({ setTabHienTai }) => {
                     </div>
                   ))}
 
-                  {/* NÚT ĐIỀU KHIỂN HIỂN THỊ */}
+                  {}
                   {danhSachDanhGiaChiTiet.length > 3 && (
                     <button
                       onClick={() => setHienTatCa(!hienTatCa)}

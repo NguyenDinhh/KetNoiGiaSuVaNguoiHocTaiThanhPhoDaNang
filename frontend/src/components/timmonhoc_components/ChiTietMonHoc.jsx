@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import '../../assets/css/TimMonHoc.css';
 
-// 🟢 IMPORT SERVICE CỦA ÔNG VÀO ĐÂY
 import KhungGio_GiaSu_MonHoc_Service from '../../services/KhungGio_GiaSu_MonHoc_Service';
 
-// 🟢 IMPORT COMPONENT FORM ĐĂNG KÝ
 import DangKyMonHoc from '../timmonhoc_components/DangKyMonHoc';
 
 const ChiTietMonHoc = ({ item, onClose }) => {
   const [danhSachKhungGio, setDanhSachKhungGio] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🟢 STATE ĐIỀU KHIỂN BẬT/TẮT FORM ĐĂNG KÝ
+  
   const [dangMoFormDangKy, setDangMoFormDangKy] = useState(false);
 
-  // Khóa cuộn trang nền khi Popup bật lên
+  
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -29,13 +27,13 @@ const ChiTietMonHoc = ({ item, onClose }) => {
       try {
         setIsLoading(true);
 
-        // GỌI API THAY VÌ DÙNG FETCH TRỰC TIẾP
+        
         const tatCaKhungGio = await KhungGio_GiaSu_MonHoc_Service.layDanhSachKhungGio();
 
-        // Đảm bảo dữ liệu là một mảng trước khi dùng hàm filter
+        
         const mangKhungGio = Array.isArray(tatCaKhungGio) ? tatCaKhungGio : [];
 
-        // Lọc các khung giờ khớp với mã gia sư môn học và đang hoạt động
+        
         const khungGioHopLe = mangKhungGio.filter(
           kg => String(kg.magiasu_monhoc) === String(item.magiasu_monhoc) && Number(kg.trangthai) === 1
         );
@@ -122,7 +120,7 @@ const ChiTietMonHoc = ({ item, onClose }) => {
           </div>
         )}
 
-        {/* 🟢 CHỈ HIỂN THỊ LỊCH RẢNH NẾU CHƯA BẤM NÚT ĐĂNG KÝ */}
+        {}
         {!dangMoFormDangKy && (
           <div className="ctmh-schedule-section">
             <h3 className="ctmh-schedule-title">
@@ -154,7 +152,7 @@ const ChiTietMonHoc = ({ item, onClose }) => {
           </div>
         )}
 
-        {/* 🟢 LOGIC CHUYỂN ĐỔI FORM ĐĂNG KÝ & NÚT */}
+        {}
         {dangMoFormDangKy ? (
           <DangKyMonHoc
             item={item}

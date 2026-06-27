@@ -18,7 +18,6 @@ nguoidung_router = APIRouter()
 @nguoidung_router.get("/danhsachnguoidung", tags=["nguoidung"])
 async def get_danhsachnguoidung(db: Session = Depends(get_db)):
     nguoidungs = db.query(NguoiDung).all()
-    # Chuyển list Object DB sang list dict
     data = [NguoiDung_Schema.model_validate(n).model_dump() for n in nguoidungs]
     return DataResponse.success_response(data)
 

@@ -69,7 +69,7 @@ const GiaSu_MonHoc_Service = {
         }
     },
 
-    // ================== BỔ SUNG API TÍNH HỌC PHÍ ==================
+    
     tinhHocPhi: async (hocphimotbuoi, sobuoi) => {
         try {
             const phanHoi = await fetch(`${DIA_CHI_API}/tinhhocphi`, {
@@ -82,10 +82,10 @@ const GiaSu_MonHoc_Service = {
             });
             if (!phanHoi.ok) throw new Error("Lỗi gọi API tính học phí!");
             const ketQua = await phanHoi.json();
-            return ketQua.data; // Trả về con số tổng
+            return ketQua.data; 
         } catch (loi) {
             console.error("Lỗi tại GiaSu_MonHoc_Service.tinhHocPhi:", loi);
-            return 0; // Backup để app không sập nếu API lỗi
+            return 0; 
         }
     }
 };

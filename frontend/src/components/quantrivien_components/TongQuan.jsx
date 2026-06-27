@@ -17,7 +17,7 @@ const TongQuan = () => {
   const [dangTai, setDangTai] = useState(true);
   const [capNhatLuc, setCapNhatLuc] = useState(new Date());
 
-  // Load dữ liệu khi component mount
+  
   useEffect(() => {
     taiDuLieu();
   }, []);
@@ -25,24 +25,24 @@ const TongQuan = () => {
   const taiDuLieu = async () => {
     setDangTai(true);
     try {
-      // Gọi API song song: Lấy luôn cục thống kê có sẵn từ Backend
+      
       const [thongKeND, dsNguoiDung, dsGiaSu] = await Promise.all([
-        NguoiDung_Service.layThongKeNguoiDung(), // API trả về: { tongSo, quanTriVien, giaSu, nguoiHoc }
+        NguoiDung_Service.layThongKeNguoiDung(), 
         NguoiDung_Service.layDanhSachNguoiDung(),
         GiaSu_Service.layDanhSachGiaSu()
       ]);
 
-      // Phân loại trạng thái kiểm duyệt gia sư (Vì thống kê User không có phần này)
-      const gsChoDuyet = dsGiaSu.filter(gs => gs.trangthaiduyet === 0); // 0: Chờ duyệt
-      const gsDaDuyet = dsGiaSu.filter(gs => gs.trangthaiduyet === 1);  // 1: Đã duyệt
-      const gsBiKhoa = dsGiaSu.filter(gs => gs.trangthai === 0);        // 0: Bị khóa
+      
+      const gsChoDuyet = dsGiaSu.filter(gs => gs.trangthaiduyet === 0); 
+      const gsDaDuyet = dsGiaSu.filter(gs => gs.trangthaiduyet === 1);  
+      const gsBiKhoa = dsGiaSu.filter(gs => gs.trangthai === 0);        
 
-      // Cập nhật thống kê bằng dữ liệu chuẩn từ Backend
+      
       setThongKe({
         tongNguoiDung: thongKeND?.tongSo || 0,
         tongNguoiHoc: thongKeND?.nguoiHoc || 0,
 
-        // SỬA DÒNG NÀY: Dùng trực tiếp chiều dài mảng dsGiaSu làm tổng số để đồng bộ Mẫu số
+        
         tongGiaSu: dsGiaSu.length || 0,
 
         giaSuChoDuyet: gsChoDuyet.length,
@@ -50,10 +50,10 @@ const TongQuan = () => {
         giaSuBiKhoa: gsBiKhoa.length
       });
 
-      // Lấy 5 gia sư mới nhất cần xác thực để hiển thị ra bảng
+      
       setGiaSuMoi(gsChoDuyet.slice(0, 5));
 
-      // Lấy 5 người dùng mới tạo tài khoản gần nhất
+      
       const nguoiDungMoiNhat = dsNguoiDung
         .sort((a, b) => new Date(b.ngaytao) - new Date(a.ngaytao))
         .slice(0, 5);
@@ -104,7 +104,7 @@ const TongQuan = () => {
         </div>
       </header>
 
-      {/* --- QUICK STATS --- */}
+      {}
       <section className="tq-stats-grid">
         <div className="tq-card">
           <div className="tq-flex-start">
@@ -163,13 +163,13 @@ const TongQuan = () => {
         </div>
       </section>
 
-      {/* --- MAIN GRID --- */}
+      {}
       <div className="tq-main-grid">
 
-        {/* === CỘT TRÁI === */}
+        {}
         <div className="tq-col-left">
 
-          {/* Gia sư mới cần xác thực */}
+          {}
           <div className="tq-card no-pad">
             <div className="tq-card-header">
               <h3 className="tq-card-title">
@@ -209,7 +209,7 @@ const TongQuan = () => {
             </div>
           </div>
 
-          {/* Danh sách người dùng mới đăng ký */}
+          {}
           <div className="tq-card no-pad">
             <div className="tq-card-header">
               <h3 className="tq-card-title">
@@ -264,10 +264,10 @@ const TongQuan = () => {
           </div>
         </div>
 
-        {/* === CỘT PHẢI === */}
+        {}
         <div className="tq-col-right">
 
-          {/* Chi tiết trạng thái Gia sư */}
+          {}
           <div className="tq-card">
             <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: 'bold' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '20px', verticalAlign: 'middle', marginRight: '8px', color: 'var(--admin-secondary)' }}>
@@ -303,7 +303,7 @@ const TongQuan = () => {
             </div>
           </div>
 
-          {/* Phân tích cộng đồng */}
+          {}
           <div className="tq-card">
             <div className="tq-flex-between">
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>Phân tích Cộng đồng</h3>

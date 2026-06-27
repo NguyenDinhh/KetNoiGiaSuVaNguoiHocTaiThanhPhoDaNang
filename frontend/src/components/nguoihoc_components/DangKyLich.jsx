@@ -15,24 +15,24 @@ import DanhGia_Service from '../../services/DanhGia_Service';
 import GiaSu_UngTuyen_Service from '../../services/GiaSu_UngTuyen_Service';
 
 const DangKyLich = () => {
-  // STATE QUẢN LÝ TAB CHÍNH CỦA TRANG
-  const [activeMainTab, setActiveMainTab] = useState('danh_sach'); // 'danh_sach' | 'lich_hoc'
+  
+  const [activeMainTab, setActiveMainTab] = useState('danh_sach'); 
 
   const [danhSachDangKy, setDanhSachDangKy] = useState([]);
-  const [danhSachYeuCau, setDanhSachYeuCau] = useState([]); // Danh sách từ YeuCauTimGiaSu
+  const [danhSachYeuCau, setDanhSachYeuCau] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-  // States phục vụ việc Chỉnh sửa đơn
+  
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [donDangChon, setDonDangChon] = useState(null);
   const [formSua, setFormSua] = useState({ ngaybatdauhoc: '', ghichu: '' });
 
-  // STATES PHỤC VỤ ĐÁNH GIÁ
+  
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewData, setReviewData] = useState({ madanhgia: null, madangky: null, sosao: 5, nhanxet: '' });
   const [hoveredStar, setHoveredStar] = useState(0);
 
-  // 🟢 STATES QUẢN LÝ THU/PHÓNG (EXPAND/COLLAPSE)
+  
   const [expanded, setExpanded] = useState({
     choDuyet: true,
     dangHoc: true,
@@ -40,7 +40,7 @@ const DangKyLich = () => {
     tuChoi: false
   });
 
-  // STATES PHỤC VỤ LỊCH HỌC CỦA TỪNG HỌC VIÊN
+  
   const [danhSachHocVienCuaToi, setDanhSachHocVienCuaToi] = useState([]);
   const [tabHocVien, setTabHocVien] = useState('Tất cả');
   const [tabThu, setTabThu] = useState('Tất cả');
@@ -115,7 +115,7 @@ const DangKyLich = () => {
         };
       });
 
-      // Sắp xếp: Chờ duyệt (0) lên đầu, Đang học (1), sau đó mới tới Đã Hủy/Từ Chối.
+      
       setDanhSachDangKy(dataHoanChinh.sort((a, b) => {
         if (Number(a.trangthai) !== Number(b.trangthai)) {
           return Number(a.trangthai) - Number(b.trangthai);
@@ -123,7 +123,7 @@ const DangKyLich = () => {
         return String(b.madangky) - String(a.madangky);
       }));
 
-      // 🟢 XỬ LÝ DATA TỪ YEU CẦU TÌM GIA SƯ (người học tạo yêu cầu, gia sư ứng tuyển)
+      
       const arrYeuCau = Array.isArray(resYeuCauTimGiaSu) ? resYeuCauTimGiaSu : (resYeuCauTimGiaSu?.data || []);
       const arrChiTietYC = Array.isArray(resChiTietYeuCau) ? resChiTietYeuCau : (resChiTietYeuCau?.data || []);
       const arrGiaSuUngTuyen = Array.isArray(resGiaSuUngTuyen) ? resGiaSuUngTuyen : (resGiaSuUngTuyen?.data || []);
@@ -133,7 +133,7 @@ const DangKyLich = () => {
       const dataYeuCau = yeuCauCuaToi.map(yc => {
         const mon = listMonHoc.find(m => String(m.mamonhoc) === String(yc.mamonhoc));
         
-        // 🔥 TÌM GIA SƯ TỪ BẢNG GIASU_UNGTUYEN (người được duyệt - trangthai = 1)
+        
         const ungTuyenDuocDuyet = arrGiaSuUngTuyen.find(ut => 
           String(ut.mayeucau) === String(yc.mayeucau) && Number(ut.trangthai) === 1
         );
@@ -153,7 +153,7 @@ const DangKyLich = () => {
 
         return {
           mayeucau: yc.mayeucau,
-          nguon: 'yeucau', // Đánh dấu nguồn data
+          nguon: 'yeucau', 
           trangthai: yc.trangthai,
           tenmonhoc: mon ? mon.tenmonhoc : 'Môn học ẩn',
           giasu_ten: thongTinGS.name || thongTinGS.hoten || 'Chưa cập nhật',
@@ -181,7 +181,7 @@ const DangKyLich = () => {
     }
   };
 
-  // 🟢 HÀM HỦY ĐƠN VÀ DỌN DẸP DỮ LIỆU
+  
   const handleHuyDonDangKy = async (dk) => {
     if (Number(dk.trangthai) !== 0) {
         return alert("Chỉ có thể hủy những đơn đang ở trạng thái 'Chờ gia sư duyệt'!");
@@ -294,17 +294,17 @@ const DangKyLich = () => {
     }
   };
 
-  // 🟢 HÀM LẤY LỊCH HỌC CHO TAB 2 - Từ cả DangKyLich và YeuCauTimGiaSu
+  
   const getLichHocData = () => {
     let dsCaHoc = [];
     
-    // 1. Lấy từ DangKyLich (trangthai = 1: đang học)
+    
     const cacLopDangHocTuDangKy = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
     
-    // 2. Lấy từ YeuCauTimGiaSu (trangthai = 1: đang học)
+    
     const cacLopDangHocTuYeuCau = danhSachYeuCau.filter(yc => Number(yc.trangthai) === 1);
 
-    // Xử lý DangKyLich
+    
     cacLopDangHocTuDangKy.forEach(dk => {
       const coHocVienDuocChon = tabHocVien === 'Tất cả'
         ? true
@@ -327,7 +327,7 @@ const DangKyLich = () => {
       }
     });
 
-    // Xử lý YeuCauTimGiaSu
+    
     cacLopDangHocTuYeuCau.forEach(yc => {
       const coHocVienDuocChon = tabHocVien === 'Tất cả'
         ? true
@@ -356,7 +356,7 @@ const DangKyLich = () => {
 
   const lichHocHienThi = getLichHocData();
 
-  // PHÂN NHÓM DANH SÁCH CHO TAB 1
+  
   const listChoDuyet = danhSachDangKy.filter(dk => Number(dk.trangthai) === 0);
   const listDangHoc = danhSachDangKy.filter(dk => Number(dk.trangthai) === 1);
   const listTuChoi = danhSachDangKy.filter(dk => Number(dk.trangthai) === 2);
@@ -366,7 +366,7 @@ const DangKyLich = () => {
   const donDangHoc = listDangHoc.length;
   const donHoanThanh = listHoanThanh.length;
 
-  // 🟢 HÀM RENDER KHỐI DANH SÁCH (CÓ THU PHÓNG)
+  
   const renderSection = (title, list, expandedKey, color, icon) => {
     if (list.length === 0) return null;
     const isExpanded = expanded[expandedKey];
@@ -537,7 +537,7 @@ const DangKyLich = () => {
       ) : activeMainTab === 'danh_sach' ? (
 
         <>
-          {/* KHỐI THỐNG KÊ */}
+          {}
           <div className="dkl-stats-grid">
             <div className="dkl-stat-card">
               <div className="dkl-stat-icon-wrapper neutral">
@@ -570,7 +570,7 @@ const DangKyLich = () => {
             </div>
           </div>
 
-          {/* DANH SÁCH ĐƠN SỬ DỤNG RENDER SECTION ĐỂ THU PHÓNG */}
+          {}
           {danhSachDangKy.length === 0 ? (
             <div className="dkl-empty-state">
               Bạn chưa thực hiện gửi đơn đăng ký lịch học nào.
@@ -586,9 +586,9 @@ const DangKyLich = () => {
         </>
       ) : (
 
-        // =================================================================================
-        // TAB 2: LỊCH HỌC TỪNG HỌC VIÊN
-        // =================================================================================
+        
+        
+        
         <div className="dkl-schedule-container">
 
           <div className="dkl-filter-box">
@@ -677,7 +677,7 @@ const DangKyLich = () => {
         </div>
       )}
 
-      {/* MODAL ĐÁNH GIÁ VÀ MODAL SỬA */}
+      {}
       {isReviewOpen && (
         <div className="dkl-modal-overlay">
           <div className="dkl-modal-content small">

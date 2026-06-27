@@ -1,7 +1,7 @@
 const DIA_CHI_API = 'http://localhost:8000';
 
 const MonHoc_Service = {
-  // 1. Lấy danh sách (GET /danhsachmonhoc)
+  
   layDanhSachMonHoc: async () => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/danhsachmonhoc`);
@@ -14,7 +14,7 @@ const MonHoc_Service = {
     }
   },
 
-  // 2. Thống kê môn học (Tự tính toán từ danh sách)
+  
   layThongKeMonHoc: async () => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/danhsachmonhoc`);
@@ -38,20 +38,20 @@ const MonHoc_Service = {
       throw loi;
     }
   },
-  // Sửa lại cho đồng bộ với phong cách dùng fetch() của toàn bộ file
+  
   layMonHocTheoLop: async (mahelop) => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/monhoc/theolop/${mahelop}`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API môn học theo lớp!");
 
       const ketQua = await phanHoi.json();
-      return ketQua.data || []; // Bóc cái mảng data ra, nếu không có thì trả về mảng rỗng
+      return ketQua.data || []; 
     } catch (loi) {
       console.error("Lỗi tại MonHoc_Service.layMonHocTheoLop:", loi);
-      return []; // Lỗi thì trả về mảng rỗng để Form Tìm kiếm không bị sập
+      return []; 
     }
   },
-  // 3. Thêm mới môn học (POST /themmonhoc)
+  
   themMonHocMoi: async (duLieuForm) => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/themmonhoc`, {
@@ -67,7 +67,7 @@ const MonHoc_Service = {
     }
   },
 
-  // 4. Cập nhật & Đổi trạng thái dùng chung 1 API (PUT /suamonhoc/{id})
+  
   capNhatMonHoc: async (maMonHoc, duLieuSua) => {
     try {
       const phanHoi = await fetch(`${DIA_CHI_API}/suamonhoc/${maMonHoc}`, {

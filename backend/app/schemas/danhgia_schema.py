@@ -4,9 +4,9 @@ from typing import Optional
 
 class DanhGia_Schema(BaseModel):
     madanhgia: str
-    mayeucau: Optional[str] = None  # 🟢 Chuyển thành tùy chọn
-    madangky: Optional[str] = None  # 🟢 Chuyển thành tùy chọn
-    sodiem: float  # 1.0 - 5.0
+    mayeucau: Optional[str] = None
+    madangky: Optional[str] = None
+    sodiem: float
     noidung: str
     ngaydanhgia: datetime
 
@@ -14,12 +14,11 @@ class DanhGia_Schema(BaseModel):
         from_attributes = True
 
 class Create_DanhGia_Schema(BaseModel):
-    mayeucau: Optional[str] = None  # 🟢 Cho phép bằng Null
-    madangky: Optional[str] = None  # 🟢 Cho phép bằng Null
-    sodiem: float  # 1.0 - 5.0
+    mayeucau: Optional[str] = None
+    madangky: Optional[str] = None
+    sodiem: float
     noidung: str
 
-    # 🟢 Thêm bộ kiểm tra điều kiện (Validator) chặn lỗi từ vòng gửi xe trước khi đụng Database
     @model_validator(mode='after')
     def check_either_exists(self):
         if self.mayeucau is None and self.madangky is None:

@@ -9,7 +9,7 @@ class ChiTietDangKyLich_Schema(BaseModel):
     ngayhoc: str
     thoigianbatdau: time
     thoigianketthuc: time
-    ghichu: Optional[str] = None # 🟢 ĐÃ SỬA: Cho phép rỗng (NULL)
+    ghichu: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -20,9 +20,8 @@ class Create_ChiTietDangKyLich_Schema(BaseModel):
     ngayhoc: str
     thoigianbatdau: time
     thoigianketthuc: time
-    ghichu: Optional[str] = None # 🟢 ĐÃ SỬA: Cho phép rỗng (NULL)
+    ghichu: Optional[str] = None
 
-# Bổ sung luôn Schema cho lúc UPDATE (PUT) cho an toàn nhé
 class Update_ChiTietDangKyLich_Schema(BaseModel):
     makhunggio: Optional[str] = None
     madangky: Optional[str] = None

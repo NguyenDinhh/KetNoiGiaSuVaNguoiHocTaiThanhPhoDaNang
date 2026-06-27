@@ -6,10 +6,10 @@ class DangKyLich_Schema(BaseModel):
     madangky: str
     manguoidung: str
     magiasu_monhoc: str
-    ngayyeucau: datetime  # 🟢 ĐÃ SỬA: Đổi từ ngaybatdau thành ngayyeucau cho khớp DB
+    ngayyeucau: datetime
     ngaybatdauhoc: date
     tonghocphi: int
-    ghichu: Optional[str] = None # Cho phép null đề phòng ghi chú trống
+    ghichu: Optional[str] = None
     trangthai: int
     lydotuchoi: Optional[str] = None
 
@@ -23,7 +23,6 @@ class Create_DangKyLich_Schema(BaseModel):
     tonghocphi: int
     ghichu: Optional[str] = None
 
-# 🟢 THÊM SCHEMA NÀY ĐỂ DÙNG CHO HÀM DUYỆT ĐƠN (CẬP NHẬT TRẠNG THÁI)
 class Update_DangKyLich_Schema(BaseModel):
     manguoidung: Optional[str] = None
     magiasu_monhoc: Optional[str] = None

@@ -18,7 +18,7 @@ const KhuVuc_Service = {
       const phanHoi = await fetch(`${DIA_CHI_API}/danhsachkhuvuc`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API!");
       const ketQua = await phanHoi.json();
-      return { tongSo: ketQua.data.length }; // Chỉ đếm tổng số
+      return { tongSo: ketQua.data.length }; 
     } catch (loi) {
       throw loi;
     }

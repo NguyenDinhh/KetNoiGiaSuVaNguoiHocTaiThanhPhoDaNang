@@ -24,9 +24,6 @@ async def get_yeucauhocvien(id: str, db: Session = Depends(get_db)):
         return DataResponse.custom_response(code="404", message="Không tìm thấy", data=None)
     return DataResponse.success_response(yeucau_hocvien)
 
-# ----------------------------------------------------------------------
-# 1. API THÊM THEO MÃ YÊU CẦU (Giữ nguyên đường dẫn cũ cho Frontend dễ gọi)
-# ----------------------------------------------------------------------
 @yeucau_hocvien_router.post("/themyeucauhocvien", tags=["yeucau_hocvien"], description="Thêm yêu cầu học viên (Bằng Mã Yêu Cầu)", response_model=DataResponse[YeuCauHocVien_Schema])
 async def create_yeucauhocvien_mayeucau(data: Create_YeuCauHocVienVoiMaYeuCau_Schema, db: Session = Depends(get_db)):
     try:
@@ -58,9 +55,6 @@ async def create_yeucauhocvien_mayeucau(data: Create_YeuCauHocVienVoiMaYeuCau_Sc
         print(f"TRACEBACK: {traceback.format_exc()}")
         raise HTTPException(status_code=400, detail=f"Lỗi: {str(e)}")
 
-# ----------------------------------------------------------------------
-# 2. API THÊM THEO MÃ ĐĂNG KÝ (Đường dẫn mới)
-# ----------------------------------------------------------------------
 @yeucau_hocvien_router.post("/themyeucauhocvien_theomadangky", tags=["yeucau_hocvien"], description="Thêm yêu cầu học viên (Bằng Mã Đăng Ký)", response_model=DataResponse[YeuCauHocVien_Schema])
 async def create_yeucauhocvien_madangky(data: Create_YeuCauHocVienVoiMaDangKy_Schema, db: Session = Depends(get_db)):
     try:

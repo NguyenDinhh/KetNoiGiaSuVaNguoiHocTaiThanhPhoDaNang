@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import BangCap_Service from '../../services/BangCap_Service';
 import MonHoc_Service from '../../services/MonHoc_Service';
 import BangCap_MonHoc_Service from '../../services/BangCap_MonHoc_Service';
-// THÊM DÒNG IMPORT NÀY ĐỂ KÉO DATA HỆ LỚP
+
 import HeLop_Service from '../../services/HeLop_Service';
 
 const BangCapManagementTable = () => {
@@ -20,12 +20,12 @@ const BangCapManagementTable = () => {
   const [formDuLieuBangCap, setFormDuLieuBangCap] = useState({ tenbangcap: "" });
   const [idBangCapDangSua, setIdBangCapDangSua] = useState(null);
 
-  // STATE DÀNH RIÊNG CHO MODAL CHI TIẾT
+  
   const [hienThiModalChiTiet, setHienThiModalChiTiet] = useState(false);
   const [bangCapDangXem, setBangCapDangXem] = useState(null);
   const [danhSachTick, setDanhSachTick] = useState([]);
   const [tuKhoaModal, setTuKhoaModal] = useState("");
-  const [heLopDangChonModal, setHeLopDangChonModal] = useState("ALL"); // Trạng thái Sidebar
+  const [heLopDangChonModal, setHeLopDangChonModal] = useState("ALL"); 
 
   useEffect(() => {
     taiDuLieuTongHop();
@@ -33,13 +33,13 @@ const BangCapManagementTable = () => {
 
   const taiDuLieuTongHop = () => {
     setDangTai(true);
-    // Tải song song 5 bảng dữ liệu cùng lúc cho mượt
+    
     Promise.all([
       BangCap_Service.layDanhSachBangCap(),
       MonHoc_Service.layDanhSachMonHoc(),
       BangCap_MonHoc_Service.layDanhSach(),
       BangCap_Service.layThongKeBangCap(),
-      HeLop_Service.layDanhSachHeLop() // Kéo thêm Hệ Lớp
+      HeLop_Service.layDanhSachHeLop() 
     ])
     .then(([bangCaps, monHocs, tieuChuans, tk, heLops]) => {
       setDanhSachBangCap(bangCaps);
@@ -107,7 +107,7 @@ const BangCapManagementTable = () => {
     setBangCapDangXem(bangCap);
     setDanhSachTick([]);
     setTuKhoaModal("");
-    setHeLopDangChonModal("ALL"); // Reset sidebar về mặc định
+    setHeLopDangChonModal("ALL"); 
     setHienThiModalChiTiet(true);
   };
 
@@ -175,7 +175,7 @@ const BangCapManagementTable = () => {
         </button>
       </div>
 
-      {/* ================= TAB 1: QUẢN LÝ BẰNG CẤP ================= */}
+      {}
       {tabHienTai === 'bangcap' && (
         <div className="tab-content-fade-in">
           <div className="admin-bento-grid">
@@ -266,7 +266,7 @@ const BangCapManagementTable = () => {
         </div>
       )}
 
-      {/* ================= TAB 2: TIÊU CHUẨN BẰNG CẤP ================= */}
+      {}
       {tabHienTai === 'tieuchuan' && (
         <div className="tab-content-fade-in">
           <div className="admin-table-card">
@@ -324,7 +324,7 @@ const BangCapManagementTable = () => {
         </div>
       )}
 
-      {/* ================= MODAL FORM ================= */}
+      {}
 
       {hienThiFormBangCap && (
         <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
@@ -341,20 +341,20 @@ const BangCapManagementTable = () => {
         </div>
       )}
 
-      {/* MODAL GÁN/HỦY HÀNG LOẠT + SIDEBAR LỌC HỆ LỚP */}
+      {}
       {hienThiModalChiTiet && (
         <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
-          {/* Mở rộng bề ngang Modal lên 850px để nhét vừa Sidebar */}
+          {}
           <div className="admin-modal-box" style={{ backgroundColor: '#ffffff', padding: '24px', borderRadius: '12px', width: '100%', maxWidth: '850px', height: '80vh', display: 'flex', flexDirection: 'column' }}>
 
-            {/* Header Modal */}
+            {}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
               <div>
                 <h2 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0 0 8px 0', color: 'var(--admin-primary)' }}>
                   Chi tiết Tiêu chuẩn: {bangCapDangXem?.tenbangcap}
                 </h2>
 
-                {/* Ô TÌM KIẾM */}
+                {}
                 <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px 12px', width: '350px', backgroundColor: '#f8fafc' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#94a3b8', marginRight: '8px' }}>search</span>
                   <input
@@ -372,10 +372,10 @@ const BangCapManagementTable = () => {
               </button>
             </div>
 
-            {/* BỐ CỤC CHÍNH: SIDEBAR (Trái) & DANH SÁCH MÔN (Phải) */}
+            {}
             <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
-              {/* SIDEBAR BÊN TRÁI: DANH SÁCH HỆ LỚP */}
+              {}
               <div style={{ width: '220px', borderRight: '1px solid #e2e8f0', paddingRight: '16px', overflowY: 'auto' }}>
                 <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#64748b', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Bộ lọc Hệ lớp
@@ -399,10 +399,10 @@ const BangCapManagementTable = () => {
                 </ul>
               </div>
 
-              {/* VÙNG DANH SÁCH BÊN PHẢI */}
+              {}
               <div style={{ flex: 1, paddingLeft: '20px', overflowY: 'auto' }}>
 
-                {/* PHẦN 1: MÔN ĐÃ GÁN */}
+                {}
                 <div style={{ marginBottom: '24px' }}>
                   <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Môn đã đăng ký
@@ -412,7 +412,7 @@ const BangCapManagementTable = () => {
                       .filter(tc => tc.mabangcap === bangCapDangXem?.mabangcap)
                       .map(tc => {
                         const mon = danhSachMonHoc.find(m => m.mamonhoc === tc.mamonhoc);
-                        // Bóc thêm mahelop để lấy dữ liệu lọc
+                        
                         return { ...tc, tenMon: mon ? mon.tenmonhoc : "", maHeLop: mon ? mon.mahelop : null };
                       })
                       .filter(item => {
@@ -435,7 +435,7 @@ const BangCapManagementTable = () => {
                   </div>
                 </div>
 
-                {/* PHẦN 2: MÔN CHƯA GÁN */}
+                {}
                 <div>
                   <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Môn học có thể thêm
@@ -467,7 +467,7 @@ const BangCapManagementTable = () => {
               </div>
             </div>
 
-            {/* Footer Modal */}
+            {}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
               <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--admin-secondary)' }}>
                 Đang tick chọn: {danhSachTick.length} môn

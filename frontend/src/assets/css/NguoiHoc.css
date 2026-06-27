@@ -857,7 +857,7 @@ textarea.yctg-form-control { min-height: 100px; resize: vertical; }
 }
 .yctg-btn-remove {
   background: #fee2e2; color: #ef4444; border: none; border-radius: 6px;
-  height: 42px; width: 42px; cursor: pointer;
+  height: 42px; width: 42px; cursor: pointer; align-items: center;
 }
 .yctg-btn-add {
   background: #e0f2fe; color: #0284c7; border: 1px dashed #7dd3fc;

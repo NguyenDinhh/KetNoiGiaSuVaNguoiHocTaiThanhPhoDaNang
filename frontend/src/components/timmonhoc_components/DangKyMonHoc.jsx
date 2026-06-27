@@ -35,7 +35,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
         ]);
 
         const mangKhungGio = Array.isArray(resKhungGio) ? resKhungGio : [];
-        // Lọc lấy các khung giờ đang sẵn sàng (trạng thái 1)
+        
         const khungGioHopLe = mangKhungGio.filter(
           kg => String(kg.magiasu_monhoc) === String(item.magiasu_monhoc) && Number(kg.trangthai) === 1
         );
@@ -65,10 +65,10 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
 
   const toggleHocVien = (id) => {
     if (hocVienDaChon.includes(id)) {
-      // Cho phép bỏ chọn
+      
       setHocVienDaChon(hocVienDaChon.filter(x => x !== id));
     } else {
-      // Kiểm tra giới hạn 3 học viên
+      
       if (hocVienDaChon.length >= 3) {
         alert("Chỉ được chọn tối đa 3 học viên cho một đơn đăng ký!");
         return;
@@ -80,9 +80,9 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
   const donGiaHocPhi = item.hocphitong || item.hocphimoibuoi || 0;
   const tongHocPhiTinhToan = hocVienDaChon.length * donGiaHocPhi;
 
-  // ====================================================================
-  // 🟢 HÀM XỬ LÝ ĐĂNG KÝ: CHẠY TUẦN TỰ 3 BƯỚC TRANSACTION VÀ KHÓA MỀM
-  // ====================================================================
+  
+  
+  
   const handleSubmitDangKy = async (e) => {
     e.preventDefault();
     if (hocVienDaChon.length === 0) return alert("Vui lòng tích chọn ít nhất một học viên!");
@@ -94,7 +94,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
       const userLocal = JSON.parse(localStorage.getItem("thongTinUser"));
       const maND = String(userLocal?.manguoidung || userLocal?.id);
 
-      // --- 🟢 BƯỚC 1: LƯU BẢNG MASTER (DANG KY LICH) ---
+      
       const formMaster = {
         manguoidung: maND,
         magiasu_monhoc: item.magiasu_monhoc,
@@ -120,7 +120,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
 
       console.log(`✅ [BƯỚC 1 OK] Đã tạo thành công Đơn Đăng Ký với mã ID: ${maDangKyMoi}`);
 
-      // --- 🟢 BƯỚC 2: LƯU CHI TIẾT ĐĂNG KÝ VÀ KHÓA MỀM KHUNG GIỜ ---
+      
       console.log(`👉 [BƯỚC 2] Đang lưu dữ liệu khung giờ học và chuyển trạng thái Chờ duyệt (3)...`);
       for (const kg of khungGioDaChon) {
         const formDetail = {
@@ -133,13 +133,13 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
         };
         await ChiTietDangKyLich_Service.themChiTietDangKyLichMoi(formDetail);
 
-        // 🟢 Cập nhật trạng thái Khung giờ thành 3 (Chờ duyệt)
-        // Vì Backend đã hỗ trợ Optional nên chỉ cần gửi đúng trường cần đổi là ăn ngay.
+        
+        
         await KhungGio_GiaSu_MonHoc_Service.suaKhungGio(kg.makhunggio, { trangthai: 3 });
       }
       console.log(`✅ [BƯỚC 2 OK] Đã đồng bộ và khóa mềm ${khungGioDaChon.length} khung giờ học.`);
 
-      // --- 🟢 BƯỚC 3: LƯU DANH SÁCH HỌC VIÊN THEO MÃ ĐĂNG KÝ (YÊU CẦU HỌC VIÊN) ---
+      
       console.log(`👉 [BƯỚC 3] Đang ánh xạ học viên tham gia với mã đăng ký...`);
       for (const maHV of hocVienDaChon) {
         const formHV = {
@@ -179,7 +179,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
 
       <form onSubmit={handleSubmitDangKy} style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginTop: '14px' }}>
 
-        {/* 1. SELECTION HỌC VIÊN */}
+        {}
         <div>
           <label className="dkmh-label">
             <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '6px', color: '#0284c7' }}>groups</span>
@@ -227,7 +227,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
           )}
         </div>
 
-        {/* 2. SELECTION KHUNG GIỜ */}
+        {}
         <div>
           <label className="dkmh-label">
             <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '6px', color: '#0284c7' }}>calendar_month</span>
@@ -259,7 +259,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
           )}
         </div>
 
-        {/* 3. INPUT NGÀY & GHI CHÚ */}
+        {}
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div className="dkmh-input-group" style={{ flex: 1, minWidth: '220px' }}>
             <label className="dkmh-label">Bước 3: Chọn ngày bắt đầu học khóa mới</label>
@@ -285,7 +285,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
           </div>
         </div>
 
-        {/* 4. TỔNG HỢP GIÁ TIỀN */}
+        {}
         <div className="dkmh-summary-box">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <div>
@@ -301,7 +301,7 @@ const DangKyMonHoc = ({ item, onClose, onSuccess }) => {
           </div>
         </div>
 
-        {/* ACTION BUTTONS */}
+        {}
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '6px' }}>
           <button
             type="button"

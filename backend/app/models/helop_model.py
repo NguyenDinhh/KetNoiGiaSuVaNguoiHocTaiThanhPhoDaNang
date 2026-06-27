@@ -7,4 +7,4 @@ class HeLop(Base):
     mahelop = Column(String(10), primary_key=True, server_default=text("''"))
     tenhelop = Column(String(255), nullable=False, unique=True)
     mota = Column(String(1000))
-    trangthai = Column(Integer, default=1)  # 1: Hoạt động, 0: Ngưng áp dụng
+    trangthai = Column(Integer, default=1)

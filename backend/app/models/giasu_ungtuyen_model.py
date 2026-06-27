@@ -9,5 +9,5 @@ class GiaSuUngTuyen(Base):
     mayeucau = Column(String(10), ForeignKey("YEUCAUTIMGIASU.mayeucau"), nullable=False)
     magiasu = Column(String(10), ForeignKey("GIASU.magiasu"), nullable=False)
     thoigian_ungtuyen = Column(DateTime, default=func.now())
-    trangthai = Column(Integer, default=0) # 0: Đang chờ, 1: Chấp nhận, 2: Từ chối
+    trangthai = Column(Integer, default=0)
     lydotuchoi = Column(String(100))

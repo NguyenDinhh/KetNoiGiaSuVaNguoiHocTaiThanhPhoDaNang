@@ -90,19 +90,14 @@ async def delete_yeucautimgiasu(id: str, db: Session = Depends(get_db)):
         )
 
     try:
-        # Xóa các ứng tuyển liên quan (bao gồm cả đang chờ và bị từ chối)
         db.query(GiaSuUngTuyen).filter(GiaSuUngTuyen.mayeucau == id).delete()
 
-        # Xóa danh sách học viên liên quan
         db.query(YeuCauHocVien).filter(YeuCauHocVien.mayeucau == id).delete()
 
-        # Xóa chi tiết yêu cầu (khung giờ)
         db.query(ChiTietYeuCau).filter(ChiTietYeuCau.mayeucau == id).delete()
 
-        # Xóa đánh giá nếu có
         db.query(DanhGia).filter(DanhGia.mayeucau == id).delete()
 
-        # Cuối cùng xóa yêu cầu chính
         db.delete(yeucau)
         db.commit()
 

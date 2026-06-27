@@ -18,7 +18,6 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
 def create_access_token(data: dict) -> str:
-    """Hàm này dùng để phát 'thẻ từ' (JWT) sau khi đăng nhập thành công"""
     to_encode = data.copy()
 
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
