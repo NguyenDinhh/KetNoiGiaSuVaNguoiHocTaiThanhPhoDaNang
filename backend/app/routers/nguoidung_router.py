@@ -147,7 +147,7 @@ async def toggle_trangthai_nguoidung(id: str, db: Session = Depends(get_db)):
         NguoiDung_Schema.model_validate(nguoidung).model_dump()
     )
 
-@nguoidung_router.delete("/xoanguoidung/{id}", tags=["NguoiDung"])
+@nguoidung_router.delete("/xoanguoidung/{id}", tags=["nguoidung"])
 async def delete_nguoidung(id: str, db: Session = Depends(get_db)):
     nguoi_dung = db.query(NguoiDung).filter(
         NguoiDung.manguoidung == id

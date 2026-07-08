@@ -33,7 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Đống include_router phía dưới ông giữ nguyên y hệt
+
 app.include_router(nguoidung_router)
 app.include_router(giasu_router)
 app.include_router(hocvien_router)

@@ -585,10 +585,6 @@ const DangKyLich = () => {
           )}
         </>
       ) : (
-
-        
-        
-        
         <div className="dkl-schedule-container">
 
           <div className="dkl-filter-box">
