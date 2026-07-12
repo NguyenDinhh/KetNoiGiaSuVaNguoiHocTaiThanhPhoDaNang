@@ -7,12 +7,17 @@ services:
     branch: main
     buildCommand: pip install -r backend/requirements.txt
     startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    pythonVersion: "3.11.0"
     envVars:
-      - key: sql
+      - key: DATABASE_URL
         sync: false
       - key: EMAIL_SENDER
         sync: false
       - key: EMAIL_APP_PASSWORD
         sync: false
-      - key: PYTHON_VERSION
-        value: 3.11.0
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
