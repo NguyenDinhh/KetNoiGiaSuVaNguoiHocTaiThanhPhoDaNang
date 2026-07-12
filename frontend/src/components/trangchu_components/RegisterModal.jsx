@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import '../../assets/css/RegisterModal.css';
 import Upload_Service from '../../services/Upload_Service';
 import XacThucEmail_Service from '../../services/XacThucEmail_Service';
@@ -40,8 +40,35 @@ const RegisterModal = ({ onClose }) => {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   
+  const fileInputRef = useRef(null);
+  const cccdTruocRef = useRef(null);
+  const cccdSauRef = useRef(null);
+
+  
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setAvatarPreview(URL.createObjectURL(file));
+    setLoadingAvatar(true);
+    try {
+      const ketQua = await Upload_Service.uploadAnh(file, "anhdaidien");
+      
+      if (ketQua.code == "200") {
+        setAvatarPreview(ketQua.url);
+      } else {
+        alert("Lỗi upload Avatar: " + ketQua.message); 
+      }
+    } catch (loi) {
+      alert("Lỗi kết nối API Upload Avatar: " + loi.message);
+    } finally {
+      setLoadingAvatar(false);
+    }
   };
 
   
@@ -63,6 +90,44 @@ const RegisterModal = ({ onClose }) => {
       alert("Lỗi kết nối API Upload Avatar: " + loi.message);
     } finally {
       setLoadingAvatar(false);
+    }
+  };
+
+  
+  const handleCCCDChange = async (e, loai) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (loai === 'truoc') {
+      setCccdTruocPreview(URL.createObjectURL(file));
+      setLoadingCccdTruoc(true);
+      try {
+        const ketQua = await Upload_Service.uploadAnh(file, "cccdmattruoc");
+        if (ketQua.code == "200") {
+          setFormData(prev => ({ ...prev, cccdmattruoc: ketQua.url }));
+        } else {
+          alert("Lỗi upload CCCD Mặt trước: " + ketQua.message);
+        }
+      } catch (loi) {
+        alert("Lỗi kết nối API Upload CCCD Trước: " + loi.message);
+      } finally {
+        setLoadingCccdTruoc(false);
+      }
+    } else if (loai === 'sau') {
+      setCccdSauPreview(URL.createObjectURL(file));
+      setLoadingCccdSau(true);
+      try {
+        const ketQua = await Upload_Service.uploadAnh(file, "cccdmatsau");
+        if (ketQua.code == "200") {
+          setFormData(prev => ({ ...prev, cccdmatsau: ketQua.url }));
+        } else {
+          alert("Lỗi upload CCCD Mặt sau: " + ketQua.message);
+        }
+      } catch (loi) {
+        alert("Lỗi kết nối API Upload CCCD Sau: " + loi.message);
+      } finally {
+        setLoadingCccdSau(false);
+      }
     }
   };
 
