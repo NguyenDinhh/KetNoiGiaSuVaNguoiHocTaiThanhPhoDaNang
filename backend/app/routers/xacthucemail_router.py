@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 load_dotenv()
@@ -33,8 +33,8 @@ def send_email_sync(email_to: str, otp_code: str):
     msg.attach(MIMEText(html_content, 'html'))
 
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10)
+        server.starttls()
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
@@ -44,12 +44,15 @@ def send_email_sync(email_to: str, otp_code: str):
         print("❌ Lỗi gửi mail:", e)
 
 @xacthucemail_router.post("/api/gui-otp")
-async def gui_ma_otp(req: EmailRequest, background_tasks: BackgroundTasks):
+async def gui_ma_otp(req: EmailRequest):
     otp_code = str(random.randint(100000, 999999))
     OTP_STORE[req.email] = {"otp": otp_code, "expires_at": datetime.now() + timedelta(minutes=5)}
 
-    background_tasks.add_task(send_email_sync, req.email, otp_code)
-    return {"message": "Đã gửi mã"}
+    try:
+        send_email_sync(req.email, otp_code)
+        return {"message": "Đã gửi mã OTP thành công"}
+    except Exception as e:
+        return {"message": "Mã OTP đã được tạo nhưng gửi email gặp lỗi. Vui lòng thử lại.", "error": str(e)}
 
 @xacthucemail_router.post("/api/xac-thuc-otp")
 async def xac_thuc_otp(req: OTPVerifyRequest):
