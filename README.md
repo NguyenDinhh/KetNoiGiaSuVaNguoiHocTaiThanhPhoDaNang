@@ -237,23 +237,51 @@ CREATE DATABASE ketnoinguoihocvagiasu CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 
 #### 2.5. Cấu hình Environment Variables
 
-Tạo file `.env` trong thư mục `backend/`:
+**Bước 1:** Copy file template `.env.example` thành `.env`:
 
-```env
-# Database Configuration
-sql="mysql://username:password@localhost:3306/ketnoinguoihocvagiasu"
+```bash
+# Windows
+copy .env.example .env
 
-# Email Configuration
-EMAIL_SENDER="your-email@gmail.com"
-EMAIL_APP_PASSWORD="your-app-password"
-
-# Security (optional)
-SECRET_KEY="your-secret-key-here"
+# Linux/Mac
+cp .env.example .env
 ```
 
-**Lưu ý**: Để sử dụng Gmail SMTP, bạn cần:
-1. Bật xác thực 2 bước trên tài khoản Google
-2. Tạo App Password tại: https://myaccount.google.com/apppasswords
+**Bước 2:** Mở file `.env` và điền thông tin của bạn:
+
+```env
+# Database Configuration (Local MySQL)
+DATABASE_URL=mysql+pymysql://root:your_password@localhost:3306/ketnoinguoihocvagiasu?charset=utf8mb4
+
+# Email Configuration (Gmail SMTP)
+EMAIL_SENDER=your_email@gmail.com
+EMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
+
+# Cloudinary Configuration (File Upload Service)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+**Hướng dẫn chi tiết:**
+
+1. **Database**: 
+   - Thay `your_password` bằng mật khẩu MySQL của bạn
+   - Đảm bảo đã tạo database `ketnoinguoihocvagiasu`
+
+2. **Gmail SMTP**: 
+   - Bật xác thực 2 bước trên tài khoản Google
+   - Tạo App Password tại: https://myaccount.google.com/apppasswords
+   - Copy password gồm 16 ký tự và dán vào `EMAIL_APP_PASSWORD`
+
+3. **Cloudinary** (Tùy chọn, để upload ảnh):
+   - Đăng ký tài khoản miễn phí tại: https://cloudinary.com/
+   - Vào Dashboard để lấy thông tin Cloud Name, API Key, API Secret
+
+**⚠️ LƯU Ý QUAN TRỌNG:**
+- File `.env` chứa thông tin nhạy cảm, **KHÔNG BAO GIỜ** commit lên Git
+- File này đã được thêm vào `.gitignore` để bảo vệ
+- Mỗi người trong team sẽ có file `.env` riêng với thông tin của mình
 
 #### 2.6. Chạy Backend Server
 
@@ -274,7 +302,25 @@ cd frontend
 npm install
 ```
 
-#### 3.2. Chạy Development Server
+#### 3.2. Cấu hình Environment (Tùy chọn)
+
+Nếu cần thay đổi API URL, copy `.env.example` thành `.env`:
+
+```bash
+# Windows
+copy .env.example .env
+
+# Linux/Mac
+cp .env.example .env
+```
+
+Sau đó sửa file `.env`:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+#### 3.3. Chạy Development Server
 
 ```bash
 npm run dev
@@ -282,7 +328,7 @@ npm run dev
 
 Frontend sẽ chạy tại: `http://localhost:5173`
 
-#### 3.3. Build cho Production
+#### 3.4. Build cho Production
 
 ```bash
 npm run build
