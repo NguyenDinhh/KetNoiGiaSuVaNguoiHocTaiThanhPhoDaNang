@@ -211,10 +211,8 @@ const RegisterModal = ({ onClose }) => {
     e.preventDefault();
 
     
-    if (!isEmailVerified) {
-      alert("Vui lòng xác thực Email bằng mã OTP trước khi đăng ký!");
-      return;
-    }
+    
+    
 
     if (role === 'gia_su') {
       if (!formData.cccdmattruoc || !formData.cccdmatsau) {
@@ -336,46 +334,64 @@ const RegisterModal = ({ onClose }) => {
           </div>
 
           {}
+          {/* TẠM THỜI TẮT XÁC THỰC EMAIL - BẬT LẠI KHI RENDER PAID HOẶC DÙNG EMAIL API */}
+          {false && (
+            <>
+              <div className="form-input-item-group">
+                <label>Email <span style={{color: 'red'}}>*</span></label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="email"
+                    name="email"
+                    onChange={handleInputChange}
+                    placeholder="example@gmail.com"
+                    required
+                    disabled={isEmailVerified}
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendOTP}
+                    disabled={countdown > 0 || isEmailVerified}
+                    style={{
+                      padding: '0 16px',
+                      backgroundColor: isEmailVerified ? '#10b981' : (countdown > 0 ? '#94a3b8' : '#005088'),
+                      color: '#fff', border: 'none', borderRadius: '6px',
+                      cursor: (countdown > 0 || isEmailVerified) ? 'not-allowed' : 'pointer',
+                      fontWeight: '600', whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {isEmailVerified ? '✔ Đã xác minh' : (countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi mã')}
+                  </button>
+                </div>
+              </div>
+
+              {isOtpSent && !isEmailVerified && (
+                <div className="form-input-item-group" style={{ marginTop: '8px', padding: '12px', backgroundColor: '#f0fdf4', border: '1px dashed #22c55e', borderRadius: '8px' }}>
+                  <label style={{ color: '#15803d', fontSize: '13px' }}>Nhập mã OTP 6 số đã gửi đến email của bạn</label>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <input type="text" maxLength="6" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Ví dụ: 123456" style={{ flex: 1, letterSpacing: '4px', textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }} />
+                    <button type="button" onClick={handleVerifyOTP} style={{ padding: '0 16px', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                      Xác nhận
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* EMAIL INPUT ĐƠN GIẢN - KHÔNG XÁC THỰC */}
           <div className="form-input-item-group">
             <label>Email <span style={{color: 'red'}}>*</span></label>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                type="email"
-                name="email"
-                onChange={handleInputChange}
-                placeholder="example@gmail.com"
-                required
-                disabled={isEmailVerified}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                onClick={handleSendOTP}
-                disabled={countdown > 0 || isEmailVerified}
-                style={{
-                  padding: '0 16px',
-                  backgroundColor: isEmailVerified ? '#10b981' : (countdown > 0 ? '#94a3b8' : '#005088'),
-                  color: '#fff', border: 'none', borderRadius: '6px',
-                  cursor: (countdown > 0 || isEmailVerified) ? 'not-allowed' : 'pointer',
-                  fontWeight: '600', whiteSpace: 'nowrap'
-                }}
-              >
-                {isEmailVerified ? '✔ Đã xác minh' : (countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi mã')}
-              </button>
-            </div>
+            <input
+              type="email"
+              name="email"
+              onChange={handleInputChange}
+              placeholder="example@gmail.com"
+              required
+              style={{ width: '100%' }}
+            />
           </div>
-
-          {isOtpSent && !isEmailVerified && (
-            <div className="form-input-item-group" style={{ marginTop: '8px', padding: '12px', backgroundColor: '#f0fdf4', border: '1px dashed #22c55e', borderRadius: '8px' }}>
-              <label style={{ color: '#15803d', fontSize: '13px' }}>Nhập mã OTP 6 số đã gửi đến email của bạn</label>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                <input type="text" maxLength="6" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Ví dụ: 123456" style={{ flex: 1, letterSpacing: '4px', textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }} />
-                <button type="button" onClick={handleVerifyOTP} style={{ padding: '0 16px', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  Xác nhận
-                </button>
-              </div>
-            </div>
-          )}
 
           {}
           {role === 'gia_su' && (
