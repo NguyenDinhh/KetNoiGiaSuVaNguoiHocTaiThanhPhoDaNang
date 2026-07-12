@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const YeuCau_HocVien_Service = {
     layDanhSachYeuCauHocVien: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachyeucauhocvien`);
+            const phanHoi = await fetch(`${API_URL}/danhsachyeucauhocvien`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API yêu cầu học viên!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const YeuCau_HocVien_Service = {
 
     layChiTietYeuCauHocVien: async (maYeuCauHocVien) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/yeucauhocvien/${maYeuCauHocVien}`);
+            const phanHoi = await fetch(`${API_URL}/yeucauhocvien/${maYeuCauHocVien}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy yêu cầu học viên!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -28,7 +28,7 @@ const YeuCau_HocVien_Service = {
     
     themYeuCauHocVienMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themyeucauhocvien`, {
+            const phanHoi = await fetch(`${API_URL}/themyeucauhocvien`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -44,7 +44,7 @@ const YeuCau_HocVien_Service = {
     
     themYeuCauHocVienTheoMaDangKy: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themyeucauhocvien_theomadangky`, {
+            const phanHoi = await fetch(`${API_URL}/themyeucauhocvien_theomadangky`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -59,7 +59,7 @@ const YeuCau_HocVien_Service = {
 
     xoaYeuCauHocVien: async (maYeuCauHocVien) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoayeucauhocvien/${maYeuCauHocVien}`, {
+            const phanHoi = await fetch(`${API_URL}/xoayeucauhocvien/${maYeuCauHocVien}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa yêu cầu học viên!");

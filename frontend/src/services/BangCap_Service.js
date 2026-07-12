@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const BangCap_Service = {
   layDanhSachBangCap: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachbangcap`);
+      const phanHoi = await fetch(`${API_URL}/danhsachbangcap`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API bằng cấp!");
       const ketQua = await phanHoi.json();
       return ketQua.data;
@@ -15,7 +15,7 @@ const BangCap_Service = {
 
   layThongKeBangCap: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachbangcap`);
+      const phanHoi = await fetch(`${API_URL}/danhsachbangcap`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API!");
       const ketQua = await phanHoi.json();
       return { tongSo: ketQua.data.length };
@@ -26,7 +26,7 @@ const BangCap_Service = {
 
   themBangCapMoi: async (duLieuForm) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/thembangcap`, {
+      const phanHoi = await fetch(`${API_URL}/thembangcap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuForm)
@@ -41,7 +41,7 @@ const BangCap_Service = {
 
   capNhatBangCap: async (maBangCap, duLieuSua) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/suabangcap/${maBangCap}`, {
+      const phanHoi = await fetch(`${API_URL}/suabangcap/${maBangCap}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuSua)
@@ -56,7 +56,7 @@ const BangCap_Service = {
 
   xoaBangCap: async (maBangCap) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/xoabangcap/${maBangCap}`, {
+      const phanHoi = await fetch(`${API_URL}/xoabangcap/${maBangCap}`, {
         method: 'DELETE'
       });
       if (!phanHoi.ok) throw new Error("Không thể xóa bằng cấp!");
@@ -69,7 +69,7 @@ const BangCap_Service = {
 
   khoaBangCap: async (maBangCap) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/khoabangcap/${maBangCap}`, {
+      const phanHoi = await fetch(`${API_URL}/khoabangcap/${maBangCap}`, {
         method: 'PUT'
       });
       if (!phanHoi.ok) throw new Error("Không thể khóa bằng cấp!");
@@ -82,7 +82,7 @@ const BangCap_Service = {
 
   moKhoaBangCap: async (maBangCap) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/mokhoabangcap/${maBangCap}`, {
+      const phanHoi = await fetch(`${API_URL}/mokhoabangcap/${maBangCap}`, {
         method: 'PUT'
       });
       if (!phanHoi.ok) throw new Error("Không thể mở khóa bằng cấp!");

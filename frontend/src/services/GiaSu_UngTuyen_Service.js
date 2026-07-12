@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const GiaSu_UngTuyen_Service = {
     layDanhSachUngTuyen: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachgiasuungtuyen`);
+            const phanHoi = await fetch(`${API_URL}/danhsachgiasuungtuyen`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API ứng tuyển gia sư!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const GiaSu_UngTuyen_Service = {
 
     layChiTietUngTuyen: async (maUngTuyen) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/giasuungtuyen/${maUngTuyen}`);
+            const phanHoi = await fetch(`${API_URL}/giasuungtuyen/${maUngTuyen}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy ứng tuyển!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const GiaSu_UngTuyen_Service = {
 
     themUngTuyenMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themgiasuungtuyen`, {
+            const phanHoi = await fetch(`${API_URL}/themgiasuungtuyen`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const GiaSu_UngTuyen_Service = {
 
     capNhatTrangThaiUngTuyen: async (maUngTuyen, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suagiasuungtuyen/${maUngTuyen}`, {
+            const phanHoi = await fetch(`${API_URL}/suagiasuungtuyen/${maUngTuyen}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const GiaSu_UngTuyen_Service = {
 
     xoaUngTuyen: async (maUngTuyen) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoagiasuungtuyen/${maUngTuyen}`, {
+            const phanHoi = await fetch(`${API_URL}/xoagiasuungtuyen/${maUngTuyen}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa ứng tuyển!");

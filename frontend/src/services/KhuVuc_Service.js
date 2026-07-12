@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const KhuVuc_Service = {
   layDanhSachKhuVuc: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachkhuvuc`);
+      const phanHoi = await fetch(`${API_URL}/danhsachkhuvuc`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API khu vực!");
       const ketQua = await phanHoi.json();
       return ketQua.data;
@@ -15,7 +15,7 @@ const KhuVuc_Service = {
 
   layThongKeKhuVuc: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachkhuvuc`);
+      const phanHoi = await fetch(`${API_URL}/danhsachkhuvuc`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API!");
       const ketQua = await phanHoi.json();
       return { tongSo: ketQua.data.length }; 
@@ -26,7 +26,7 @@ const KhuVuc_Service = {
 
   themKhuVucMoi: async (duLieuForm) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/themkhuvuc`, {
+      const phanHoi = await fetch(`${API_URL}/themkhuvuc`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuForm)
@@ -41,7 +41,7 @@ const KhuVuc_Service = {
 
   capNhatKhuVuc: async (maKhuVuc, duLieuSua) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/suakhuvuc/${maKhuVuc}`, {
+      const phanHoi = await fetch(`${API_URL}/suakhuvuc/${maKhuVuc}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuSua)
@@ -56,7 +56,7 @@ const KhuVuc_Service = {
 
   xoaKhuVuc: async (maKhuVuc) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/xoakhuvuc/${maKhuVuc}`, {
+      const phanHoi = await fetch(`${API_URL}/xoakhuvuc/${maKhuVuc}`, {
         method: 'DELETE'
       });
       if (!phanHoi.ok) throw new Error("Không thể xóa khu vực!");
@@ -69,7 +69,7 @@ const KhuVuc_Service = {
 
   khoaKhuVuc: async (maKhuVuc) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/khoakhuvuc/${maKhuVuc}`, {
+      const phanHoi = await fetch(`${API_URL}/khoakhuvuc/${maKhuVuc}`, {
         method: 'PUT'
       });
       if (!phanHoi.ok) throw new Error("Không thể khóa khu vực!");
@@ -82,7 +82,7 @@ const KhuVuc_Service = {
 
   moKhoaKhuVuc: async (maKhuVuc) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/mokhoakhuvuc/${maKhuVuc}`, {
+      const phanHoi = await fetch(`${API_URL}/mokhoakhuvuc/${maKhuVuc}`, {
         method: 'PUT'
       });
       if (!phanHoi.ok) throw new Error("Không thể mở khóa khu vực!");

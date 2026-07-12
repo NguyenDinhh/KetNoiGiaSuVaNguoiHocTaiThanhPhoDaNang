@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const KhungGio_GiaSu_MonHoc_Service = {
     layDanhSachKhungGio: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachkhunggiogiasumonhoc`);
+            const phanHoi = await fetch(`${API_URL}/danhsachkhunggiogiasumonhoc`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API khung giờ!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const KhungGio_GiaSu_MonHoc_Service = {
 
     themKhungGioMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themkhunggiogiasumonhoc`, {
+            const phanHoi = await fetch(`${API_URL}/themkhunggiogiasumonhoc`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -31,7 +31,7 @@ const KhungGio_GiaSu_MonHoc_Service = {
     
     suaKhungGio: async (maKhungGio, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suakhunggiogiasumonhoc/${maKhungGio}`, {
+            const phanHoi = await fetch(`${API_URL}/suakhunggiogiasumonhoc/${maKhungGio}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -46,7 +46,7 @@ const KhungGio_GiaSu_MonHoc_Service = {
 
     khoaKhungGio: async (maKhungGio) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/khoakhunggiogiasumonhoc/${maKhungGio}`, {
+            const phanHoi = await fetch(`${API_URL}/khoakhunggiogiasumonhoc/${maKhungGio}`, {
                 method: 'PUT'
             });
             if (!phanHoi.ok) throw new Error("Không thể khóa khung giờ!");

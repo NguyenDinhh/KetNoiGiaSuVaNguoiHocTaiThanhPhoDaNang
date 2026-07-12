@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const ChiTietYeuCau_Service = {
     layDanhSachChiTietYeuCau: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachchitietyeucau`);
+            const phanHoi = await fetch(`${API_URL}/danhsachchitietyeucau`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API chi tiết yêu cầu!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const ChiTietYeuCau_Service = {
 
     layChiTietYeuCau: async (maChiTietYeuCau) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/chitietyeucau/${maChiTietYeuCau}`);
+            const phanHoi = await fetch(`${API_URL}/chitietyeucau/${maChiTietYeuCau}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy chi tiết yêu cầu!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const ChiTietYeuCau_Service = {
 
     themChiTietYeuCauMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themchitietyeucau`, {
+            const phanHoi = await fetch(`${API_URL}/themchitietyeucau`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const ChiTietYeuCau_Service = {
 
     capNhatChiTietYeuCau: async (maChiTietYeuCau, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suachitietyeucau/${maChiTietYeuCau}`, {
+            const phanHoi = await fetch(`${API_URL}/suachitietyeucau/${maChiTietYeuCau}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const ChiTietYeuCau_Service = {
 
     xoaChiTietYeuCau: async (maChiTietYeuCau) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoachitietyeucau/${maChiTietYeuCau}`, {
+            const phanHoi = await fetch(`${API_URL}/xoachitietyeucau/${maChiTietYeuCau}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa chi tiết yêu cầu!");

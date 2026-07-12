@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const ChiTietDangKyLich_Service = {
     layDanhSachChiTietDangKyLich: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachchitietdangkylich`);
+            const phanHoi = await fetch(`${API_URL}/danhsachchitietdangkylich`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API chi tiết đăng ký lịch!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const ChiTietDangKyLich_Service = {
 
     layChiTietDangKyLich: async (maChiTietDangKy) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/chitietdangkylich/${maChiTietDangKy}`);
+            const phanHoi = await fetch(`${API_URL}/chitietdangkylich/${maChiTietDangKy}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy chi tiết đăng ký lịch!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const ChiTietDangKyLich_Service = {
 
     themChiTietDangKyLichMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themchitietdangkylich`, {
+            const phanHoi = await fetch(`${API_URL}/themchitietdangkylich`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const ChiTietDangKyLich_Service = {
 
     capNhatChiTietDangKyLich: async (maChiTietDangKy, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suachitietdangkylich/${maChiTietDangKy}`, {
+            const phanHoi = await fetch(`${API_URL}/suachitietdangkylich/${maChiTietDangKy}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const ChiTietDangKyLich_Service = {
 
     xoaChiTietDangKyLich: async (maChiTietDangKy) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoachitietdangkylich/${maChiTietDangKy}`, {
+            const phanHoi = await fetch(`${API_URL}/xoachitietdangkylich/${maChiTietDangKy}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa chi tiết đăng ký lịch!");

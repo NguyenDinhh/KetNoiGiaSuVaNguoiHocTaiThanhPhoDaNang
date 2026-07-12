@@ -1,11 +1,15 @@
+import os
 import cloudinary
 import cloudinary.uploader
 from fastapi import UploadFile
+from dotenv import load_dotenv
+
+load_dotenv()
 
 cloudinary.config(
-    cloud_name = "dg9s75xsf",
-    api_key = "518449666752956",
-    api_secret = "OOraXbaskxUq_0dhJooYMlkBRKs"
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_API_SECRET")
 )
 
 def upload_image_to_cloud(file_content: bytes, folder_name: str = "GiaSuDaNang") -> str:

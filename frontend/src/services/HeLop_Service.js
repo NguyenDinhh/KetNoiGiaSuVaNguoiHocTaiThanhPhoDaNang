@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const HeLop_Service = {
   layDanhSachHeLop: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachhelop`);
+      const phanHoi = await fetch(`${API_URL}/danhsachhelop`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API hệ lớp!");
       const ketQua = await phanHoi.json();
       return ketQua.data;
@@ -15,7 +15,7 @@ const HeLop_Service = {
 
   layThongKeHeLop: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachhelop`);
+      const phanHoi = await fetch(`${API_URL}/danhsachhelop`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API!");
       const ketQua = await phanHoi.json();
       const danhSachGoc = ketQua.data;
@@ -39,7 +39,7 @@ const HeLop_Service = {
 
   themHeLopMoi: async (duLieuForm) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/themhelop`, {
+      const phanHoi = await fetch(`${API_URL}/themhelop`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const HeLop_Service = {
 
   capNhatHeLop: async (maHeLop, duLieuSua) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/suahelop/${maHeLop}`, {
+      const phanHoi = await fetch(`${API_URL}/suahelop/${maHeLop}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuSua)

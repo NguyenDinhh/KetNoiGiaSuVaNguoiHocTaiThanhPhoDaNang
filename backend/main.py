@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import Base
@@ -12,17 +13,25 @@ from app.routers import (
     upload_router, xacthucemail_router
 )
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title="Đồ án tốt nghiệp",
     description="Đề tài: Kết nối người học với gia sư tại thành phố Đà Nẵng"
 )
 
+@app.get("/")
+async def root():
+    return {"message": "API đang hoạt động", "status": "OK"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
+    "https://*.netlify.app",
+    "https://*.netlify.com",
 ]
 
 app.add_middleware(

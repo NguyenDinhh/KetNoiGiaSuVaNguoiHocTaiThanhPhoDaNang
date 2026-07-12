@@ -1,4 +1,4 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const Upload_Service = {
   
@@ -8,7 +8,7 @@ const Upload_Service = {
       gioDuLieu.append("file", fileObject);
       gioDuLieu.append("loai_anh", loaiAnh); 
 
-      const phanHoi = await fetch(`${DIA_CHI_API}/api/upload`, {
+      const phanHoi = await fetch(`${API_URL}/api/upload`, {
         method: 'POST',
         body: gioDuLieu
       });

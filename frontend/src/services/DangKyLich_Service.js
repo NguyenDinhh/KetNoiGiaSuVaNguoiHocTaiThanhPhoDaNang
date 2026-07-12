@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const DangKyLich_Service = {
     layDanhSachDangKyLich: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachdangkylich`);
+            const phanHoi = await fetch(`${API_URL}/danhsachdangkylich`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API đăng ký lịch!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const DangKyLich_Service = {
 
     layChiTietDangKyLich: async (maDangKy) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/dangkylich/${maDangKy}`);
+            const phanHoi = await fetch(`${API_URL}/dangkylich/${maDangKy}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy đăng ký lịch!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const DangKyLich_Service = {
 
     themDangKyLichMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themdangkylich`, {
+            const phanHoi = await fetch(`${API_URL}/themdangkylich`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const DangKyLich_Service = {
 
     capNhatDangKyLich: async (maDangKy, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suadangkylich/${maDangKy}`, {
+            const phanHoi = await fetch(`${API_URL}/suadangkylich/${maDangKy}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const DangKyLich_Service = {
 
     xoaDangKyLich: async (maDangKy) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoadangkylich/${maDangKy}`, {
+            const phanHoi = await fetch(`${API_URL}/xoadangkylich/${maDangKy}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa đăng ký lịch!");

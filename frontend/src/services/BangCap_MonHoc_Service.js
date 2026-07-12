@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const BangCap_MonHoc_Service = {
   layDanhSach: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachbangcapmonhoc`);
+      const phanHoi = await fetch(`${API_URL}/danhsachbangcapmonhoc`);
       if (!phanHoi.ok) throw new Error("Lỗi lấy danh sách tiêu chuẩn!");
       const ketQua = await phanHoi.json();
       return ketQua.data;
@@ -15,7 +15,7 @@ const BangCap_MonHoc_Service = {
 
   ganMonHoc: async (duLieuGan) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/thembangcapmonhoc`, {
+      const phanHoi = await fetch(`${API_URL}/thembangcapmonhoc`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuGan)
@@ -30,7 +30,7 @@ const BangCap_MonHoc_Service = {
 
   huyMonHoc: async (maBangCap_MonHoc) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/xoabangcapmonhoc/${maBangCap_MonHoc}`, {
+      const phanHoi = await fetch(`${API_URL}/xoabangcapmonhoc/${maBangCap_MonHoc}`, {
         method: 'DELETE'
       });
       if (!phanHoi.ok) throw new Error("Lỗi hủy môn học!");

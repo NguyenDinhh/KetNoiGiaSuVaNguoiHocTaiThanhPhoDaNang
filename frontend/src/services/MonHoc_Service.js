@@ -1,10 +1,10 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const MonHoc_Service = {
   
   layDanhSachMonHoc: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachmonhoc`);
+      const phanHoi = await fetch(`${API_URL}/danhsachmonhoc`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API môn học!");
       const ketQua = await phanHoi.json();
       return ketQua.data;
@@ -17,7 +17,7 @@ const MonHoc_Service = {
   
   layThongKeMonHoc: async () => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/danhsachmonhoc`);
+      const phanHoi = await fetch(`${API_URL}/danhsachmonhoc`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API!");
       const ketQua = await phanHoi.json();
       const danhSachGoc = ketQua.data;
@@ -41,7 +41,7 @@ const MonHoc_Service = {
   
   layMonHocTheoLop: async (mahelop) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/monhoc/theolop/${mahelop}`);
+      const phanHoi = await fetch(`${API_URL}/monhoc/theolop/${mahelop}`);
       if (!phanHoi.ok) throw new Error("Lỗi kết nối API môn học theo lớp!");
 
       const ketQua = await phanHoi.json();
@@ -54,7 +54,7 @@ const MonHoc_Service = {
   
   themMonHocMoi: async (duLieuForm) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/themmonhoc`, {
+      const phanHoi = await fetch(`${API_URL}/themmonhoc`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuForm)
@@ -70,7 +70,7 @@ const MonHoc_Service = {
   
   capNhatMonHoc: async (maMonHoc, duLieuSua) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/suamonhoc/${maMonHoc}`, {
+      const phanHoi = await fetch(`${API_URL}/suamonhoc/${maMonHoc}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(duLieuSua)
@@ -85,7 +85,7 @@ const MonHoc_Service = {
 
   xoaMonHoc: async (maMonHoc) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/xoamonhoc/${maMonHoc}`, {
+      const phanHoi = await fetch(`${API_URL}/xoamonhoc/${maMonHoc}`, {
         method: 'DELETE'
       });
       if (!phanHoi.ok) throw new Error("Không thể xóa môn học!");

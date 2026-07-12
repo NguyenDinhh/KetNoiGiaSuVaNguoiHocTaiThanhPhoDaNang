@@ -1,10 +1,10 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const XacThucEmail_Service = {
   
   guiMaOTP: async (emailCuaNguoiDung) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/api/gui-otp`, {
+      const phanHoi = await fetch(`${API_URL}/api/gui-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailCuaNguoiDung })
@@ -21,7 +21,7 @@ const XacThucEmail_Service = {
   
   xacThucOTP: async (emailCuaNguoiDung, maOTP) => {
     try {
-      const phanHoi = await fetch(`${DIA_CHI_API}/api/xac-thuc-otp`, {
+      const phanHoi = await fetch(`${API_URL}/api/xac-thuc-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailCuaNguoiDung, otp: maOTP })

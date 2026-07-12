@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const GiaSu_MonHoc_Service = {
     layDanhSachGiaSuMonHoc: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachgiasumonhoc`);
+            const phanHoi = await fetch(`${API_URL}/danhsachgiasumonhoc`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API môn học gia sư!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const GiaSu_MonHoc_Service = {
 
     themGiaSuMonHocMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themgiasumonhoc`, {
+            const phanHoi = await fetch(`${API_URL}/themgiasumonhoc`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -30,7 +30,7 @@ const GiaSu_MonHoc_Service = {
 
     capNhatGiaSuMonHoc: async (maGiaSuMonHoc, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suagiasumonhoc/${maGiaSuMonHoc}`, {
+            const phanHoi = await fetch(`${API_URL}/suagiasumonhoc/${maGiaSuMonHoc}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -45,7 +45,7 @@ const GiaSu_MonHoc_Service = {
 
     khoaGiaSuMonHoc: async (maGiaSuMonHoc) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/khoagiasumonhoc/${maGiaSuMonHoc}`, {
+            const phanHoi = await fetch(`${API_URL}/khoagiasumonhoc/${maGiaSuMonHoc}`, {
                 method: 'PUT'
             });
             if (!phanHoi.ok) throw new Error("Không thể khóa môn học gia sư!");
@@ -58,7 +58,7 @@ const GiaSu_MonHoc_Service = {
 
     moKhoaGiaSuMonHoc: async (maGiaSuMonHoc) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/mokhoagiasumonhoc/${maGiaSuMonHoc}`, {
+            const phanHoi = await fetch(`${API_URL}/mokhoagiasumonhoc/${maGiaSuMonHoc}`, {
                 method: 'PUT'
             });
             if (!phanHoi.ok) throw new Error("Không thể mở khóa môn học gia sư!");
@@ -72,7 +72,7 @@ const GiaSu_MonHoc_Service = {
     
     tinhHocPhi: async (hocphimotbuoi, sobuoi) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/tinhhocphi`, {
+            const phanHoi = await fetch(`${API_URL}/tinhhocphi`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

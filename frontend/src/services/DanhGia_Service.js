@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const DanhGia_Service = {
     layDanhSachDanhGia: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachdanhgia`);
+            const phanHoi = await fetch(`${API_URL}/danhsachdanhgia`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API đánh giá!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const DanhGia_Service = {
 
     layChiTietDanhGia: async (maDanhGia) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhgia/${maDanhGia}`);
+            const phanHoi = await fetch(`${API_URL}/danhgia/${maDanhGia}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy đánh giá!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -26,7 +26,7 @@ const DanhGia_Service = {
     },
     themDanhGiaMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themdanhgia`, {
+            const phanHoi = await fetch(`${API_URL}/themdanhgia`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm) 
@@ -44,7 +44,7 @@ const DanhGia_Service = {
 
     capNhatDanhGia: async (maDanhGia, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suadanhgia/${maDanhGia}`, { 
+            const phanHoi = await fetch(`${API_URL}/suadanhgia/${maDanhGia}`, { 
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const DanhGia_Service = {
     },
     xoaDanhGia: async (maDanhGia) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoadanhgia/${maDanhGia}`, {
+            const phanHoi = await fetch(`${API_URL}/xoadanhgia/${maDanhGia}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa đánh giá!");

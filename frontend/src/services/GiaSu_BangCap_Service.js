@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const GiaSu_BangCap_Service = {
     layDanhSachGiaSuBangCap: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachgiasubangcap`);
+            const phanHoi = await fetch(`${API_URL}/danhsachgiasubangcap`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API bằng cấp gia sư!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const GiaSu_BangCap_Service = {
 
     layChiTietGiaSuBangCap: async (maBangCapGiaSu) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/giasubangcap/${maBangCapGiaSu}`);
+            const phanHoi = await fetch(`${API_URL}/giasubangcap/${maBangCapGiaSu}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy bằng cấp gia sư!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const GiaSu_BangCap_Service = {
 
     themGiaSuBangCapMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themgiasubangcap`, {
+            const phanHoi = await fetch(`${API_URL}/themgiasubangcap`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const GiaSu_BangCap_Service = {
 
     capNhatGiaSuBangCap: async (maBangCapGiaSu, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suagiasubangcap/${maBangCapGiaSu}`, {
+            const phanHoi = await fetch(`${API_URL}/suagiasubangcap/${maBangCapGiaSu}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const GiaSu_BangCap_Service = {
 
     xoaGiaSuBangCap: async (maBangCapGiaSu) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoagiasubangcap/${maBangCapGiaSu}`, {
+            const phanHoi = await fetch(`${API_URL}/xoagiasubangcap/${maBangCapGiaSu}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa bằng cấp gia sư!");

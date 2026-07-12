@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const YeuCauTimGiaSu_Service = {
     layDanhSachYeuCau: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachyeucautimgiasu`);
+            const phanHoi = await fetch(`${API_URL}/danhsachyeucautimgiasu`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API yêu cầu tìm gia sư!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const YeuCauTimGiaSu_Service = {
 
     layChiTietYeuCau: async (maYeuCau) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/yeucautimgiasu/${maYeuCau}`);
+            const phanHoi = await fetch(`${API_URL}/yeucautimgiasu/${maYeuCau}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy yêu cầu!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const YeuCauTimGiaSu_Service = {
 
     taoYeuCauMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themyeucautimgiasu`, {
+            const phanHoi = await fetch(`${API_URL}/themyeucautimgiasu`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const YeuCauTimGiaSu_Service = {
 
     capNhatYeuCau: async (maYeuCau, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suayeucautimgiasu/${maYeuCau}`, {
+            const phanHoi = await fetch(`${API_URL}/suayeucautimgiasu/${maYeuCau}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -56,7 +56,7 @@ const YeuCauTimGiaSu_Service = {
     },
     capNhatTrangThaiYeuCau: async (maYeuCau, trangThaiMoi) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/capnhattrangthaiyeucau/${maYeuCau}`, {
+            const phanHoi = await fetch(`${API_URL}/capnhattrangthaiyeucau/${maYeuCau}`, {
                 method: 'PATCH', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ trangthai: trangThaiMoi }) 
@@ -76,7 +76,7 @@ const YeuCauTimGiaSu_Service = {
     },
     xoaYeuCau: async (maYeuCau) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoayeucautimgiasu/${maYeuCau}`, {
+            const phanHoi = await fetch(`${API_URL}/xoayeucautimgiasu/${maYeuCau}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa yêu cầu!");

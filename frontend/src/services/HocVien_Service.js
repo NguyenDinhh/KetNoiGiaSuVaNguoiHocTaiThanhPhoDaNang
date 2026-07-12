@@ -1,9 +1,9 @@
-const DIA_CHI_API = 'http://localhost:8000';
+import { API_URL } from '../config/api.js';
 
 const HocVien_Service = {
     layDanhSachHocVien: async () => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/danhsachhocvien`);
+            const phanHoi = await fetch(`${API_URL}/danhsachhocvien`);
             if (!phanHoi.ok) throw new Error("Lỗi kết nối API học viên!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -15,7 +15,7 @@ const HocVien_Service = {
 
     layChiTietHocVien: async (maHocVien) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/hocvien/${maHocVien}`);
+            const phanHoi = await fetch(`${API_URL}/hocvien/${maHocVien}`);
             if (!phanHoi.ok) throw new Error("Không tìm thấy học viên!");
             const ketQua = await phanHoi.json();
             return ketQua.data;
@@ -27,7 +27,7 @@ const HocVien_Service = {
 
     themHocVienMoi: async (duLieuForm) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/themhocvien`, {
+            const phanHoi = await fetch(`${API_URL}/themhocvien`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuForm)
@@ -42,7 +42,7 @@ const HocVien_Service = {
 
     capNhatHocVien: async (maHocVien, duLieuSua) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/suahocvien/${maHocVien}`, {
+            const phanHoi = await fetch(`${API_URL}/suahocvien/${maHocVien}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(duLieuSua)
@@ -57,7 +57,7 @@ const HocVien_Service = {
 
     xoaHocVien: async (maHocVien) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/xoahocvien/${maHocVien}`, {
+            const phanHoi = await fetch(`${API_URL}/xoahocvien/${maHocVien}`, {
                 method: 'DELETE'
             });
             if (!phanHoi.ok) throw new Error("Không thể xóa học viên!");
@@ -70,7 +70,7 @@ const HocVien_Service = {
 
     khoaHocVien: async (maHocVien) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/khoahocvien/${maHocVien}`, {
+            const phanHoi = await fetch(`${API_URL}/khoahocvien/${maHocVien}`, {
                 method: 'PUT'
             });
             if (!phanHoi.ok) {
@@ -86,7 +86,7 @@ const HocVien_Service = {
 
     moKhoaHocVien: async (maHocVien) => {
         try {
-            const phanHoi = await fetch(`${DIA_CHI_API}/mokhoahocvien/${maHocVien}`, {
+            const phanHoi = await fetch(`${API_URL}/mokhoahocvien/${maHocVien}`, {
                 method: 'PUT'
             });
             if (!phanHoi.ok) {
